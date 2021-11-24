@@ -10,9 +10,7 @@ namespace Editor {
             GalaxyGenerator generator = (GalaxyGenerator)target;
             DrawDefaultInspector();
             if (GUILayout.Button("Generate Galaxy")) {
-                CameraController.SetupCameraBounds(generator.width,generator.height);
-                GameObject.FindObjectOfType<CameraController>().SetCamera();
-                generator.ShowGalaxy(generator.GenGalaxy());
+                generator.Start();
             }
         }
     }

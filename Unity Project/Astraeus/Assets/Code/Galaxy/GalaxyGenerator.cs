@@ -7,14 +7,13 @@ using Code.CelestialObjects;
 using Code.CelestialObjects.BlackHole;
 using Code.CelestialObjects.Planet;
 using Code.CelestialObjects.Star;
-using UnityEngine.Serialization;
 using Random = System.Random;
 using StarType = Code.CelestialObjects.Star.Star.StarType;
 using BodyTier = Code.CelestialObjects.Body.BodyTier;
 
 namespace Code.Galaxy {
     public class GalaxyGenerator : MonoBehaviour {
-        private static Random _rng;
+        public static Random Rng;
         public int seed = 1337;
         [Range(20, 2000)] public int maxSystems = 500;
         [Range(1, 5)] public int minBodiesPerSystem = 1;
@@ -27,8 +26,8 @@ namespace Code.Galaxy {
         public GalaxyStats stats;
         private static GalaxyController _controller;
 
-        private void Start() {
-            CameraController.SetupCameraBounds(width, height);
+        public void Start() {
+            GameObject.FindObjectOfType<GalaxyCameraController>().SetupCamera(width, height);
             ShowGalaxy(GenGalaxy());
         }
 
@@ -52,13 +51,13 @@ namespace Code.Galaxy {
         private bool IsRareRoll(int rarePercentageChance) {
             int maxRoll = 100;
             int rareRoll = maxRoll - rarePercentageChance;
-            return _rng.Next(maxRoll) > rareRoll;
+            return Rng.Next(maxRoll) > rareRoll;
         }
 
         //Generates a galaxy
         public Galaxy GenGalaxy() {
             stats = new GalaxyStats();
-            _rng = new Random(seed);
+            Rng = new Random(seed);
             List<Vector2> systemCoordinates = PickDistributedPoints(maxSystems, width, height, systemExclusionDiameter);
             List<SolarSystem> solarSystems = new List<SolarSystem>();
             //setup systems
@@ -78,7 +77,7 @@ namespace Code.Galaxy {
                 }
 
                 //pick random body count
-                int numOfBodies = _rng.Next(minBodiesPerSystem, maxBodiesPerSystem + 1);
+                int numOfBodies = Rng.Next(minBodiesPerSystem, maxBodiesPerSystem + 1);
                 solarSystems.Add(GenSolarSystem(systemPrimary, systemCoordinate, numOfBodies));
             }
 
@@ -91,18 +90,18 @@ namespace Code.Galaxy {
         private BodyTier PickRandomPlanetTier(BodyTier parent) {
             int maxTierFromParent = (int)parent - 1;
             int max = maxTierFromParent < (int)Planet.maxPlanetTier ? maxTierFromParent : (int)Planet.maxPlanetTier;
-            return (BodyTier)_rng.Next((int)Planet.minPlanetTier, max);
+            return (BodyTier)Rng.Next((int)Planet.minPlanetTier, max);
         }
 
         private StarType PickRandomStarType() {
             int max = Enum.GetNames(typeof(StarType)).Length;
-            StarType starType = (StarType)_rng.Next(max);
+            StarType starType = (StarType)Rng.Next(max);
             return starType;
         }
 
         private StarType PickRandomStarType(StarType type) {
             int max = (int)type;
-            StarType starType = (StarType)_rng.Next(max + 1);
+            StarType starType = (StarType)Rng.Next(max + 1);
             return starType;
         }
 
@@ -111,7 +110,7 @@ namespace Code.Galaxy {
             for (int i = celestialBodies.Count; i < numOfBodies; i++) {
                 //find eligible primaries
                 List<Body> potentialPrimaries = celestialBodies.FindAll(b => b.Tier > BodyTier.T2);
-                int currentPrimaryIndex = _rng.Next(potentialPrimaries.Count);
+                int currentPrimaryIndex = Rng.Next(potentialPrimaries.Count);
                 Body currentPrimary = potentialPrimaries[currentPrimaryIndex];
                 //if currentPrimary == star then roll to pick another star
                 int extraStarChance = 4;
@@ -139,7 +138,7 @@ namespace Code.Galaxy {
                 stats.smallestSystem = systemSize;
             }
 
-            return new SolarSystem(systemCoordinate, SetupRotations(SetupPositions(celestialBodies)));
+            return new SolarSystem(systemCoordinate, primary, SetupRotations(SetupPositions(celestialBodies)));
         }
 
         private List<Body> SetupPositions(List<Body> bodies) {
@@ -202,8 +201,13 @@ namespace Code.Galaxy {
         }
 
         private List<Body> SetupRotations(List<Body> bodies) {
-            //orbital period should be defined by distance from primary
-            //rotation base is just random
+            //orbital period  - relative to distance from primary? random?
+            //what units to use - seconds, minutes, hours?
+            //rotation base set randomly
+            foreach (Body body in bodies) {
+                body._rotationBase = (float)Rng.NextDouble();
+                body._rotationCurrent = body._rotationBase;
+            }
             return bodies;
         }
 
@@ -222,8 +226,8 @@ namespace Code.Galaxy {
             }
 
             public Vector2 GetRandomPoint() {
-                float x = (float)_rng.NextDouble() * (_x2 - _x1) + _x1;
-                float y = (float)_rng.NextDouble() * (_y2 - _y1) + _y1;
+                float x = (float)Rng.NextDouble() * (_x2 - _x1) + _x1;
+                float y = (float)Rng.NextDouble() * (_y2 - _y1) + _y1;
                 return new Vector2(x, y);
             }
         }
@@ -278,7 +282,7 @@ namespace Code.Galaxy {
             List<Vector2> coordinatesList = new List<Vector2>();
 
             while (coordinatesList.Count < maxPoints && tileList.Count > 0) {
-                Tile pickedTile = tileList[_rng.Next(tileList.Count)]; //pick random tile
+                Tile pickedTile = tileList[Rng.Next(tileList.Count)]; //pick random tile
                 tileList.Remove(pickedTile); //removes the selected tile from the potential tiles
                 List<(int x, int y)> surroundingTiles = GetSurroundingIndexes(pickedTile.XIndex, pickedTile.YIndex); //get surrounding tiles
                 foreach ((int x, int y) tile in surroundingTiles) { //remove surrounding tiles from potential tiles

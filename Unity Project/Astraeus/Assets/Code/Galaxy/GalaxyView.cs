@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Code.CelestialObjects;
+using UnityEngine;
 
 namespace Code.Galaxy {
     public class GalaxyView : MonoBehaviour {
@@ -16,10 +17,15 @@ namespace Code.Galaxy {
             _galaxyHolder = new GameObject(name);
         }
         
-        public void DisplaySolarSystem(Vector2 coordinate) {
-            GameObject primary = GameObject.CreatePrimitive(PrimitiveType.Sphere);  //change out for Instantiate() when prefabs are made
-            primary.transform.SetParent(_galaxyHolder.transform);
-            primary.transform.localPosition = new Vector3(coordinate.x, coordinate.y);
+        public void DisplaySolarSystemPrimary(SolarSystem solarSystem, int num) {
+            CelestialBody primary = (CelestialBody)solarSystem.Bodies[0];
+            GameObject primaryObject = primary.GetMapObject();  //change out for Instantiate() when prefabs are made
+            primaryObject.transform.SetParent(_galaxyHolder.transform);
+            primaryObject.transform.localPosition = new Vector3(solarSystem.Coordinate.x, solarSystem.Coordinate.y);
+            primaryObject.name = "System: " + num + " Tier: " + primary.Tier;
+            SolarSystemController controller = primaryObject.AddComponent<SolarSystemController>();
+            controller.AssignSystem(solarSystem);
+
         }
     }
 }
