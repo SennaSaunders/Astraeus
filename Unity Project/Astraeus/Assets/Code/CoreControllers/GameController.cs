@@ -5,8 +5,7 @@ namespace Code.CoreControllers {
         public enum GameFocus {
             Map,
             SolarSystem,
-            PauseMenu,
-            MainMenu
+            Paused
         }
 
         public static GameFocus GameStateFocus;

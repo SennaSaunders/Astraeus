@@ -7,6 +7,7 @@ using Code.CelestialObjects;
 using Code.CelestialObjects.BlackHole;
 using Code.CelestialObjects.Planet;
 using Code.CelestialObjects.Star;
+using Code.TextureGen;
 using Random = System.Random;
 using StarType = Code.CelestialObjects.Star.Star.StarType;
 using BodyTier = Code.CelestialObjects.Body.BodyTier;
@@ -14,21 +15,21 @@ using BodyTier = Code.CelestialObjects.Body.BodyTier;
 namespace Code.Galaxy {
     public class GalaxyGenerator : MonoBehaviour {
         public static Random Rng;
-        public int seed = 1337;
-        [Range(20, 2000)] public int maxSystems = 500;
-        [Range(1, 5)] public int minBodiesPerSystem = 1;
-        [Range(5, 50)] public int maxBodiesPerSystem = 20;
-        [Range(50, 2000)] public float width = 1000;
-        [Range(50, 2000)] public float height = 1000;
-
-        [Range(2, 10)] public float systemExclusionDiameter = 5;
+        public GalaxyGeneratorInput seed = new GalaxyGeneratorInput(1337);
+        public GalaxyGeneratorInput maxSystems = new GalaxyGeneratorInput(1,2000,500);
+        public GalaxyGeneratorInput minBodiesPerSystem = new GalaxyGeneratorInput(1,5,1);
+        public GalaxyGeneratorInput maxBodiesPerSystem = new GalaxyGeneratorInput(5,20,5);
+        public GalaxyGeneratorInput width = new GalaxyGeneratorInput(50,2000,1000);
+        public GalaxyGeneratorInput height = new GalaxyGeneratorInput(50,2000,1000);
+        public GalaxyGeneratorInput systemExclusionDiameter = new GalaxyGeneratorInput(5,20,5);
 
         public GalaxyStats stats;
         private static GalaxyController _controller;
 
         public void Start() {
-            GameObject.FindObjectOfType<GalaxyCameraController>().SetupCamera(width, height);
-            ShowGalaxy(GenGalaxy());
+            //this method needs to change and be controlled GalaxyGeneratorGUIController 
+            //GameObject.FindObjectOfType<GalaxyCameraController>().SetupCamera(width, height);
+            //ShowGalaxy(GenGalaxy());
         }
 
         private void SetupController() {
@@ -57,8 +58,8 @@ namespace Code.Galaxy {
         //Generates a galaxy
         public Galaxy GenGalaxy() {
             stats = new GalaxyStats();
-            Rng = new Random(seed);
-            List<Vector2> systemCoordinates = PickDistributedPoints(maxSystems, width, height, systemExclusionDiameter);
+            Rng = new Random(seed.GetValue());
+            List<Vector2> systemCoordinates = PickDistributedPoints(maxSystems.GetValue(), width.GetValue(), height.GetValue(), systemExclusionDiameter.GetValue());
             List<SolarSystem> solarSystems = new List<SolarSystem>();
             //setup systems
             for (int i = 0; i < systemCoordinates.Count; i++) {
@@ -77,7 +78,7 @@ namespace Code.Galaxy {
                 }
 
                 //pick random body count
-                int numOfBodies = Rng.Next(minBodiesPerSystem, maxBodiesPerSystem + 1);
+                int numOfBodies = Rng.Next(minBodiesPerSystem.GetValue(), maxBodiesPerSystem.GetValue() + 1);
                 solarSystems.Add(GenSolarSystem(systemPrimary, systemCoordinate, numOfBodies));
             }
 
@@ -105,6 +106,30 @@ namespace Code.Galaxy {
             return starType;
         }
 
+        private Planet GenPlanet(Body primary, BodyTier tier) {
+             int notRockyChance = 10;
+             int earthChance = 30;
+            
+             PlanetGen planetGen;
+             int size = 512;
+             int planetTextureSeed = Rng.Next();
+             if (IsRareRoll(notRockyChance)) {
+                 if (IsRareRoll(earthChance)) { //earth-like
+                     planetGen = new EarthWorldGen(planetTextureSeed, size);
+                 }
+                 else { //water world
+                     planetGen = new WaterWorldGen(planetTextureSeed, size);
+                 }
+             }
+             else { //rocky planet
+                 planetGen = new RockyWorldGen(planetTextureSeed, size);
+             }
+
+             Planet planet = new Planet(primary, tier, planetGen);
+
+            return planet;
+        }
+
         private SolarSystem GenSolarSystem(CelestialBody primary, Vector2 systemCoordinate, int numOfBodies) {
             List<Body> celestialBodies = new List<Body>() { primary };
             for (int i = celestialBodies.Count; i < numOfBodies; i++) {
@@ -122,7 +147,8 @@ namespace Code.Galaxy {
                 }
                 //planets
                 else {
-                    newBody = new Planet(currentPrimary, PickRandomPlanetTier(currentPrimary.Tier));
+                    //gen planet texture
+                    newBody = GenPlanet(currentPrimary, PickRandomPlanetTier(currentPrimary.Tier));
                     stats.planetCount += 1;
                 }
 
@@ -208,6 +234,7 @@ namespace Code.Galaxy {
                 body._rotationBase = (float)Rng.NextDouble();
                 body._rotationCurrent = body._rotationBase;
             }
+
             return bodies;
         }
 

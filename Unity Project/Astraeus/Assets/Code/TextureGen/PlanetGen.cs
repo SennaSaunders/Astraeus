@@ -4,6 +4,14 @@ using UnityEngine;
 
 namespace Code.TextureGen {
     public abstract class PlanetGen {
+        private int _seed;
+        private int _size;
+        protected PlanetGen(int seed, int size) {
+            _seed = seed;
+            _size = size;
+            Setup();
+        }
+
         //sea colours list to choose from
         private List<(int r, int g, int b)> _seaColours = new List<(int r, int g, int b)>() {
             (0, 255, 230),
@@ -66,9 +74,8 @@ namespace Code.TextureGen {
         internal float SeaLevel;
         private Color _lowSeaColour;
         private Color _highSeaColour;
-        public Texture2D PlanetTexture;
 
-        public void GenerateSeaColours() {
+        protected void GenerateSeaColours() {
             int firstIndex = GalaxyGenerator.Rng.Next(_seaColours.Count);
             int secondIndex = firstIndex;
 
@@ -82,8 +89,8 @@ namespace Code.TextureGen {
             _highSeaColour = GetLuminance(firstRGB) > GetLuminance(secondRGB) ? RGBToColour(firstRGB) : RGBToColour(secondRGB);
             _lowSeaColour = GetLuminance(firstRGB) > GetLuminance(secondRGB) ? RGBToColour(secondRGB) : RGBToColour(firstRGB);
         }
-        
-        public void GenerateLandColourMapping() {
+
+        protected void GenerateLandColourMapping() {
             // how to select main colour band?
             //do we always want it to be the lowest one?
             //no
@@ -92,7 +99,7 @@ namespace Code.TextureGen {
             _landColourMappings = new List<LandColourMapping>();
             List<double> heights = new List<double>();
             double relativeColourLeft = 1;
-            while (relativeColourLeft > 0 && heights.Count < 2) {
+            while (relativeColourLeft > 0 || heights.Count < 2) {
                 double rollPercentage = GalaxyGenerator.Rng.NextDouble();
                 relativeColourLeft -= rollPercentage;
                 if (relativeColourLeft > 0) {
@@ -107,7 +114,7 @@ namespace Code.TextureGen {
             for (int i = 0; i < heights.Count; i++) {
                 int landColourRoll = -1;
                 do {
-                    lastColourRoll = GalaxyGenerator.Rng.Next(_landColours.Count);
+                    landColourRoll = GalaxyGenerator.Rng.Next(_landColours.Count);
                 } while (lastColourRoll == landColourRoll);
 
                 lastColourRoll = landColourRoll;
@@ -116,14 +123,13 @@ namespace Code.TextureGen {
             }
         }
 
-        public (Color low, Color high, float relHeight) GetLandColorFromHeight(float height) {
+        private (Color low, Color high, float relHeight) GetLandColorFromHeight(float height) {
             int colourIndex = 0;
+            float currentHeight = 0;
             for (int i = 0; i < _landColourMappings.Count-1; i++) {   //find which colour the height belongs to
-                if (height < _landColourMappings[i].Height) {
+                currentHeight += _landColourMappings[i].Height;
+                if (currentHeight < height) {
                     colourIndex = i;
-                }
-                else {
-                    break;
                 }
             }
             
@@ -187,7 +193,8 @@ namespace Code.TextureGen {
         }
 
         public Texture2D GenTexture(float[,] noise) {
-            Texture2D texture = new Texture2D(noise.Length, noise.Length);
+            
+            Texture2D texture = new Texture2D(noise.GetLength(0), noise.GetLength(1));
             Color[] colors = new Color[]{};
             if (SeaLevel == 0) { //no sea
                 colors = GenLandOnly(noise);
@@ -198,12 +205,27 @@ namespace Code.TextureGen {
                 colors = GenLandAndSea(noise);
             }
             texture.SetPixels(colors);
+            texture.Apply();
+            return texture;
+        }
+
+        public static Texture2D GenNoiseTex(float[] noise, int size) {
+            Color[] colours = new Color[noise.Length];
+            for (int i =0;i< noise.Length;i++) {
+                float value = noise[i];
+                colours[i] = new Color(value, value, value);
+            }
+
+            Texture2D texture = new Texture2D(size, size);
+            texture.SetPixels(colours);
+            texture.Apply();
             return texture;
         }
     }
 
     public class WaterWorldGen : PlanetGen { //very high sea level/only sea
-        //
+        public WaterWorldGen(int seed, int size) : base(seed, size) {
+        }
         public override void Setup() {
             //roll for all sea or high sea
             double allSeaChance = 0.9;
@@ -219,16 +241,24 @@ namespace Code.TextureGen {
             }
             GenerateSeaColours();
         }
+
+        
     }
 
     public class RockyWorldGen : PlanetGen { //no sea
+        public RockyWorldGen(int seed, int size) : base(seed, size) {
+        }
         public override void Setup() {
             GenerateLandColourMapping();
             SeaLevel = 0;
         }
+
+        
     }
 
     public class EarthWorldGen : PlanetGen { //medium sea level
+        public EarthWorldGen(int seed, int size) : base(seed, size) {
+        }
         public override void Setup() {
             double lowestSea = .4;
             double highestSea = .8;

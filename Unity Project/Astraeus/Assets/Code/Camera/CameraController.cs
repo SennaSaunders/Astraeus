@@ -8,8 +8,10 @@ namespace Code.Camera {
         private float _y;
         private float _z;
 
-        private float _x1 = 0;
-        private float _y1 = 0;
+        private float _x1;
+        private float _y1;
+        private float _x2;
+        private float _y2;
         
         private float _minMoveSpeed;
         private float _maxMoveSpeed;
@@ -17,8 +19,6 @@ namespace Code.Camera {
         private float _minScrollSpeed;
         private float _maxScrollSpeed;
 
-        private float _x2;
-        private float _y2;
         private float _maxZoomOutDistance;
         private float _minZoomInDistance;
 
