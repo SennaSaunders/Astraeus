@@ -6,7 +6,7 @@ namespace Code.GUI {
     public class GalaxyGenSliderController : GalaxyGenInputModifier, IIntObserver{
         private Slider slider;
 
-        public void Start() {
+        public void Awake() {
             slider = GetComponentInParent<Slider>();
             slider.onValueChanged.AddListener(delegate { ChangeGalaxyGenInputValue(); });
         }

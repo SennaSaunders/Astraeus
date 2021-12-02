@@ -6,7 +6,7 @@ namespace Code.GUI {
     public class GalaxyGenInputController : GalaxyGenInputModifier, IIntObserver {
         private TMP_InputField inputField;
 
-        public void Start() {
+        public void Awake() {
             inputField = GetComponentInParent<TMP_InputField>();
             inputField.onEndEdit.AddListener(delegate { ChangeGalaxyGenInputValue(); });
         }

@@ -306,6 +306,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2899717774035554984, guid: 5f7c2d54b8d45e04db2f76cb663a9d1b, type: 3}
+      propertyPath: m_Navigation.m_Mode
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 2899717774070354983, guid: 5f7c2d54b8d45e04db2f76cb663a9d1b, type: 3}
       propertyPath: m_Name
       value: MenuGUI
@@ -393,6 +397,22 @@ PrefabInstance:
     - target: {fileID: 2899717774070355003, guid: 5f7c2d54b8d45e04db2f76cb663a9d1b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2899717774245982064, guid: 5f7c2d54b8d45e04db2f76cb663a9d1b, type: 3}
+      propertyPath: m_Navigation.m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2899717774345374555, guid: 5f7c2d54b8d45e04db2f76cb663a9d1b, type: 3}
+      propertyPath: m_Navigation.m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2899717774354855219, guid: 5f7c2d54b8d45e04db2f76cb663a9d1b, type: 3}
+      propertyPath: m_Navigation.m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2899717774583637057, guid: 5f7c2d54b8d45e04db2f76cb663a9d1b, type: 3}
+      propertyPath: m_Navigation.m_Mode
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5f7c2d54b8d45e04db2f76cb663a9d1b, type: 3}
