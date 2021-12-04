@@ -95,8 +95,9 @@ namespace Code.GUI {
         private void NewGameBtnClick() {
             //galaxy gen GUI
             Debug.Log("Pressed New Game");
-            GameObject test = (GameObject)Resources.Load("GUIPrefabs/GalaxyGenerationGUI");
-            GameObject galaxygenMenu = Instantiate(test);
+            GameObject newGUI = (GameObject)Resources.Load("GUIPrefabs/GalaxyGenerationGUI");
+            newGUI = Instantiate(newGUI);
+            newGUI.name = "GalaxyGenerationGUI";
             Destroy(_menu);
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Code.Galaxy;
 using TMPro;
 using UnityEngine;
@@ -6,13 +7,21 @@ using UnityEngine.UI;
 
 namespace Code.GUI {
     public class GalaxyGeneratorGUIController : MonoBehaviour {
-        public GalaxyGenerator _generator;
-
+        private GalaxyGenerator _generator;
+        private GameObject _guiGameObject;
+        private GameObject _loadingScreen;
+        private Galaxy.Galaxy _galaxy;
+        private Thread _generationThread;
         public void Start() {
+            SetGUIGameObject();
             _generator = gameObject.AddComponent<GalaxyGenerator>();
             if (!LoadPreviousGeneratorConfig()) LoadDefaultGeneratorConfig();
             InitFields();
-            SetupGenerateGlalaxyBtn();
+            SetupGenerateGalaxyBtn();
+        }
+
+        private void SetGUIGameObject() {
+            _guiGameObject = GameObject.Find("GalaxyGenerationGUI");
         }
 
         private bool LoadPreviousGeneratorConfig() {
@@ -112,13 +121,40 @@ namespace Code.GUI {
             input.NotifyObservers();
         }
 
-        private void SetupGenerateGlalaxyBtn() {
+        private void SetupGenerateGalaxyBtn() {
             Button button = GetComponentInChildren<Button>();
             button.onClick.AddListener(delegate { GenerateGalaxy(); });
         }
         
         private void GenerateGalaxy() {
-            _generator.ShowGalaxy(_generator.GenGalaxy());
+            _loadingScreen = (GameObject)Resources.Load("GUIPrefabs/LoadingGUI");
+            _loadingScreen = Instantiate(_loadingScreen);
+            //Destroy(_guiGameObject);
+            
+            _generationThread = new Thread(() => {
+                _galaxy = _generator.GenGalaxy();
+                //Loaded();
+            });
+            _generationThread.Start();
+            Destroy(GameObject.Find("GUIHolder"));//removes visual elements of the GUI so that it doesn't cover the loading screen - may be better to pass the Thread to the loading screen and destroy itself?
+        }
+
+        private void Loaded() {
+            Destroy(_loadingScreen);
+            _generator.ShowGalaxy(_galaxy);
+            Destroy(_guiGameObject);
+        }
+
+        public void Update() {
+            if (_generationThread != null) {
+                if (_generationThread.IsAlive) {
+                    Debug.Log("Running..");
+                }
+                else {
+                    Loaded();
+                    Debug.Log("Stopped");
+                }
+            }
         }
     }
 }
