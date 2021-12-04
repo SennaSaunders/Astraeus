@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Code.Galaxy;
+using Code._Galaxy;
 using UnityEngine;
 
 namespace Code.TextureGen {
@@ -13,7 +13,7 @@ namespace Code.TextureGen {
         }
 
         //sea colours list to choose from
-        private List<(int r, int g, int b)> _seaColours = new List<(int r, int g, int b)>() {
+        private List<(int r, int g, int b)> _seaColours = new List<(int r, int g, int b)> {
             (0, 255, 230),
             (105, 255, 205),
             (66, 161, 129),
@@ -26,7 +26,7 @@ namespace Code.TextureGen {
         };
 
         //land colours list to choose from
-        private List<(int r, int g, int b)> _landColours = new List<(int r, int g, int b)>() {
+        private List<(int r, int g, int b)> _landColours = new List<(int r, int g, int b)> {
             (77, 191, 10), //light green
             (42, 112, 1), //dark green
             (42, 51, 2), //jungle green
@@ -50,25 +50,25 @@ namespace Code.TextureGen {
             (56, 36, 36) //murky red brown
         };
 
-        public float GetLuminance((int r, int g, int b) colourCode) {
+        private float GetLuminance((int r, int g, int b) colourCode) {
             return 0.2126f * colourCode.r + 0.7152f * colourCode.g + 0.0722f * colourCode.b;
         }
 
-        public Color RGBToColour((int r, int g, int b) colourCode) {
+        private Color RGBToColour((int r, int g, int b) colourCode) {
             return new Color((float)colourCode.r / 255, (float)colourCode.g / 255, (float)colourCode.b / 255);
         }
 
-        internal class LandColourMapping {
+        private class LandColourMapping {
             public LandColourMapping(Color colour, float height) {
-                this.Colour = colour;
-                this.Height = height;
+                Colour = colour;
+                Height = height;
             }
 
             public Color Colour;
             public float Height; // treat like flex box in CSS - sea height will condense the total region that is available for these colour mappings
         }
 
-        public abstract void Setup();
+        protected abstract void Setup();
 
         private List<LandColourMapping> _landColourMappings;
         internal float SeaLevel;
@@ -195,7 +195,7 @@ namespace Code.TextureGen {
         public Texture2D GenTexture(float[,] noise) {
             
             Texture2D texture = new Texture2D(noise.GetLength(0), noise.GetLength(1));
-            Color[] colors = new Color[]{};
+            Color[] colors;
             if (SeaLevel == 0) { //no sea
                 colors = GenLandOnly(noise);
             } else if (SeaLevel > 1 - 0.1) { //all sea
@@ -226,7 +226,8 @@ namespace Code.TextureGen {
     public class WaterWorldGen : PlanetGen { //very high sea level/only sea
         public WaterWorldGen(int seed, int size) : base(seed, size) {
         }
-        public override void Setup() {
+
+        protected override void Setup() {
             //roll for all sea or high sea
             double allSeaChance = 0.9;
             if (GalaxyGenerator.Rng.NextDouble() > allSeaChance) { //some land
@@ -248,7 +249,8 @@ namespace Code.TextureGen {
     public class RockyWorldGen : PlanetGen { //no sea
         public RockyWorldGen(int seed, int size) : base(seed, size) {
         }
-        public override void Setup() {
+
+        protected override void Setup() {
             GenerateLandColourMapping();
             SeaLevel = 0;
         }
@@ -259,7 +261,8 @@ namespace Code.TextureGen {
     public class EarthWorldGen : PlanetGen { //medium sea level
         public EarthWorldGen(int seed, int size) : base(seed, size) {
         }
-        public override void Setup() {
+
+        protected override void Setup() {
             double lowestSea = .4;
             double highestSea = .8;
             double seaDiff = highestSea - lowestSea;

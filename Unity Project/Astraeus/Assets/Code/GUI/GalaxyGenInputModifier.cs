@@ -1,11 +1,11 @@
-﻿using Code.Galaxy;
+﻿using Code._Galaxy;
 using UnityEngine;
 
 namespace Code.GUI {
     public abstract class GalaxyGenInputModifier : MonoBehaviour {
-        protected GalaxyGeneratorInput _input;
+        protected GalaxyGeneratorInput Input;
         public virtual void SetInput(GalaxyGeneratorInput input) {
-            _input = input;
+            Input = input;
         }
         protected abstract void ChangeGalaxyGenInputValue();
     }

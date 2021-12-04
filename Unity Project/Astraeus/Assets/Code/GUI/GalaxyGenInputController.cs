@@ -4,30 +4,26 @@ using TMPro;
 
 namespace Code.GUI {
     public class GalaxyGenInputController : GalaxyGenInputModifier, IIntObserver {
-        private TMP_InputField inputField;
+        private TMP_InputField _inputField;
 
         public void Awake() {
-            inputField = GetComponentInParent<TMP_InputField>();
-            inputField.onEndEdit.AddListener(delegate { ChangeGalaxyGenInputValue(); });
+            _inputField = GetComponentInParent<TMP_InputField>();
+            _inputField.onEndEdit.AddListener(delegate { ChangeGalaxyGenInputValue(); });
         }
 
         protected override void ChangeGalaxyGenInputValue() {
-            long tempLong = Int64.Parse(inputField.text);
-            int tempInt = Int32.MaxValue < tempLong ? Int32.MaxValue : Int32.MinValue > tempLong ? Int32.MinValue : (int)tempLong;
+            long tempLong = long.Parse(_inputField.text);
+            int tempInt = int.MaxValue < tempLong ? int.MaxValue : int.MinValue > tempLong ? int.MinValue : (int)tempLong;
             UpdateSelf(tempInt);
-            _input.SetValue(tempInt);
+            Input.SetValue(tempInt);
         }
 
         public void UpdateSelf(int value) {
-            inputField.text = value.ToString();
+            _inputField.text = value.ToString();
         }
 
         public bool UpdateNeeded(int value) {
-            if (Int32.Parse(inputField.text) != value) {
-                return true;
-            }
-
-            return false;
+            return int.Parse(_inputField.text) != value;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Code.GUI {
     public class MainMenuController : MonoBehaviour {
         private GameObject _menu;
         private List<GameSave> _saves = new List<GameSave>();
-        private List<(GameObject obj, UnityAction func)> _buttonObjFuncTuple = new List<(GameObject obj, UnityAction func)>(){ };
+        private List<(GameObject obj, UnityAction func)> _buttonObjFuncTuple;
 
         public void Start() {
             SetMenu();
@@ -32,14 +32,8 @@ namespace Code.GUI {
 
         private bool GetGameSaves() {
             SetSaves();
-            
-            if (_saves.Count > 0) {
-                
-                return true;
-            }
-            else {
-                return false;
-            }
+
+            return _saves.Count > 0;
         }
 
         private void SetSaves() {
@@ -55,7 +49,7 @@ namespace Code.GUI {
             buttonObject.SetActive(false);
         }
 
-        private void InitFocusedButton(Button button) {
+        private static void InitFocusedButton(Button button) {
             button.Select();
         }
 
@@ -74,7 +68,7 @@ namespace Code.GUI {
             return _buttonObjFuncTuple.Find(b => b.obj.name == buttonName).obj;
         }
 
-        private Button GetButtonComponent(GameObject buttonObject) {
+        private static Button GetButtonComponent(GameObject buttonObject) {
             return buttonObject.GetComponent<Button>();
         }
 
@@ -87,7 +81,7 @@ namespace Code.GUI {
                 }
             }
         }
-        private void ContinueBtnClick() {
+        private static void ContinueBtnClick() {
             //load last save
             Debug.Log("Pressed Continue");
         }
@@ -101,17 +95,17 @@ namespace Code.GUI {
             Destroy(_menu);
         }
 
-        private void LoadGameBtnClick() {
+        private static void LoadGameBtnClick() {
             //brings up all saved games to choose from
             Debug.Log("Pressed Load Game");
         }
 
-        private void SettingsBtnClick() {
+        private static void SettingsBtnClick() {
             //goes to settings
             Debug.Log("Pressed Settings");
         }
 
-        private void ExitBtnClick() {
+        private static void ExitBtnClick() {
             //pops up a confirmation prompt which quits the game if yes
             Debug.Log("Pressed Exit");
         }

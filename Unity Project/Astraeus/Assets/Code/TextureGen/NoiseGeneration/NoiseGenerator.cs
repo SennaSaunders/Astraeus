@@ -10,9 +10,7 @@ namespace Code.TextureGen.NoiseGeneration {
             int y1 = 0;
             int x2 = 1;
             int y2 = 1;
-            float[] noiseTest = new float[size * size];
-            //var test = fastNoiseTree.GenUniformGrid4D(noiseTest, 0, 0, 0, 0, size, size, size, size, 1, seed);
-            
+
             float min = float.MaxValue;
             float max = float.MinValue;
             for (int x = 0; x < size; x++) {
@@ -29,8 +27,6 @@ namespace Code.TextureGen.NoiseGeneration {
                     
                     float value =  fastNoiseTree.GenSingle4D(nx, ny, nz, nw, seed);
                     // float value =  fastNoiseTree.GenSingle2D(x, y, seed);
-                    
-                     
                     //float value =  fastNoiseTree.GenSingle2D(x, y, seed);
                     min = value < min ? value : min;
                     max = value > max ? value : max;

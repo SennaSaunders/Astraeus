@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Code.Camera {
     public abstract class CameraController : MonoBehaviour {
@@ -21,6 +20,11 @@ namespace Code.Camera {
 
         private float _maxZoomOutDistance;
         private float _minZoomInDistance;
+        private UnityEngine.Camera _camera;
+
+        private void Start() {
+            _camera = UnityEngine.Camera.main;
+        }
 
         public abstract void ToggleCameraControl();//maybe?
 
@@ -31,8 +35,8 @@ namespace Code.Camera {
             _y1 = y1;
             _x2 = x2;
             _y2 = y2;
-            float hFov = UnityEngine.Camera.VerticalToHorizontalFieldOfView(UnityEngine.Camera.main.fieldOfView, UnityEngine.Camera.main.aspect);
-            float vFov = UnityEngine.Camera.main.fieldOfView;
+            float hFov = UnityEngine.Camera.VerticalToHorizontalFieldOfView(_camera.fieldOfView, _camera.aspect);
+            float vFov = _camera.fieldOfView;
             double a1 = x2 / Math.Sin(hFov * Math.PI / 180) * Math.Sin((180 - hFov) / 2 * Math.PI / 180);
             double a2 = y2 / Math.Sin(vFov * Math.PI / 180) * Math.Sin((180 - vFov) / 2 * Math.PI / 180);
             float b1 = x2 / 2;
