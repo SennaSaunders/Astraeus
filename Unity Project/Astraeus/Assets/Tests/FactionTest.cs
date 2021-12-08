@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using Code._CelestialObjects;
 using Code._CelestialObjects.BlackHole;
@@ -10,7 +9,6 @@ using Code._Galaxy._SolarSystem;
 using Code.TextureGen;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
 
 namespace Tests {
     public class FactionTest {

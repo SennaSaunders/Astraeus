@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Code._CelestialObjects;
-using Code._CelestialObjects.BlackHole;
-using Code._CelestialObjects.Planet;
-using Code._CelestialObjects.Star;
+using Code._Factions.FactionTypes;
 using Code._Galaxy;
 using Code._Galaxy._SolarSystem;
-using Code.TextureGen;
 
 namespace Code._Factions {
     public abstract class Faction {
@@ -34,6 +31,10 @@ namespace Code._Factions {
         public FactionTypeEnum FactionType { get; }
         public List<SolarSystem> Systems { get; }
         public string GroupName { get; }
+        
+        protected static List<Body> GetCelestialBodiesInSystem(SolarSystem solarSystem) {
+            return solarSystem.Bodies.FindAll(b => b.GetType().IsSubclassOf(typeof(CelestialBody)));
+        }
     }
 
     public static class FactionTypeExtension {
@@ -178,188 +179,13 @@ namespace Code._Factions {
         }
 
         private static int FactionSystemDesire(this Faction.FactionTypeEnum factionType, SolarSystem solarSystem) {
-            if (factionType == Faction.FactionTypeEnum.Agriculture) return GetAgricultureFactionSystemDesire(solarSystem);
-            if (factionType == Faction.FactionTypeEnum.Commerce) return GetCommerceFactionSystemDesire(solarSystem);
-            if (factionType == Faction.FactionTypeEnum.Industrial) return GetIndustrialSystemDesire(solarSystem);
-            if (factionType == Faction.FactionTypeEnum.Military) return GetMilitaryFactionSystemDesire(solarSystem);
-            if (factionType == Faction.FactionTypeEnum.Pirate) return GetPirateFactionSystemDesire(solarSystem);
-            if (factionType == Faction.FactionTypeEnum.Technology) return GetTechnologyFactionSystemDesire(solarSystem);
+            if (factionType == Faction.FactionTypeEnum.Agriculture) return AgricultureFaction.GetAgricultureFactionSystemDesire(solarSystem);
+            if (factionType == Faction.FactionTypeEnum.Commerce) return CommerceFaction.GetCommerceFactionSystemDesire(solarSystem);
+            if (factionType == Faction.FactionTypeEnum.Industrial) return IndustrialFaction.GetIndustrialSystemDesire(solarSystem);
+            if (factionType == Faction.FactionTypeEnum.Military) return MilitaryFaction.GetMilitaryFactionSystemDesire(solarSystem);
+            if (factionType == Faction.FactionTypeEnum.Pirate) return PirateFaction.GetPirateFactionSystemDesire(solarSystem);
+            if (factionType == Faction.FactionTypeEnum.Technology) return TechnologyFaction.GetTechnologyFactionSystemDesire(solarSystem);
             else return 0; //if generic factions are desired this can be altered to allow for them
         }
-
-        private static List<Body> GetCelestialBodiesInSystem(SolarSystem solarSystem) {
-            return solarSystem.Bodies.FindAll(b => b.GetType().IsSubclassOf(typeof(CelestialBody)));
-        }
-
-        private static int GetAgricultureFactionSystemDesire(SolarSystem system) {
-            //assign high values to earth-likes & water worlds - these are the most prized
-            int desireValue = 0;
-            foreach (Body body in GetCelestialBodiesInSystem(system)) {
-                if (body.GetType() == typeof(Planet)) {
-                    Planet planet = (Planet)body;
-                    if (planet.PlanetGen.GetType() == typeof(EarthWorldGen) || planet.PlanetGen.GetType() == typeof(WaterWorldGen)) {
-                        desireValue += AgricultureFaction.OrganicWorldDesire * (int)planet.Tier;
-                    }
-                    else {
-                        desireValue += (int)body.Tier;
-                    }
-                }
-                else if (body.GetType() == typeof(BlackHole)) {
-                    desireValue += AgricultureFaction.BlackHoleDesire * (int)body.Tier;
-                }
-            }
-
-            return desireValue;
-        }
-
-        private static int GetCommerceFactionSystemDesire(SolarSystem system) {
-            //assign higher values to larger planets - so the more large planets the better
-            int desireValue = 0;
-            foreach (Body body in GetCelestialBodiesInSystem(system)) {
-                if (body.GetType() == typeof(Planet)) {
-                    desireValue += (int)body.Tier * (int)body.Tier;
-                }
-                else if (body.GetType() == typeof(BlackHole)) {
-                    desireValue += CommerceFaction.BlackHoleDesire * (int)body.Tier;
-                }
-            }
-
-            return desireValue;
-        }
-
-        private static int GetIndustrialSystemDesire(SolarSystem system) {
-            int desireValue = 0;
-            foreach (Body body in GetCelestialBodiesInSystem(system)) {
-                if (body.GetType() == typeof(Planet)) {
-                    Planet planet = (Planet)body;
-                    if (planet.PlanetGen.GetType() == typeof(WaterWorldGen)) {
-                        desireValue += IndustrialFaction.WaterWorldDesire * (int)planet.Tier;
-                    }
-                    else if (planet.PlanetGen.GetType() == typeof(RockyWorldGen)) {
-                        desireValue += IndustrialFaction.RockyWorldDesire * (int)planet.Tier;
-                    }
-                    else {
-                        desireValue += (int)body.Tier * (int)body.Tier;
-                    }
-                }
-                else if (body.GetType() == typeof(BlackHole)) {
-                    desireValue += IndustrialFaction.BlackHoleDesire * (int)body.Tier;
-                }
-            }
-
-            return desireValue;
-        }
-
-        private static int GetMilitaryFactionSystemDesire(SolarSystem system) {
-            int desireValue = 0;
-            foreach (Body body in GetCelestialBodiesInSystem(system)) {
-                if (body.GetType() == typeof(Planet)) { //ignore stars/black holes
-                    Planet planet = (Planet)body;
-                    if (planet.PlanetGen.GetType() == typeof(EarthWorldGen)) {
-                        desireValue += MilitaryFaction.EarthWorldDesire * (int)planet.Tier;
-                    }
-                    else {
-                        desireValue += (int)body.Tier;
-                    }
-                }
-            }
-
-            return desireValue;
-        }
-
-        private static int GetPirateFactionSystemDesire(SolarSystem system) {
-            int desireValue = 0;
-            foreach (Body body in GetCelestialBodiesInSystem(system)) {
-                if (body.GetType() == typeof(Planet)) {
-                    Planet planet = (Planet)body;
-                    if (planet.PlanetGen.GetType() == typeof(EarthWorldGen)) {
-                        desireValue += PirateFaction.EarthlikeDesire * (int)planet.Tier;
-                    }
-                    else {
-                        desireValue += (int)planet.Tier;
-                    }
-                }
-            }
-
-            return desireValue;
-        }
-
-        private static int GetTechnologyFactionSystemDesire(SolarSystem system) {
-            int desireValue = 0;
-            foreach (Body body in GetCelestialBodiesInSystem(system)) {
-                if (body.GetType() == typeof(BlackHole)) {
-                    desireValue += TechnologyFaction.BlackHoleValue * (int)body.Tier;
-                }
-                else if (body.GetType() == typeof(Star) && body.Tier == Body.BodyTier.T9) {
-                    desireValue += TechnologyFaction.StarT9Value * (int)body.Tier;
-                }
-                else if (body.GetType() == typeof(Star) && body.Tier == Body.BodyTier.T8) {
-                    desireValue += TechnologyFaction.StarT8Value * (int)body.Tier;
-                }
-                else if (body.GetType() == typeof(Star)) {
-                    desireValue += TechnologyFaction.StarT7Value * (int)body.Tier;
-                }
-                else if (body.GetType() == typeof(Planet)) {
-                    Planet planet = (Planet)body;
-                    if (planet.PlanetGen.GetType() == typeof(EarthWorldGen) || planet.PlanetGen.GetType() == typeof(WaterWorldGen)) {
-                        desireValue += TechnologyFaction.OrganicWorldValue * (int)body.Tier;
-                    }
-                    else {
-                        desireValue += (int)body.Tier;
-                    }
-                }
-            }
-
-            return desireValue;
-        }
-    }
-
-    public class AgricultureFaction : Faction {
-        public AgricultureFaction(SolarSystem homeSystem, List<SolarSystem> systems) : base(homeSystem, FactionTypeEnum.Agriculture, systems) {
-        }
-
-        public static int OrganicWorldDesire = 50;
-        public static int BlackHoleDesire = -100;
-    }
-
-    public class CommerceFaction : Faction {
-        public CommerceFaction(SolarSystem homeSystem, List<SolarSystem> systems) : base(homeSystem, FactionTypeEnum.Commerce, systems) {
-        }
-
-        public static int BlackHoleDesire = -100;
-    }
-
-    public class IndustrialFaction : Faction {
-        public IndustrialFaction(SolarSystem homeSystem, List<SolarSystem> systems) : base(homeSystem, FactionTypeEnum.Industrial, systems) {
-        }
-
-        public static int WaterWorldDesire = 15;
-        public static int RockyWorldDesire = 30;
-        public static int BlackHoleDesire = -50;
-    }
-
-    public class MilitaryFaction : Faction {
-        public MilitaryFaction(SolarSystem homeSystem, List<SolarSystem> systems) : base(homeSystem, FactionTypeEnum.Military, systems) {
-        }
-
-        public static int EarthWorldDesire = 20;
-    }
-
-    public class PirateFaction : Faction {
-        public PirateFaction(SolarSystem homeSystem, List<SolarSystem> systems) : base(homeSystem, FactionTypeEnum.Pirate, systems) {
-        }
-
-        public static int EarthlikeDesire = -10;
-    }
-
-    public class TechnologyFaction : Faction {
-        public TechnologyFaction(SolarSystem homeSystem, List<SolarSystem> systems) : base(homeSystem, FactionTypeEnum.Technology, systems) {
-        }
-
-        public static int BlackHoleValue = 30;
-        public static int StarT9Value = 20;
-        public static int StarT8Value = 15;
-        public static int StarT7Value = 10;
-        public static int OrganicWorldValue = 30;
     }
 }

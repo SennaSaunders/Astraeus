@@ -101,14 +101,7 @@ namespace Code._Galaxy {
                 maxFactionAmounts.Add((factionType, (int)Math.Ceiling(factionRatioMultiplier*factionType.FactionRatio())));
             }
 
-            FactionTypeExtension.PreCalcDesireValues(sectors);
-            //each faction needs to have a preferred type of body/planet gen/system
-            
-            //order the sectors by preference for each faction type
-            //choose the highest preference sector available and remove it from the possible sectors
-            //then once each faction has a starting system
-            //start spreading th
-
+            FactionTypeExtension.PreCalcDesireValues(sectors); //Pre calculate (for performance) the preferences for each sector/system to decide which is best for each faction
 
             List<Faction> factions = new List<Faction>();
             return factions;
