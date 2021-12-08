@@ -75,7 +75,6 @@ namespace Code.GUI {
         private void SetupActiveButtons() {
             foreach ((GameObject obj, UnityAction func) buttonObject in _buttonObjFuncTuple) {
                 if (buttonObject.obj.activeSelf) {
-                    Debug.Log(buttonObject.obj.name);
                     Button button = GetButtonComponent(buttonObject.obj);  
                     button.onClick.AddListener( buttonObject.func);
                 }

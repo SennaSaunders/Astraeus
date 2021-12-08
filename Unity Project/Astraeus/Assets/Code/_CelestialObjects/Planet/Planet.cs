@@ -4,13 +4,13 @@ using UnityEngine;
 namespace Code._CelestialObjects.Planet {
     public class Planet : CelestialBody {
         public Planet(Body primary, BodyTier tier, PlanetGen planetGen) : base(primary, tier) {
-            _planetGen = planetGen;
+            PlanetGen = planetGen;
         }
 
         public const BodyTier MAXPlanetTier = BodyTier.T6;
         public const BodyTier MINPlanetTier = BodyTier.T1;
 
-        private PlanetGen _planetGen;
+        public PlanetGen PlanetGen { get; }
         private Texture _surfaceTexture;
         public override GameObject GetSystemObject() {
             GameObject sphere = base.GetSystemObject();

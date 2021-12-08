@@ -2,7 +2,6 @@
 using System.Threading;
 using Code._Galaxy;
 using Code._GameControllers;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,7 +10,7 @@ namespace Code.GUI {
         private GalaxyGenerator _generator;
         private GameObject _guiGameObject;
         private GameObject _loadingScreen;
-        private _Galaxy.Galaxy _galaxy;
+        private Galaxy _galaxy;
         private Thread _generationThread;
         public void Start() {
             SetGUIGameObject();
@@ -36,12 +35,11 @@ namespace Code.GUI {
             _generator.height.SetValue(500);
             _generator.minBodiesPerSystem.SetValue(1);
             _generator.maxBodiesPerSystem.SetValue(10);
-            _generator.systemExclusionDiameter.SetValue(5);
+            _generator.systemExclusionDistance.SetValue(5);
         }
         
         private void InitSlider(string newName, GalaxyGeneratorInput input) {
             GameObject inputObject = GameObject.Find(newName);
-            Slider slider = inputObject.GetComponent<Slider>();
             GalaxyGenSliderController sliderController = inputObject.GetComponent<GalaxyGenSliderController>();
 
             if (sliderController == null) {
@@ -54,7 +52,6 @@ namespace Code.GUI {
 
         private void InitTextField(string newName, GalaxyGeneratorInput input) {
             GameObject inputObject = GameObject.Find(newName);
-            TMP_InputField txtField = inputObject.GetComponent<TMP_InputField>();
             GalaxyGenInputController inputController = inputObject.GetComponent<GalaxyGenInputController>();
             if (inputController == null) {
                 inputController = inputObject.AddComponent<GalaxyGenInputController>();
@@ -113,11 +110,11 @@ namespace Code.GUI {
             input.NotifyObservers();
             
             fieldName = "MinSystemDistanceInput";
-            input = _generator.systemExclusionDiameter;
+            input = _generator.systemExclusionDistance;
             InitTextField(fieldName,input);
             
             fieldName = "MinSystemDistanceSlider";
-            input = _generator.systemExclusionDiameter;
+            input = _generator.systemExclusionDistance;
             InitSlider(fieldName,input);
             input.NotifyObservers();
         }
@@ -131,7 +128,6 @@ namespace Code.GUI {
             _loadingScreen = (GameObject)Resources.Load("GUIPrefabs/LoadingGUI");
             _loadingScreen = Instantiate(_loadingScreen);
             LoadingScreenController.SetLoadingText("Generating Galaxy");
-            //Destroy(_guiGameObject);
             
             _generationThread = new Thread(() => {
                 _galaxy = _generator.GenGalaxy();
@@ -151,14 +147,19 @@ namespace Code.GUI {
             Destroy(_guiGameObject);
         }
 
+        private bool startedMsg = false;
         public void Update() {
             if (_generationThread != null) {
                 if (_generationThread.IsAlive) {
-                    Debug.Log("Running Generation in separate thread..");
+                    if (!startedMsg) {
+                        Debug.Log("Running Generation in separate thread..");
+                        startedMsg = !startedMsg;
+                    }
                 }
                 else {
-                    Loaded();
                     Debug.Log("Stopped");
+                    Loaded();
+                    
                 }
             }
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using Code.ObserverPattern;
+﻿using Code.ObserverPattern;
 using TMPro;
 
 namespace Code.GUI {
