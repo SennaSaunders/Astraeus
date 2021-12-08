@@ -8,10 +8,10 @@ using Code._Galaxy._SolarSystem;
 
 namespace Code._Factions {
     public abstract class Faction {
-        protected Faction(SolarSystem homeSystem, FactionTypeEnum factionType, List<SolarSystem> systems) {
+        protected Faction(SolarSystem homeSystem, FactionTypeEnum factionType) {
             HomeSystem = homeSystem;
             FactionType = factionType;
-            Systems = systems;
+            Systems = new List<SolarSystem> { homeSystem };
             GroupName = factionType.GetFactionGroupNameList()[GalaxyGenerator.Rng.Next(FactionType.GetFactionGroupNameList().Count)];
         }
 
@@ -28,6 +28,10 @@ namespace Code._Factions {
         }
 
         public SolarSystem HomeSystem { get; }
+
+        public void AddSolarSystem(SolarSystem solarSystem) {
+            Systems.Add(solarSystem);
+        }
         public FactionTypeEnum FactionType { get; }
         public List<SolarSystem> Systems { get; }
         public string GroupName { get; }
@@ -55,18 +59,19 @@ namespace Code._Factions {
 
                 for (int j = 0; j < sectors.Count; j++) { //for each sector in galaxy
                     Sector sector = sectors[j];
+                    if (sector.Systems.Count > 0) { //stops adding empty sectors to the list
+                        int sectorDesire = 0;
+                        for (int k = 0; k < sectors[j].Systems.Count; k++) { //for each system in sector
+                            SolarSystem system = sector.Systems[k];
 
-                    int sectorDesire = 0;
-                    for (int k = 0; k < sectors[j].Systems.Count; k++) { //for each system in sector
-                        SolarSystem system = sector.Systems[k];
+                            int systemDesire = factionType.FactionSystemDesire(system);
+                            sectorDesire += systemDesire;
 
-                        int systemDesire = factionType.FactionSystemDesire(system);
-                        sectorDesire += systemDesire;
+                            systemDesires.Add((systemDesire, system));
+                        }
 
-                        systemDesires.Add((systemDesire, system));
+                        sectorDesires.Add((sectorDesire, sector));
                     }
-
-                    sectorDesires.Add((sectorDesire, sector));
                 }
 
                 systemDesires = systemDesires.OrderByDescending(s => s.desire).ToList();
@@ -74,6 +79,24 @@ namespace Code._Factions {
                 factionSystemDesires.Add((factionType, systemDesires));
                 factionSectorDesires.Add((factionType, sectorDesires));
             }
+        }
+
+        public static Faction GetFactionObjectFromType(this Faction.FactionTypeEnum factionType, SolarSystem homeWorld) {
+            if (factionType == Faction.FactionTypeEnum.Agriculture) return new AgricultureFaction(homeWorld);
+            if (factionType == Faction.FactionTypeEnum.Commerce) return new CommerceFaction(homeWorld);
+            if (factionType == Faction.FactionTypeEnum.Industrial) return new IndustrialFaction(homeWorld);
+            if (factionType == Faction.FactionTypeEnum.Military) return new MilitaryFaction(homeWorld);
+            if (factionType == Faction.FactionTypeEnum.Pirate) return new PirateFaction(homeWorld);
+            if (factionType == Faction.FactionTypeEnum.Technology) return new TechnologyFaction(homeWorld);
+            else return null;
+        }
+        
+        public static List<(int desire, Sector sector)> GetFactionSectorPreferencesList(this Faction.FactionTypeEnum factionType) {
+            return factionSectorDesires.Find(f => f.factionType == factionType).sectorDesire; //if generic unfocused factions are desired this can be increased to allow for them
+        }
+        
+        public static List<(int desire, SolarSystem solarSystem)> GetFactionSystemPreferencesList(this Faction.FactionTypeEnum factionType) {
+            return factionSystemDesires.Find(f => f.factionType == factionType).systemDesire; //if generic unfocused factions are desired this can be increased to allow for them
         }
 
         public static List<string> GetFactionGroupNameList(this Faction.FactionTypeEnum factionType) {

@@ -8,7 +8,7 @@ using Code.TextureGen;
 
 namespace Code._Factions.FactionTypes {
     public class TechnologyFaction : Faction {
-        public TechnologyFaction(SolarSystem homeSystem, List<SolarSystem> systems) : base(homeSystem, FactionTypeEnum.Technology, systems) {
+        public TechnologyFaction(SolarSystem homeSystem) : base(homeSystem, FactionTypeEnum.Technology) {
         }
 
         public static int BlackHoleValue = 30;

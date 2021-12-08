@@ -101,9 +101,37 @@ namespace Code._Galaxy {
                 maxFactionAmounts.Add((factionType, (int)Math.Ceiling(factionRatioMultiplier*factionType.FactionRatio())));
             }
 
-            FactionTypeExtension.PreCalcDesireValues(sectors); //Pre calculate (for performance) the preferences for each sector/system to decide which is best for each faction
-
+            FactionTypeExtension.PreCalcDesireValues(sectors); //Pre calculate (for performance) the preferences for each sector/system for each faction
+            
+            //choose a home world for each faction
+            //get the top sector in the list and add it to a chosen sector list
+            //iterate through faction types first before coming back to
+            
             List<Faction> factions = new List<Faction>();
+            List<Sector> pickedSectors = new List<Sector>();
+            int largestTypeNum = maxFactionAmounts.OrderByDescending(a => a.maxFactionsOfType).ToList()[0].maxFactionsOfType;
+            
+            for (int i = 0; i < largestTypeNum; i++) {
+                for (int j = 0; j < numFactionTypes; j++) {
+                    int maxFactionsOfType = maxFactionAmounts.Find(f => f.type == (Faction.FactionTypeEnum)j).maxFactionsOfType; 
+                    if (i < maxFactionsOfType) {
+                        var factionType = (Faction.FactionTypeEnum)j;
+                        Sector preferredSector = factionType.GetFactionSectorPreferencesList().Find(s => !pickedSectors.Contains(s.sector)).sector;
+                        if (preferredSector != null) {//stops trying to add factions when there are no valid sectors
+                            pickedSectors.Add(preferredSector);
+                            SolarSystem preferredSolarSystemInSector = factionType.GetFactionSystemPreferencesList().Find(s => preferredSector.Systems.Contains(s.solarSystem)).solarSystem;
+                            if (preferredSolarSystemInSector != null) {//stops trying to add factions when there are no valid planets in the sector
+                                factions.Add(factionType.GetFactionObjectFromType(preferredSolarSystemInSector));
+                            }
+                        }
+                        
+                    }
+                }
+            }
+            
+            //try to grow the factions up to their max sprawl
+            
+            
             return factions;
         }
 

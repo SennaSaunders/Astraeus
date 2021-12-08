@@ -6,7 +6,7 @@ using Code._Galaxy._SolarSystem;
 
 namespace Code._Factions.FactionTypes {
     public class CommerceFaction : Faction {
-        public CommerceFaction(SolarSystem homeSystem, List<SolarSystem> systems) : base(homeSystem, FactionTypeEnum.Commerce, systems) {
+        public CommerceFaction(SolarSystem homeSystem) : base(homeSystem, FactionTypeEnum.Commerce) {
         }
 
         public static int BlackHoleDesire = -100;
