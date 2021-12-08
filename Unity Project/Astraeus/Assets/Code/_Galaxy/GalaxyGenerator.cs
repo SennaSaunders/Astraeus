@@ -86,52 +86,57 @@ namespace Code._Galaxy {
             //find the ratio of factions to sectors
             int maxFactionSprawlRatio = 0;
             int numFactionTypes = Enum.GetValues(typeof(Faction.FactionTypeEnum)).Length;
-            
+
             for (int i = 0; i < numFactionTypes; i++) {
                 Faction.FactionTypeEnum factionType = (Faction.FactionTypeEnum)i;
-                maxFactionSprawlRatio += factionType.FactionRatio()*factionType.FactionSprawlRatio();
+                maxFactionSprawlRatio += factionType.FactionRatio() * factionType.FactionSprawlRatio();
             }
+
             //then set the max number of factions for each
             float maxPopulationDensity = .7f;
-            float factionRatioMultiplier = (sectorsWithBodies.Count*maxPopulationDensity) / maxFactionSprawlRatio;
-            
+            float factionRatioMultiplier = (sectorsWithBodies.Count * maxPopulationDensity) / maxFactionSprawlRatio;
+
             List<(Faction.FactionTypeEnum type, int maxFactionsOfType)> maxFactionAmounts = new List<(Faction.FactionTypeEnum type, int maxFactionsOfType)>();
             for (int i = 0; i < numFactionTypes; i++) {
                 Faction.FactionTypeEnum factionType = (Faction.FactionTypeEnum)i;
-                maxFactionAmounts.Add((factionType, (int)Math.Ceiling(factionRatioMultiplier*factionType.FactionRatio())));
+                maxFactionAmounts.Add((factionType, (int)Math.Ceiling(factionRatioMultiplier * factionType.FactionRatio())));
             }
 
             FactionTypeExtension.PreCalcDesireValues(sectors); //Pre calculate (for performance) the preferences for each sector/system for each faction
-            
+
             //choose a home world for each faction
             //get the top sector in the list and add it to a chosen sector list
             //iterate through faction types first before coming back to
-            
+
             List<Faction> factions = new List<Faction>();
             List<Sector> pickedSectors = new List<Sector>();
             int largestTypeNum = maxFactionAmounts.OrderByDescending(a => a.maxFactionsOfType).ToList()[0].maxFactionsOfType;
-            
+
             for (int i = 0; i < largestTypeNum; i++) {
                 for (int j = 0; j < numFactionTypes; j++) {
-                    int maxFactionsOfType = maxFactionAmounts.Find(f => f.type == (Faction.FactionTypeEnum)j).maxFactionsOfType; 
+                    int maxFactionsOfType = maxFactionAmounts.Find(f => f.type == (Faction.FactionTypeEnum)j).maxFactionsOfType;
                     if (i < maxFactionsOfType) {
                         var factionType = (Faction.FactionTypeEnum)j;
-                        Sector preferredSector = factionType.GetFactionSectorPreferencesList().Find(s => !pickedSectors.Contains(s.sector)).sector;
-                        if (preferredSector != null) {//stops trying to add factions when there are no valid sectors
-                            pickedSectors.Add(preferredSector);
-                            SolarSystem preferredSolarSystemInSector = factionType.GetFactionSystemPreferencesList().Find(s => preferredSector.Systems.Contains(s.solarSystem)).solarSystem;
-                            if (preferredSolarSystemInSector != null) {//stops trying to add factions when there are no valid planets in the sector
+                        //section of the top results and pick from those - so that all the best sectors aren't always chosen
+                        float topValuePercentage = .05f; //get the top 5%
+                        List<(int desire, Sector sector)> allUnpickedSectors = factionType.GetFactionSectorPreferencesList().FindAll(s => !pickedSectors.Contains(s.sector)); //.Select(s=> s.sector).ToList(); //if only sector is needed - currently not used as this way is easier to see the quality of a system when debugging
+                        List<(int desire, Sector sector)> topSectors = allUnpickedSectors.GetRange(0, (int)Math.Floor(allUnpickedSectors.Count * topValuePercentage));
+                        (int desire, Sector sector) pickedSector = topSectors[Rng.Next(topSectors.Count)];
+                        
+                        if (pickedSector.sector != null) { //stops trying to add factions when there are no valid sectors
+                            pickedSectors.Add(pickedSector.sector);
+                            SolarSystem preferredSolarSystemInSector = factionType.GetFactionSystemPreferencesList().Find(s => pickedSector.sector.Systems.Contains(s.solarSystem)).solarSystem;
+                            if (preferredSolarSystemInSector != null) { //stops trying to add factions when there are no valid planets in the sector
                                 factions.Add(factionType.GetFactionObjectFromType(preferredSolarSystemInSector));
                             }
                         }
-                        
                     }
                 }
             }
-            
+
             //try to grow the factions up to their max sprawl
-            
-            
+
+
             return factions;
         }
 
