@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Code._Factions;
 using Code._Galaxy._SolarSystem;
+using Code._Galaxy.GalaxyComponents;
 
 namespace Code._Galaxy {
     public class Galaxy {

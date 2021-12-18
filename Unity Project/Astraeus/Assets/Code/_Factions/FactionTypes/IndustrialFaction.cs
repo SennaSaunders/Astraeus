@@ -2,12 +2,14 @@
 using Code._CelestialObjects;
 using Code._CelestialObjects.BlackHole;
 using Code._CelestialObjects.Planet;
+using Code._Galaxy;
 using Code._Galaxy._SolarSystem;
+using Code._Galaxy.GalaxyComponents;
 using Code.TextureGen;
 
 namespace Code._Factions.FactionTypes {
     public class IndustrialFaction : Faction {
-        public IndustrialFaction(SolarSystem homeSystem) : base(homeSystem, FactionTypeEnum.Industrial) {
+        public IndustrialFaction(SolarSystem homeSystem) : base(homeSystem,FactionTypeEnum.Industrial) {
         }
 
         public static int WaterWorldDesire = 15;

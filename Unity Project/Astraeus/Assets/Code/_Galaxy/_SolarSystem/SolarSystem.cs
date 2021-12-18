@@ -1,13 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Code._CelestialObjects;
+using Code._Factions;
+using Code._Galaxy.GalaxyComponents;
 using UnityEngine;
 
 namespace Code._Galaxy._SolarSystem {
     public class SolarSystem {
+        public Sector Sector { get; set; }
         public Vector2 Coordinate { get; }
         public List<Body> Bodies { get; }
         public Body Primary { get; }
+
+        public Faction OwnerFaction { get; set; }
         
         public SolarSystem(Vector2 coordinate, Body primary, List<Body> bodies) {
             Coordinate = coordinate;

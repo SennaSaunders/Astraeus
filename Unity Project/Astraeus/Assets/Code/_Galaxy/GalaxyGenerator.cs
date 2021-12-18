@@ -7,6 +7,7 @@ using Code._CelestialObjects.Planet;
 using Code._CelestialObjects.Star;
 using Code._Factions;
 using Code._Galaxy._SolarSystem;
+using Code._Galaxy.GalaxyComponents;
 using Code.TextureGen;
 using UnityEngine;
 using Random = System.Random;
@@ -26,13 +27,11 @@ namespace Code._Galaxy {
 
         public GalaxyStats stats;
 
-
         private bool IsRareRoll(int rarePercentageChance) {
             int maxRoll = 100;
             int rareRoll = maxRoll - rarePercentageChance;
             return Rng.Next(maxRoll) > rareRoll;
         }
-
 
         //Generates a galaxy
         public Galaxy GenGalaxy() {
@@ -67,39 +66,35 @@ namespace Code._Galaxy {
 
             Galaxy galaxy = new Galaxy(solarSystems, GetSectors(solarSystems));
 
-            galaxy.Factions = GenGalaxyFactions(galaxy.Sectors);
+            GenGalaxyFactions(galaxy);
 
             return galaxy;
         }
 
-        private List<Faction> GenGalaxyFactions(List<Sector> sectors) {
-            //get max numbers of systems for each faction type
-            //get max sector size for each faction type
-            //get faction types preferred planet type - for homeworld
-            //assign each faction a starting location - biased towards preferred type of planet - then system size
-            //for each faction get adjacent tiles
-
-            //get max numbers for each faction type
-            //how
-            //need to find the number of sectors with systems inside
+        private void GenGalaxyFactions(Galaxy galaxy) {
+            List<Sector> sectors = galaxy.Sectors;
             List<Sector> sectorsWithBodies = sectors.FindAll(s => s.Systems.Count > 0);
+
             //find the ratio of factions to sectors
-            int maxFactionSprawlRatio = 0;
             int numFactionTypes = Enum.GetValues(typeof(Faction.FactionTypeEnum)).Length;
+            int maxFactionSprawl = 0;
+            int maxTotalFactionSprawl = 0;
 
             for (int i = 0; i < numFactionTypes; i++) {
                 Faction.FactionTypeEnum factionType = (Faction.FactionTypeEnum)i;
-                maxFactionSprawlRatio += factionType.FactionRatio() * factionType.FactionSprawlRatio();
+                int factionSprawl = factionType.GetFactionSprawlRatio();
+                maxFactionSprawl = factionSprawl > maxFactionSprawl ? factionSprawl : maxFactionSprawl;
+                maxTotalFactionSprawl += factionType.GetFactionRatio() * factionSprawl;
             }
 
             //then set the max number of factions for each
             float maxPopulationDensity = .7f;
-            float factionRatioMultiplier = (sectorsWithBodies.Count * maxPopulationDensity) / maxFactionSprawlRatio;
+            float factionRatioMultiplier = (sectorsWithBodies.Count * maxPopulationDensity) / maxTotalFactionSprawl;
 
             List<(Faction.FactionTypeEnum type, int maxFactionsOfType)> maxFactionAmounts = new List<(Faction.FactionTypeEnum type, int maxFactionsOfType)>();
             for (int i = 0; i < numFactionTypes; i++) {
                 Faction.FactionTypeEnum factionType = (Faction.FactionTypeEnum)i;
-                maxFactionAmounts.Add((factionType, (int)Math.Ceiling(factionRatioMultiplier * factionType.FactionRatio())));
+                maxFactionAmounts.Add((factionType, (int)Math.Ceiling(factionRatioMultiplier * factionType.GetFactionRatio())));
             }
 
             FactionTypeExtension.PreCalcDesireValues(sectors); //Pre calculate (for performance) the preferences for each sector/system for each faction
@@ -112,32 +107,44 @@ namespace Code._Galaxy {
             List<Sector> pickedSectors = new List<Sector>();
             int largestTypeNum = maxFactionAmounts.OrderByDescending(a => a.maxFactionsOfType).ToList()[0].maxFactionsOfType;
 
-            for (int i = 0; i < largestTypeNum; i++) {
-                for (int j = 0; j < numFactionTypes; j++) {
-                    int maxFactionsOfType = maxFactionAmounts.Find(f => f.type == (Faction.FactionTypeEnum)j).maxFactionsOfType;
-                    if (i < maxFactionsOfType) {
-                        var factionType = (Faction.FactionTypeEnum)j;
+            for (int factionNum = 0; factionNum < largestTypeNum; factionNum++) {
+                for (int factionTypeIndex = 0; factionTypeIndex < numFactionTypes; factionTypeIndex++) {
+                    int maxFactionsOfType = maxFactionAmounts.Find(f => f.type == (Faction.FactionTypeEnum)factionTypeIndex).maxFactionsOfType;
+                    if (factionNum < maxFactionsOfType) {
+                        Faction.FactionTypeEnum factionType = (Faction.FactionTypeEnum)factionTypeIndex;
                         //section of the top results and pick from those - so that all the best sectors aren't always chosen
-                        float topValuePercentage = .05f; //get the top 5%
-                        List<(int desire, Sector sector)> allUnpickedSectors = factionType.GetFactionSectorPreferencesList().FindAll(s => !pickedSectors.Contains(s.sector)); //.Select(s=> s.sector).ToList(); //if only sector is needed - currently not used as this way is easier to see the quality of a system when debugging
-                        List<(int desire, Sector sector)> topSectors = allUnpickedSectors.GetRange(0, (int)Math.Floor(allUnpickedSectors.Count * topValuePercentage));
-                        (int desire, Sector sector) pickedSector = topSectors[Rng.Next(topSectors.Count)];
-                        
-                        if (pickedSector.sector != null) { //stops trying to add factions when there are no valid sectors
+                        float percentile = .05f; //get the top 5%
+                        List<(int desire, Sector sector)> topSectors = factionType.GetPercentileFactionSectorPreferencesList(percentile).FindAll(s => !pickedSectors.Contains(s.sector)); //gets all top sectors for a faction other than those already picked
+
+                        if (topSectors.Count > 0) { //only creates a faction if there are valid sectors to choose from
+                            (int desire, Sector sector) pickedSector = topSectors[Rng.Next(topSectors.Count)]; //get a random sector in the top list
                             pickedSectors.Add(pickedSector.sector);
                             SolarSystem preferredSolarSystemInSector = factionType.GetFactionSystemPreferencesList().Find(s => pickedSector.sector.Systems.Contains(s.solarSystem)).solarSystem;
-                            if (preferredSolarSystemInSector != null) { //stops trying to add factions when there are no valid planets in the sector
-                                factions.Add(factionType.GetFactionObjectFromType(preferredSolarSystemInSector));
+                            if (preferredSolarSystemInSector != null) {
+                                
+                                Faction faction = factionType.GetFactionObjectFromType(preferredSolarSystemInSector);
+                                factions.Add(faction);
+                                faction.AddSector(pickedSector.sector);
                             }
                         }
                     }
                 }
             }
 
-            //try to grow the factions up to their max sprawl
+            galaxy.Factions = factions;
 
+            // Grow factions
+            for (int sprawlRoll = 0; sprawlRoll < maxFactionSprawl; sprawlRoll++) {
+                for (int factionIndex = 0; factionIndex < factions.Count; factionIndex++) {
+                    Faction faction = factions[factionIndex];
 
-            return factions;
+                    if (sprawlRoll < faction.FactionType.GetFactionSprawlRatio()) { //if this faction is still allowed to grow
+                        if (Rng.NextDouble() < faction.FactionType.GetFactionGrowthChance()) { //if this factions successfully rolls for a chance to grow
+                            bool factionGrew = faction.GrowFaction(galaxy, false);
+                        }
+                    }
+                }
+            }
         }
 
 
@@ -155,6 +162,9 @@ namespace Code._Galaxy {
 
             foreach (Sector sector in sectors) {
                 List<SolarSystem> systems = solarSystems.FindAll(s => sector.SectorTile.IsInsideTile(s.Coordinate));
+                foreach (SolarSystem solarSystem in systems) {
+                    solarSystem.Sector = sector;
+                }
                 sector.SetSolarSystems(systems);
             }
 
@@ -174,8 +184,9 @@ namespace Code._Galaxy {
         }
 
         private static StarType PickRandomStarType(StarType type) {
-            int max = (int)type;
-            StarType starType = (StarType)Rng.Next(max + 1);
+            int min = (int)type;
+            int max = Enum.GetValues(typeof(StarType)).Length+1;
+            StarType starType = (StarType)Rng.Next(min, max);
             return starType;
         }
 
@@ -311,30 +322,6 @@ namespace Code._Galaxy {
             return bodies;
         }
 
-        public class Tile {
-            private readonly float _x1, _x2;
-            private readonly float _y1, _y2;
-            public readonly int XIndex, YIndex;
-
-            public Tile(int xIndex, int yIndex, float x1, float x2, float y1, float y2) {
-                XIndex = xIndex;
-                YIndex = yIndex;
-                _x1 = x1;
-                _x2 = x2;
-                _y1 = y1;
-                _y2 = y2;
-            }
-
-            public Vector2 GetRandomPoint() {
-                float x = (float)Rng.NextDouble() * (_x2 - _x1) + _x1;
-                float y = (float)Rng.NextDouble() * (_y2 - _y1) + _y1;
-                return new Vector2(x, y);
-            }
-
-            public bool IsInsideTile(Vector2 pos) {
-                return pos.x >= _x1 && pos.x < _x2 && pos.y >= _y1 && pos.y < _y2;
-            }
-        }
 
         private static Tile[,] GetTiles(float areaWidth, float areaHeight, float tileSize) {
             //get num of tiles needed
@@ -359,26 +346,6 @@ namespace Code._Galaxy {
             return grid;
         }
 
-        private static List<(int, int)> GetSurroundingIndexes(int x, int y) {
-            List<(int, int)> surroundingIndexes = new List<(int, int)> {
-                (x - 1, y - 1), //top left
-                (x, y - 1), //top middle
-                (x + 1, y - 1), //top right
-                (x - 1, y), //middle left
-                (x + 1, y), //middle right
-                (x - 1, y + 1), //bottom left
-                (x, y + 1), //bottom middle
-                (x + 1, y + 1) //bottom right
-            };
-
-            return surroundingIndexes;
-        }
-
-        private bool InsideMapBounds((int x, int y) pos, int maxX, int maxY) {
-            bool xValid = pos.x >= 0 && pos.x < maxX;
-            bool yValid = pos.y >= 0 && pos.y < maxY;
-            return xValid && yValid;
-        }
 
         private List<Vector2> PickDistributedPoints(int maxPoints, float areaWidth, float areaHeight, float exclusionDistance) {
             Tile[,] tileArray = GetTiles(areaWidth, areaHeight, exclusionDistance);
@@ -388,8 +355,8 @@ namespace Code._Galaxy {
             while (coordinatesList.Count < maxPoints && tileList.Count > 0) {
                 Tile pickedTile = tileList[Rng.Next(tileList.Count)]; //pick random tile
                 tileList.Remove(pickedTile); //removes the selected tile from the potential tiles
-                List<(int x, int y)> surroundingTiles = GetSurroundingIndexes(pickedTile.XIndex, pickedTile.YIndex); //get surrounding tiles
-                foreach (var tile in surroundingTiles.Where(tile => InsideMapBounds(tile, tileArray.GetLength(0), tileArray.GetLength(1)))) {
+                List<(int x, int y)> surroundingTiles = pickedTile.GetSurroundingIndexes(); //get surrounding tiles
+                foreach (var tile in surroundingTiles.Where(tile => Tile.InsideMapTiles(tile, tileArray.GetLength(0) - 1, tileArray.GetLength(1) - 1))) {
                     tileList.Remove(tileArray[tile.x, tile.y]);
                 }
 

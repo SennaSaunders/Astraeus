@@ -40,9 +40,9 @@ MonoBehaviour:
   m_Position:
     serializedVersion: 2
     x: 0
-    y: 486
-    width: 276
-    height: 340
+    y: 338
+    width: 284
+    height: 132
   m_MinSize: {x: 101, y: 121}
   m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 17}
@@ -66,9 +66,9 @@ MonoBehaviour:
   m_Position:
     serializedVersion: 2
     x: 0
-    y: 221
-    width: 1351
-    height: 886
+    y: 268
+    width: 1263
+    height: 839
   m_MinSize: {x: 102, y: 121}
   m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 18}
@@ -93,14 +93,14 @@ MonoBehaviour:
   - {fileID: 3}
   m_Position:
     serializedVersion: 2
-    x: 231
+    x: 311
     y: 0
-    width: 1351
+    width: 1263
     height: 1107
   m_MinSize: {x: 202, y: 342}
   m_MaxSize: {x: 4002, y: 8042}
   vertical: 1
-  controlID: 172
+  controlID: 196
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -146,7 +146,7 @@ MonoBehaviour:
     y: 0
     width: 1858
     height: 1157
-  m_MinSize: {x: 875, y: 542}
+  m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
   m_UseTopView: 1
   m_TopViewHeight: 30
@@ -223,7 +223,7 @@ MonoBehaviour:
   m_MinSize: {x: 709, y: 492}
   m_MaxSize: {x: 18004, y: 14042}
   vertical: 0
-  controlID: 193
+  controlID: 195
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -243,12 +243,12 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 231
+    width: 311
     height: 1107
   m_MinSize: {x: 231, y: 492}
   m_MaxSize: {x: 10001, y: 14042}
   vertical: 1
-  controlID: 200
+  controlID: 99
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -266,7 +266,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 231
+    width: 311
     height: 495
   m_MinSize: {x: 201, y: 221}
   m_MaxSize: {x: 4001, y: 4021}
@@ -292,7 +292,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 495
-    width: 231
+    width: 311
     height: 612
   m_MinSize: {x: 231, y: 271}
   m_MaxSize: {x: 10001, y: 10021}
@@ -318,8 +318,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1351
-    height: 221
+    width: 1263
+    height: 268
   m_MinSize: {x: 202, y: 221}
   m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 21}
@@ -346,14 +346,14 @@ MonoBehaviour:
   - {fileID: 16}
   m_Position:
     serializedVersion: 2
-    x: 1582
+    x: 1574
     y: 0
-    width: 276
+    width: 284
     height: 1107
   m_MinSize: {x: 276, y: 313}
   m_MaxSize: {x: 4001, y: 12063}
   vertical: 1
-  controlID: 194
+  controlID: 145
 --- !u!114 &15
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -371,8 +371,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 276
-    height: 486
+    width: 284
+    height: 338
   m_MinSize: {x: 276, y: 71}
   m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 23}
@@ -396,9 +396,9 @@ MonoBehaviour:
   m_Position:
     serializedVersion: 2
     x: 0
-    y: 826
-    width: 276
-    height: 281
+    y: 470
+    width: 284
+    height: 637
   m_MinSize: {x: 101, y: 121}
   m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 24}
@@ -426,18 +426,18 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: -276
-    y: 559
-    width: 275
-    height: 319
+    x: -284
+    y: 411
+    width: 283
+    height: 111
   m_ViewDataDictionary: {fileID: 0}
   m_Spl:
-    ID: 229
+    ID: 225
     splitterInitialOffset: 174
     currentActiveSplitter: -1
     realSizes:
-    - 118
-    - 131
+    - 32
+    - 32
     relativeSizes:
     - 0.47247708
     - 0.5275229
@@ -447,7 +447,7 @@ MonoBehaviour:
     maxSizes:
     - 0
     - 0
-    lastTotalSize: 249
+    lastTotalSize: 44
     splitSize: 6
     xOffset: 0
     m_Version: 1
@@ -516,7 +516,7 @@ MonoBehaviour:
       name: Astraeus
       fullName: Astraeus
       resultStatus: 1
-      duration: 0.0810288
+      duration: 0.1221451
       messages: 
       output: 
       stacktrace: 
@@ -527,12 +527,12 @@ MonoBehaviour:
       categories: []
       parentId: 
       parentUniqueId: 
-    - id: 1004
+    - id: 1008
       uniqueId: '[Tests.dll][suite]'
       name: Tests.dll
       fullName: C:/Users/senna/Desktop/Uni/Final Project/Astraeus/Unity Project/Astraeus/Library/ScriptAssemblies/Tests.dll
       resultStatus: 1
-      duration: 0.0428394
+      duration: 0.0844112
       messages: 
       output: 
       stacktrace: 
@@ -543,12 +543,12 @@ MonoBehaviour:
       categories: []
       parentId: 1000
       parentUniqueId: '[Astraeus][suite]'
-    - id: 1005
+    - id: 1009
       uniqueId: Tests.dll/[Tests][suite]
       name: Tests
       fullName: Tests
       resultStatus: 1
-      duration: 0.0418721
+      duration: 0.0837263
       messages: 
       output: 
       stacktrace: 
@@ -557,14 +557,14 @@ MonoBehaviour:
       description: 
       isSuite: 1
       categories: []
-      parentId: 1004
+      parentId: 1008
       parentUniqueId: '[Tests.dll][suite]'
     - id: 1001
       uniqueId: Tests.dll/Tests/[Tests][Tests.FactionTest][suite]
       name: FactionTest
       fullName: Tests.FactionTest
       resultStatus: 1
-      duration: 0.0406645
+      duration: 0.0824333
       messages: 
       output: 
       stacktrace: 
@@ -573,14 +573,31 @@ MonoBehaviour:
       description: 
       isSuite: 1
       categories: []
-      parentId: 1005
+      parentId: 1009
       parentUniqueId: Tests.dll/[Tests][suite]
-    - id: 1003
+    - id: 1002
       uniqueId: Tests.dll/Tests/FactionTest/[Tests][Tests.FactionTest.AgriFactionTest]
       name: AgriFactionTest
       fullName: Tests.FactionTest.AgriFactionTest
       resultStatus: 1
-      duration: 0.0170821
+      duration: 0.0591605
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1001
+      parentUniqueId: Tests.dll/Tests/[Tests][Tests.FactionTest][suite]
+    - id: 1003
+      uniqueId: Tests.dll/Tests/FactionTest/[Tests][Tests.FactionTest.CommerceFactionTest]
+      name: CommerceFactionTest
+      fullName: Tests.FactionTest.CommerceFactionTest
+      resultStatus: 1
+      duration: 0.0012804
       messages: 
       output: 
       stacktrace: 
@@ -593,11 +610,11 @@ MonoBehaviour:
       parentId: 1001
       parentUniqueId: Tests.dll/Tests/[Tests][Tests.FactionTest][suite]
     - id: 1004
-      uniqueId: Tests.dll/Tests/FactionTest/[Tests][Tests.FactionTest.CommerceFactionTest]
-      name: CommerceFactionTest
-      fullName: Tests.FactionTest.CommerceFactionTest
+      uniqueId: Tests.dll/Tests/FactionTest/[Tests][Tests.FactionTest.IndustrialFactionTest]
+      name: IndustrialFactionTest
+      fullName: Tests.FactionTest.IndustrialFactionTest
       resultStatus: 1
-      duration: 0.0012619
+      duration: 0.0011452
       messages: 
       output: 
       stacktrace: 
@@ -610,11 +627,11 @@ MonoBehaviour:
       parentId: 1001
       parentUniqueId: Tests.dll/Tests/[Tests][Tests.FactionTest][suite]
     - id: 1005
-      uniqueId: Tests.dll/Tests/FactionTest/[Tests][Tests.FactionTest.IndustrialFactionTest]
-      name: IndustrialFactionTest
-      fullName: Tests.FactionTest.IndustrialFactionTest
+      uniqueId: Tests.dll/Tests/FactionTest/[Tests][Tests.FactionTest.MilitaryFactionTest]
+      name: MilitaryFactionTest
+      fullName: Tests.FactionTest.MilitaryFactionTest
       resultStatus: 1
-      duration: 0.001094
+      duration: 0.0011031
       messages: 
       output: 
       stacktrace: 
@@ -627,11 +644,11 @@ MonoBehaviour:
       parentId: 1001
       parentUniqueId: Tests.dll/Tests/[Tests][Tests.FactionTest][suite]
     - id: 1006
-      uniqueId: Tests.dll/Tests/FactionTest/[Tests][Tests.FactionTest.MilitaryFactionTest]
-      name: MilitaryFactionTest
-      fullName: Tests.FactionTest.MilitaryFactionTest
+      uniqueId: Tests.dll/Tests/FactionTest/[Tests][Tests.FactionTest.PirateFactionTest]
+      name: PirateFactionTest
+      fullName: Tests.FactionTest.PirateFactionTest
       resultStatus: 1
-      duration: 0.0038012
+      duration: 0.0011146
       messages: 
       output: 
       stacktrace: 
@@ -644,28 +661,11 @@ MonoBehaviour:
       parentId: 1001
       parentUniqueId: Tests.dll/Tests/[Tests][Tests.FactionTest][suite]
     - id: 1007
-      uniqueId: Tests.dll/Tests/FactionTest/[Tests][Tests.FactionTest.PirateFactionTest]
-      name: PirateFactionTest
-      fullName: Tests.FactionTest.PirateFactionTest
-      resultStatus: 1
-      duration: 0.0011224
-      messages: 
-      output: 
-      stacktrace: 
-      notRunnable: 0
-      ignoredOrSkipped: 0
-      description: 
-      isSuite: 0
-      categories:
-      - Uncategorized
-      parentId: 1001
-      parentUniqueId: Tests.dll/Tests/[Tests][Tests.FactionTest][suite]
-    - id: 1008
       uniqueId: Tests.dll/Tests/FactionTest/[Tests][Tests.FactionTest.TechnologyFactionTest]
       name: TechnologyFactionTest
       fullName: Tests.FactionTest.TechnologyFactionTest
       resultStatus: 1
-      duration: 0.0010839
+      duration: 0.0011029
       messages: 
       output: 
       stacktrace: 
@@ -729,10 +729,10 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: -1627
-    y: 294
-    width: 1349
-    height: 865
+    x: -1547
+    y: 341
+    width: 1261
+    height: 818
   m_ViewDataDictionary: {fileID: 0}
   m_SerializedViewNames: []
   m_SerializedViewValues: []
@@ -776,10 +776,10 @@ MonoBehaviour:
       serializedVersion: 2
       x: 0
       y: 21
-      width: 1349
-      height: 844
-    m_Scale: {x: 0.5269531, y: 0.5269531}
-    m_Translation: {x: 674.5, y: 422}
+      width: 1261
+      height: 797
+    m_Scale: {x: 0.49257812, y: 0.49257812}
+    m_Translation: {x: 630.5, y: 398.5}
     m_MarginLeft: 0
     m_MarginRight: 0
     m_MarginTop: 0
@@ -787,12 +787,12 @@ MonoBehaviour:
     m_LastShownAreaInsideMargins:
       serializedVersion: 2
       x: -1280
-      y: -800.83026
+      y: -809.0087
       width: 2560
-      height: 1601.6605
+      height: 1618.0175
     m_MinimalGUI: 1
-  m_defaultScale: 0.5269531
-  m_LastWindowPixelSize: {x: 1349, y: 865}
+  m_defaultScale: 0.49257812
+  m_LastWindowPixelSize: {x: 1261, y: 818}
   m_ClearInEditMode: 1
   m_NoCameraWarning: 1
   m_LowResolutionForAspectRatios: 01000000000000000000
@@ -820,7 +820,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: -1858
     y: 73
-    width: 230
+    width: 310
     height: 474
   m_ViewDataDictionary: {fileID: 0}
   m_SceneHierarchy:
@@ -828,7 +828,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 52fbffff
+      m_ExpandedIDs: 4cfbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -874,7 +874,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: -1858
     y: 568
-    width: 230
+    width: 310
     height: 591
   m_ViewDataDictionary: {fileID: 0}
   m_SearchFilter:
@@ -904,7 +904,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 923c0000
     m_LastClickedID: 15506
-    m_ExpandedIDs: 00000000d03e0000d23e0000d43e0000d63e0000d83e0000da3e0000dc3e0000de3e0000
+    m_ExpandedIDs: 00000000d43e0000d63e0000d83e0000da3e0000dc3e0000de3e0000e03e0000e23e0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -932,7 +932,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: ffffffff00000000d03e0000d23e0000d43e0000d63e0000d83e0000da3e0000dc3e0000de3e0000
+    m_ExpandedIDs: ffffffff00000000d43e0000d63e0000d83e0000da3e0000dc3e0000de3e0000e03e0000e23e0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1008,10 +1008,10 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: -1627
+    x: -1547
     y: 73
-    width: 1349
-    height: 200
+    width: 1261
+    height: 247
   m_ViewDataDictionary: {fileID: 0}
   m_ShowContextualTools: 0
   m_WindowGUID: cef332f130d91014ab0ffde9d85c2e38
@@ -1024,9 +1024,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 1136.965, y: 852.08923, z: 217.00507}
+    m_Target: {x: 1411.877, y: 1492.1539, z: 226.46234}
     speed: 2
-    m_Value: {x: 1136.965, y: 852.08923, z: 217.00507}
+    m_Value: {x: 1411.877, y: 1492.1539, z: 226.46234}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1077,9 +1077,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0.032934416, y: 0.059931416, z: -0.0019796214, w: 0.99765706}
   m_Size:
-    m_Target: 1219.1333
+    m_Target: 1054.5503
     speed: 2
-    m_Value: 1219.1333
+    m_Value: 1054.5503
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -1149,10 +1149,10 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: -276
+    x: -284
     y: 73
-    width: 275
-    height: 465
+    width: 283
+    height: 317
   m_ViewDataDictionary: {fileID: 0}
   m_ObjectsLockedBeforeSerialization: []
   m_InstanceIDsLockedBeforeSerialization: 
@@ -1186,10 +1186,10 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: -276
-    y: 899
-    width: 275
-    height: 260
+    x: -284
+    y: 543
+    width: 283
+    height: 616
   m_ViewDataDictionary: {fileID: 0}
 --- !u!114 &25
 MonoBehaviour:
