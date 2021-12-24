@@ -18,7 +18,7 @@ namespace Code._Galaxy {
     public class GalaxyGenerator : MonoBehaviour {
         public static Random Rng = new Random();
         public GalaxyGeneratorInput seed = new GalaxyGeneratorInput(1337);
-        public GalaxyGeneratorInput maxSystems = new GalaxyGeneratorInput(1, 2000, 500);
+        public GalaxyGeneratorInput maxSystems = new GalaxyGeneratorInput(100, 2000, 500);
         public GalaxyGeneratorInput minBodiesPerSystem = new GalaxyGeneratorInput(1, 5, 1);
         public GalaxyGeneratorInput maxBodiesPerSystem = new GalaxyGeneratorInput(5, 20, 5);
         public GalaxyGeneratorInput width = new GalaxyGeneratorInput(50, 2000, 1000);

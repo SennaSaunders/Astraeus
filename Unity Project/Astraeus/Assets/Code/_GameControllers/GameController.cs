@@ -1,4 +1,6 @@
-﻿using Code._Galaxy;
+﻿using Code._CelestialObjects.Stations;
+using Code._Galaxy;
+using Code._Galaxy._SolarSystem;
 using UnityEngine;
 
 namespace Code._GameControllers {
@@ -29,7 +31,22 @@ namespace Code._GameControllers {
         }
 
         public static GameFocus GameStateFocus;
-        
+
+        private void StartGame() {
+            
+        }
+
+        private SolarSystem GetStartingSystem() {
+            return null;
+        }
+
+        private SpaceStation GetStartingStation() {
+            return null;
+        }
+        //start of game stuff
+        //pick starting system
+        //pick space station in system
+        //spawn player in system
         
     }
 }
