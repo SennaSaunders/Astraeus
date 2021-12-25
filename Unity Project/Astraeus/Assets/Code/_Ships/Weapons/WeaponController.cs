@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Code._Ships.Weapons {
-    public class WeaponController {
+    public class WeaponController {//should be individual weapon not a list of weapons
         public List<(Weapon weapon, int fireGroup)> Weapons; //holds the Weapons from ship components with their fire group
         public int currentFireGroup = 0;
         public WeaponController(List<Weapon> weapons) {
@@ -20,6 +21,14 @@ namespace Code._Ships.Weapons {
         
         //fire
         public void Fire() {
+            //get weapon projectile type
+            //spawn it
+            //set projectile velocity to ship velocity + firing angle/projectile speed vector
+        }
+
+        public void TurnWeapon(Vector2 pointTowards) {
+            //get angle between gun's position and pointTowards
+            //rotate towards 
         }
     }
 }

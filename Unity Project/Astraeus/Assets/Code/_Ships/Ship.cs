@@ -13,12 +13,15 @@ namespace Code._Ships {
         private ThrusterController _thrusterController;
         private WeaponController _weaponController;
         public Vector2 velocity;
+        public float mainForce = 10000;
+        public float manoeuvreForce = 2500;
 
+        
         private void Start() {
             ShipHull = new Hull(null, 5000);
             ShipComponents = new List<ShipComponent>() { 
-                new MainThruster(1, 300, 40000, 5),
-                new ManoeuvringThruster(1, 300, 10000, 5) };
+                new MainThruster(1, 300, mainForce, 5),
+                new ManoeuvringThruster(1, 300, manoeuvreForce, 5) };
             SetupShipControllers();
         }
 
@@ -61,8 +64,9 @@ namespace Code._Ships {
             }
 
             transform.Translate(_thrusterController.velocity * Time.deltaTime, relativeTo:Space.World);
-            transform.rotation = Quaternion.Euler(0,0,_thrusterController.facingAngle);
-            UnityEngine.Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -50);
+            var rotation =Quaternion.Euler(0,0,_thrusterController.facingAngle);
+            transform.rotation = rotation;
+            UnityEngine.Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -30);
         }
 
         private void SetupShipControllers() {

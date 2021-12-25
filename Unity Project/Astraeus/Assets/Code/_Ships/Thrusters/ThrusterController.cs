@@ -16,7 +16,7 @@ namespace Code._Ships.Thrusters {
         public float facingAngle = -90; //degrees - from 0 to 360
         
         
-        public const float MaxSpeed = 250;
+        public const float MaxSpeed = 100;
         public const float MaxRotationSpeed = 90;
 
         public ThrusterController(List<MainThruster> mainThrusters, List<ManoeuvringThruster> manoeuvringThrusters, float shipMass) {
