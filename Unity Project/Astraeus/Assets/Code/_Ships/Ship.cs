@@ -11,7 +11,7 @@ namespace Code._Ships {
         public Hull ShipHull;
         public List<ShipComponent> ShipComponents; //list of all ship components - must be checked against hull to see if all components will fit
         private ThrusterController _thrusterController;
-        private WeaponController _weaponController;
+        private List<WeaponController> _weaponControllers = new List<WeaponController>();
         public Vector2 velocity;
         public float mainForce = 10000;
         public float manoeuvreForce = 2500;
@@ -71,7 +71,10 @@ namespace Code._Ships {
 
         private void SetupShipControllers() {
             _thrusterController = new ThrusterController(GetShipComponents<MainThruster>(), GetShipComponents<ManoeuvringThruster>(), GetShipMass());
-            _weaponController = new WeaponController(GetShipComponents<Weapon>());
+            List<Weapon> weapons = GetShipComponents<Weapon>();
+            foreach (Weapon weapon in weapons) {
+                _weaponControllers.Add(new WeaponController(weapon));
+            }
         }
 
         private float GetShipMass() {

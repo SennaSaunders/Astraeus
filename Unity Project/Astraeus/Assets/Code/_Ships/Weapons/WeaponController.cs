@@ -1,24 +1,16 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Code._Ships.Weapons {
-    public class WeaponController {//should be individual weapon not a list of weapons
-        public List<(Weapon weapon, int fireGroup)> Weapons; //holds the Weapons from ship components with their fire group
-        public int currentFireGroup = 0;
-        public WeaponController(List<Weapon> weapons) {
-            SetWeapons(weapons);
-        }
-
-        public void SetWeapons(List<Weapon> weapons) {
-            List<(Weapon weapon, int fireGroup)> weaponsFireGroup = new List<(Weapon weapon, int fireGroup)>();
-
-            foreach (Weapon weapon in weapons) {//need to check for whether the weapons are already assigned a fire group and not change them if they do
-                weaponsFireGroup.Add((weapon, 0));
-            }
-
-            Weapons = weaponsFireGroup;
-        }
+    public class WeaponController : MonoBehaviour {//should be individual weapon not a list of weapons
+        private Weapon _weapon; //holds the Weapons from ship components with their fire group
+        private float rotation = 0;
         
+        public WeaponController(Weapon weapon) {
+            _weapon = weapon;
+        }
+
         //fire
         public void Fire() {
             //get weapon projectile type
@@ -26,9 +18,17 @@ namespace Code._Ships.Weapons {
             //set projectile velocity to ship velocity + firing angle/projectile speed vector
         }
 
-        public void TurnWeapon(Vector2 pointTowards) {
-            //get angle between gun's position and pointTowards
-            //rotate towards 
+        private void Update() {
+            TurnWeapon();
+        }
+
+        public void TurnWeapon() {
+            Vector3 startingVector = Vector3.right;//need to pass this in from the rotation of the turret 
+            float maxRotationSpeed = 1;//needs to be pulled from the weapon
+            Vector3 targetVector = UnityEngine.Camera.main.ScreenPointToRay(Input.mousePosition).direction;
+            float angle = Vector2.SignedAngle(startingVector, targetVector);
+            Quaternion target = Quaternion.Euler(transform.localRotation.x, transform.localRotation.y, -angle);
+            transform.localRotation = Quaternion.RotateTowards(transform.localRotation, target, maxRotationSpeed);
         }
     }
 }
