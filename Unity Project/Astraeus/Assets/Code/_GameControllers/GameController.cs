@@ -1,6 +1,6 @@
-﻿using Code._CelestialObjects.Stations;
-using Code._Galaxy;
+﻿using Code._Galaxy;
 using Code._Galaxy._SolarSystem;
+using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
 using UnityEngine;
 
 namespace Code._GameControllers {

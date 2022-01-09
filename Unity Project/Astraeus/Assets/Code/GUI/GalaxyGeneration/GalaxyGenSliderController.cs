@@ -2,7 +2,7 @@
 using Code.ObserverPattern;
 using UnityEngine.UI;
 
-namespace Code.GUI {
+namespace Code.GUI.GalaxyGeneration {
     public class GalaxyGenSliderController : GalaxyGenInputModifier, IIntObserver{
         private Slider _slider;
 

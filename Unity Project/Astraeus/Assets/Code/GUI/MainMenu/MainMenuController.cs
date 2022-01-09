@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace Code.GUI {
+namespace Code.GUI.MainMenu {
     public class MainMenuController : MonoBehaviour {
         private GameObject _menu;
         private List<GameSave> _saves = new List<GameSave>();

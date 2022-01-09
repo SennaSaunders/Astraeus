@@ -1,10 +1,12 @@
 ﻿namespace Code._Ships.Power_Plants {
-    public class PowerPlant : ShipComponent {
+    public abstract class PowerPlant : ShipComponent {
+        private static float baseMass = 300;
+        
         public float EnergyCapacity;
         public float CurrentEnergy;
         public float RechargeRate;
         
-        public float DepletionRecoveryTime;
+        public static float DepletionRecoveryTime;
         public bool Depleted = false;
         
         public float DrainPower(float powerRequested) {
@@ -24,7 +26,34 @@
             return outputEffectiveness;
         }
 
-        public PowerPlant(int componentSize,int mass) : base(ShipComponentType.Internal, componentSize, mass) {
+        public PowerPlant(string name, ShipComponentTier componentSize, float baseEnergyCapacity, float baseRechargeRate) : base(name + " Power Plant",ShipComponentType.Internal, componentSize, baseMass) {
+            EnergyCapacity = GetTierMultipliedStat(baseEnergyCapacity, componentSize);
+            CurrentEnergy = EnergyCapacity;
+            RechargeRate = GetTierMultipliedStat(baseRechargeRate, componentSize);
+        }
+    }
+
+    public class PowerPlantHighRecharge : PowerPlant {
+        private static float baseEnergyCapacity = 1000;
+        private static float baseRechargeRate = 250;
+
+        public PowerPlantHighRecharge(ShipComponentTier componentSize) : base("High Recharge",componentSize, baseEnergyCapacity, baseRechargeRate) {
+        }
+    }
+    
+    public class PowerPlantHighCapacity : PowerPlant {
+        private static float baseEnergyCapacity = 3000;
+        private static float baseRechargeRate = 100;
+
+        public PowerPlantHighCapacity(ShipComponentTier componentSize) : base("High Capacity",componentSize, baseEnergyCapacity, baseRechargeRate) {
+        }
+    }
+    
+    public class PowerPlantBalanced : PowerPlant {
+        private static float baseEnergyCapacity = 2000;
+        private static float baseRechargeRate = 200;
+
+        public PowerPlantBalanced(ShipComponentTier componentSize) : base("Balanced",componentSize, baseEnergyCapacity, baseRechargeRate) {
         }
     }
 }

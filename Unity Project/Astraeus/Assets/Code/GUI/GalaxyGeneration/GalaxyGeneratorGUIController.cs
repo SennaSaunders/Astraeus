@@ -2,10 +2,11 @@
 using System.Threading;
 using Code._Galaxy;
 using Code._GameControllers;
+using Code.GUI.Loading;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Code.GUI {
+namespace Code.GUI.GalaxyGeneration {
     public class GalaxyGeneratorGUIController : MonoBehaviour {
         private GalaxyGenerator _generator;
         private GameObject _guiGameObject;

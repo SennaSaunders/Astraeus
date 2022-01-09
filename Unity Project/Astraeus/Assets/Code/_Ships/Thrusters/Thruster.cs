@@ -1,11 +1,11 @@
 ﻿namespace Code._Ships.Thrusters {
-    public class Thruster : ShipComponent {
+    public abstract class Thruster : ShipComponent {
         public float Force;
         public float PowerDraw;
 
-        public Thruster(ShipComponentType componentType, int componentSize, int mass, float force, float powerDraw) : base(componentType, componentSize, mass) {
-            Force = force;
-            PowerDraw = powerDraw;
+        protected Thruster(string name, ShipComponentType componentType, ShipComponentTier componentSize, int baseMass, float baseForce, float basePowerDraw) : base(name,componentType, componentSize, baseMass) {
+            Force = GetTierMultipliedStat(baseForce, componentSize);
+            PowerDraw = GetTierMultipliedStat(basePowerDraw, componentSize);
         }
     }
 }

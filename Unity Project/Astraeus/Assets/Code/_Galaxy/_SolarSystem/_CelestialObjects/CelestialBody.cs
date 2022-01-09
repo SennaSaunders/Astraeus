@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Code._CelestialObjects {
+namespace Code._Galaxy._SolarSystem._CelestialObjects {
     public abstract class CelestialBody : Body {
         protected CelestialBody(Body primary, Vector2 coordinate, BodyTier tier) : base(primary, coordinate, tier) {
         }

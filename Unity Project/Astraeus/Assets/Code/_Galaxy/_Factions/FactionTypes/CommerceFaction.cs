@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using Code._CelestialObjects;
-using Code._CelestialObjects.BlackHole;
-using Code._CelestialObjects.Planet;
-using Code._Galaxy;
-using Code._Galaxy._SolarSystem;
-using Code._Galaxy.GalaxyComponents;
+﻿using Code._Galaxy._SolarSystem;
+using Code._Galaxy._SolarSystem._CelestialObjects;
+using Code._Galaxy._SolarSystem._CelestialObjects.BlackHole;
+using Code._Galaxy._SolarSystem._CelestialObjects.Planet;
 
-namespace Code._Factions.FactionTypes {
+namespace Code._Galaxy._Factions.FactionTypes {
     public class CommerceFaction : Faction {
         public CommerceFaction(SolarSystem homeSystem) : base(homeSystem, FactionTypeEnum.Commerce) {
         }

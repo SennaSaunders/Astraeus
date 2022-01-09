@@ -1,42 +1,31 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Code._Ships.Hulls {
     //ship blueprint for the components allowed on a particular hull 
-    public class Hull {
-        public Hull(List<(ShipComponentType, int maxSize, int maxNum)> hullComponents, int mass) {
-            HullComponents = hullComponents;
-            HullMass = mass;
+    public abstract class Hull : MonoBehaviour {
+        public string BaseHullPath = "Ships/Hulls/";
+        public Vector3 outfittingPosition;
+        public Quaternion outfittingRotation;
+        protected abstract string GetHullPath();
+        
+        protected void SetupHull(List<( ShipComponentType, int maxSize, int maxNum)> internalComponents, float hullMass) {
+            SetHullPrefab(GetHullPath());
+            SetExternalComponents();
+            InternalComponents = internalComponents;
+            HullMass = hullMass;
         }
 
-        public List<(ShipComponentType, int maxSize, int maxNum)> HullComponents;
+        private void SetHullPrefab(string hullPath) {
+            string fullHullPath = BaseHullPath+ hullPath;
+            hullObject = (GameObject)Resources.Load(fullHullPath);
+        }
+
+        public GameObject hullObject;
+        public List<(ShipComponentType, int maxSize, int maxNum)> InternalComponents;
+        public List<(ShipComponentType, int maxSize, Transform parent)> ExternalComponents;
         public float HullMass;
-    }
 
-    public class TestLightHull:Hull {
-        private static List<(ShipComponentType, int maxSize, int maxNum)> hullComponents = new List<(ShipComponentType, int maxSize, int maxNum)>() {
-            (ShipComponentType.MainThruster, 1, 2),         //2 x size 1 Main Thruster
-            (ShipComponentType.ManoeuvringThruster, 1, 4),  //4 x size 1 Manoeuvring Thruster
-            (ShipComponentType.Internal, 2, 1),             //2 x size 1 Internal Bays
-            (ShipComponentType.Internal, 2, 2),             //2 x size 2 Internal Bays
-            (ShipComponentType.Weapon, 2, 2)                // 2 x size 2 weapons hardpoints
-        };
-        public TestLightHull() : base(hullComponents, 5000) {
-        }
+        public abstract void SetExternalComponents();
     }
-    
-    public  class TestLargeHull:Hull {
-        private static List<(ShipComponentType, int maxSize, int maxNum)> hullComponents = new List<(ShipComponentType, int maxSize, int maxNum)>() {
-            (ShipComponentType.MainThruster, 3, 4),
-            (ShipComponentType.ManoeuvringThruster, 3, 8),
-            (ShipComponentType.Internal, 2, 4),
-            (ShipComponentType.Internal, 3, 4),
-            (ShipComponentType.Internal, 5, 2),
-            (ShipComponentType.Weapon, 5, 3),
-            (ShipComponentType.Weapon, 3, 4)
-        };
-        public TestLargeHull() : base(hullComponents, 50000) {
-        }
-    }
-    
-    
 }

@@ -13,19 +13,16 @@ namespace Code._Ships {
         private ThrusterController _thrusterController;
         private List<WeaponController> _weaponControllers = new List<WeaponController>();
         public Vector2 velocity;
-        public float mainForce = 10000;
-        public float manoeuvreForce = 2500;
-
-        
-        private void Start() {
-            ShipHull = new Hull(null, 5000);
-            ShipComponents = new List<ShipComponent>() { 
-                new MainThruster(1, 300, mainForce, 5),
-                new ManoeuvringThruster(1, 300, manoeuvreForce, 5) };
-            SetupShipControllers();
-        }
+        public bool Active { get; set; } = false;
+        public bool PlayerControlled { get; set; } = false;
 
         private void Update() {
+            if (Active && PlayerControlled) {
+                PlayerFlyShip();
+            }
+        }
+
+        private void PlayerFlyShip() {
             velocity = _thrusterController.velocity;
             bool up = Input.GetKey(KeyCode.W);
             bool down = Input.GetKey(KeyCode.S);
@@ -33,28 +30,28 @@ namespace Code._Ships {
             bool right = Input.GetKey(KeyCode.D);
             bool turnLeft = Input.GetKey(KeyCode.Q);
             bool turnRight = Input.GetKey(KeyCode.E);
-
+        
             if (up || down || left || right) {
                 Vector2 moveVector = new Vector2();
                 if (up) {
                     moveVector += Vector2.up;
                 }
-
+        
                 if (down) {
                     moveVector += Vector2.down;
                 }
-
+        
                 if (left) {
                     moveVector += Vector2.left;
                 }
-
+        
                 if (right) {
                     moveVector += Vector2.right;
                 }
-
+        
                 _thrusterController.FireThrusters(moveVector, Time.deltaTime);
             }
-
+        
             if (turnLeft && !turnRight) {
                 _thrusterController.TurnShip(Time.deltaTime, 1);
             }
@@ -62,7 +59,7 @@ namespace Code._Ships {
             if (!turnLeft && turnRight) {
                 _thrusterController.TurnShip(Time.deltaTime, -1);
             }
-
+        
             transform.Translate(_thrusterController.velocity * Time.deltaTime, relativeTo:Space.World);
             var rotation =Quaternion.Euler(0,0,_thrusterController.facingAngle);
             transform.rotation = rotation;

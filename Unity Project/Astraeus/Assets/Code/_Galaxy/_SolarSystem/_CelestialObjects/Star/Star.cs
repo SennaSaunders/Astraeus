@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Code._CelestialObjects.Star {
+namespace Code._Galaxy._SolarSystem._CelestialObjects.Star {
     public class Star : CelestialBody {
         public enum StarType {
             O,

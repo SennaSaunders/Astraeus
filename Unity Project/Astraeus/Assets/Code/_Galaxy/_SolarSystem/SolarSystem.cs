@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Code._CelestialObjects;
-using Code._Factions;
+using Code._Galaxy._Factions;
+using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._Galaxy.GalaxyComponents;
 using UnityEngine;
 

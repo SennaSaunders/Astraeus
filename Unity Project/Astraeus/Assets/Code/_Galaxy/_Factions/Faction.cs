@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Code._CelestialObjects;
-using Code._Factions.FactionTypes;
-using Code._Galaxy;
+using Code._Galaxy._Factions.FactionTypes;
 using Code._Galaxy._SolarSystem;
+using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._Galaxy.GalaxyComponents;
 
-namespace Code._Factions {
+namespace Code._Galaxy._Factions {
     public abstract class Faction {
         public FactionTypeEnum FactionType { get; }
         public SolarSystem HomeSystem { get; }

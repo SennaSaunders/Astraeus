@@ -1,7 +1,7 @@
 ﻿using Code.ObserverPattern;
 using TMPro;
 
-namespace Code.GUI {
+namespace Code.GUI.GalaxyGeneration {
     public class GalaxyGenInputController : GalaxyGenInputModifier, IIntObserver {
         private TMP_InputField _inputField;
 

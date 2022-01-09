@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Code._Factions;
+using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem;
 
 namespace Code._Galaxy.GalaxyComponents {

@@ -1,7 +1,7 @@
 ﻿using Code.TextureGen;
 using UnityEngine;
 
-namespace Code._CelestialObjects.Planet {
+namespace Code._Galaxy._SolarSystem._CelestialObjects.Planet {
     public class Planet : CelestialBody {
         public Planet(Body primary, BodyTier tier, PlanetGen planetGen) : base(primary, tier) {
             PlanetGen = planetGen;

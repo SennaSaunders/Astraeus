@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Code.GUI {
+namespace Code.GUI.Loading {
     public class PlaceInScreenCenterOffset : MonoBehaviour {
         public float xOffset =0;
         public float yOffset=0;

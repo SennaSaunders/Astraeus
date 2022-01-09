@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Code._CelestialObjects.Stations.StationIndustries;
-using Code._CelestialObjects.Stations.StationServices;
+using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationIndustries;
+using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
 
-namespace Code._CelestialObjects.Stations {
+namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations {
     public abstract class Station {
         protected Station(List<StationService> stationServices, List<StationIndustry> stationIndustries) {
             StationServices = stationServices;

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Code._CelestialObjects {
+namespace Code._Galaxy._SolarSystem._CelestialObjects {
     public abstract class Body {
         protected Body(Body primary, Vector2 coordinate, BodyTier tier) {
             SetPrimary(primary);

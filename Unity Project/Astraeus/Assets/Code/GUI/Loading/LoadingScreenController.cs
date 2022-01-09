@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace Code.GUI {
+namespace Code.GUI.Loading {
     public class LoadingScreenController : MonoBehaviour {
         private GameObject _loadingIcon;
 

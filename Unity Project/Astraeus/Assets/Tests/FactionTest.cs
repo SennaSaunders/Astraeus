@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using Code._CelestialObjects;
-using Code._CelestialObjects.BlackHole;
-using Code._CelestialObjects.Planet;
-using Code._CelestialObjects.Star;
-using Code._Factions;
-using Code._Galaxy;
+using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem;
+using Code._Galaxy._SolarSystem._CelestialObjects;
+using Code._Galaxy._SolarSystem._CelestialObjects.BlackHole;
+using Code._Galaxy._SolarSystem._CelestialObjects.Planet;
+using Code._Galaxy._SolarSystem._CelestialObjects.Star;
 using Code._Galaxy.GalaxyComponents;
 using Code.TextureGen;
 using NUnit.Framework;

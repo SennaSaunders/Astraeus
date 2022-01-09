@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Code._Ships;
 using Code._Ships.Thrusters;
 using NUnit.Framework;
 using UnityEngine;
@@ -11,11 +12,11 @@ namespace Tests {
         public static void SetupTest() {
             float shipMass = 10000;
             List<MainThruster> mainThrusters = new List<MainThruster>();
-            MainThruster thruster1 = new MainThruster(1, 300, 20000, 10);
+            MainThruster thruster1 = new PrimitiveThruster(ShipComponentTier.T1);
             mainThrusters.Add(thruster1);
             
             List<ManoeuvringThruster> manoeuvringThrusters=new List<ManoeuvringThruster>();
-            ManoeuvringThruster manoeuvringThruster1 = new ManoeuvringThruster(1, 20, 1000, 2);
+            ManoeuvringThruster manoeuvringThruster1 = new ManoeuvringThruster("",ShipComponentTier.T1, 20, 1000, 2);
             manoeuvringThrusters.Add(manoeuvringThruster1);
             manoeuvringThrusters.Add(manoeuvringThruster1);
             

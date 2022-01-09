@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Code._CelestialObjects;
+using Code._Galaxy._SolarSystem._CelestialObjects;
 using UnityEngine;
 
 namespace Code._Galaxy._SolarSystem {
