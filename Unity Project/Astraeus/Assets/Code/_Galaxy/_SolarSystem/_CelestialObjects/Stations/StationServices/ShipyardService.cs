@@ -7,8 +7,8 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
 
         void SetShipHulls() {
             hulls = new List<Hull>();
-            hulls.Add(gameObject.AddComponent<MedCargoHull>());
-            hulls.Add(gameObject.AddComponent<SmallFighterHull>());
+            hulls.Add(new MedCargoHull());
+            hulls.Add(new SmallFighterHull());
         }
     }
 }

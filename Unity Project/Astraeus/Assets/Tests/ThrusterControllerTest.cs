@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
-using Code._Ships;
-using Code._Ships.Thrusters;
+using Code._Ships.ShipComponents;
+using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
+using Code._Ships.ShipComponents.ExternalComponents.Thrusters.Types;
 using NUnit.Framework;
 using UnityEngine;
 
 namespace Tests {
     public class ThrusterControllerTest {
-        private static ThrusterController _thrusterController;
+        private static ThrustersController _thrustersController;
 
         [SetUp]
         public static void SetupTest() {
@@ -20,7 +21,7 @@ namespace Tests {
             manoeuvringThrusters.Add(manoeuvringThruster1);
             manoeuvringThrusters.Add(manoeuvringThruster1);
             
-            _thrusterController = new ThrusterController(mainThrusters, manoeuvringThrusters, shipMass);
+            _thrustersController = new ThrustersController(mainThrusters, manoeuvringThrusters, shipMass);
         }
 
         [Test]
@@ -30,18 +31,18 @@ namespace Tests {
             Vector2 left = Vector2.left;
             Vector2 right = Vector2.right;
            
-            _thrusterController.facingAngle = 30;
+            _thrustersController.facingAngle = 30;
             
-            _thrusterController.velocity = up;
-            _thrusterController.FireThrusters(up, 1);
-            _thrusterController.velocity = up*1400;
-            _thrusterController.FireThrusters(up, 1);
+            _thrustersController.velocity = up;
+            _thrustersController.FireThrusters(up, 1);
+            _thrustersController.velocity = up*1400;
+            _thrustersController.FireThrusters(up, 1);
             
             
-            _thrusterController.velocity = down;
-            _thrusterController.FireThrusters(up, 1);
-            _thrusterController.velocity = down *1400;
-            _thrusterController.FireThrusters(up, 1);
+            _thrustersController.velocity = down;
+            _thrustersController.FireThrusters(up, 1);
+            _thrustersController.velocity = down *1400;
+            _thrustersController.FireThrusters(up, 1);
         }
         
     }

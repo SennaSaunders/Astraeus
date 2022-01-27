@@ -2,18 +2,26 @@
 using System.Linq;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
 using Code._Ships;
-using Code._Ships.Power_Plants;
-using Code._Ships.Storage;
-using Code._Ships.Thrusters;
-using Code._Ships.Weapons;
+using Code._Ships.ShipComponents;
+using Code._Ships.ShipComponents.ExternalComponents;
+using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
+using Code._Ships.ShipComponents.ExternalComponents.Weapons;
+using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
+using Code._Ships.ShipComponents.InternalComponents.Storage;
+using Code._Utility;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Code.GUI.SpaceStations.Services {
     public class OutfittingGUIController : MonoBehaviour {
-        private Ship _ship;
         private OutfittingService _outfittingService;
         private GameObject _guiGameObject;
+        private PrefabHandler _prefabHandler;
+        private ShipObjectHandler _shipObjectHandler;
+        private Collider _selectedCollider;
+        private  UnityEngine.Camera _camera;
 
         private string _cardPath = "GUIPrefabs/SpaceStation/Services/Outfitting/";
         private string _cargoBayCardPath = "CargoBayCard";
@@ -22,19 +30,30 @@ namespace Code.GUI.SpaceStations.Services {
         private string _powerPlantCardPath = "PowerPlantCard";
 
         private void Start() {
+            _camera = UnityEngine.Camera.main;
+            SetHandlers();
             SetGUIGameObject();
             SetupOutfittingService();
-            DisplayWeaponComponents();
-            DisplayThrusterComponents();
-            DisplayInternalComponents();
             DisplayShip();
+            SetupComponentBtns();
+        }
+
+        private void Update() {
+            CheckSelectionColliders();
+        }
+
+        private void SetHandlers() {
+            _prefabHandler = gameObject.AddComponent<PrefabHandler>();
+            _shipObjectHandler = gameObject.AddComponent<ShipObjectHandler>();
         }
 
         private void DisplayShip() {
-            _ship = _outfittingService.Ships[1];
-            GameObject shipObject = Instantiate(_ship.ShipHull.hullObject);
-            shipObject.transform.position = _ship.ShipHull.outfittingPosition;
-            shipObject.transform.rotation = _ship.ShipHull.outfittingRotation;
+            _shipObjectHandler.ManagedShip = _outfittingService.Ships[0];//needs to be changed to the player's current ship
+            _shipObjectHandler.CreateShip();
+
+            GameObject shipObject = _shipObjectHandler.ShipObject;
+            shipObject.transform.position = _shipObjectHandler.ManagedShip.ShipHull.outfittingPosition;
+            shipObject.transform.rotation = _shipObjectHandler.ManagedShip.ShipHull.outfittingRotation;
         }
 
         private void SetupOutfittingService() {
@@ -52,6 +71,50 @@ namespace Code.GUI.SpaceStations.Services {
             return contentContainer;
         }
 
+        private void SetupComponentBtns() {
+            Button thrustersBtn = GameObject.Find("ThrustersBtn").GetComponentInChildren<Button>();
+            thrustersBtn.onClick.AddListener(delegate { ThrusterBtnClick(); });
+            thrustersBtn.Select();
+            ThrusterBtnClick();
+            Button weaponsBtn = GameObject.Find("WeaponsBtn").GetComponentInChildren<Button>();
+            weaponsBtn.onClick.AddListener(delegate { WeaponBtnClick(); });
+            Button internalBtn = GameObject.Find("InternalBtn").GetComponentInChildren<Button>();
+            internalBtn.onClick.AddListener(delegate { InternalBtnClick(); });
+        }
+
+        private void ThrusterBtnClick() {
+            ClearScrollView();
+            DisplayThrusterComponents();
+            _shipObjectHandler.CreateThrusterSelectionColliders();
+        }
+
+        private void WeaponBtnClick() {
+            ClearScrollView();
+            DisplayWeaponComponents();
+            _shipObjectHandler.CreateWeaponSelectionColliders();
+        }
+
+        private void InternalBtnClick() {
+            ClearScrollView();
+            DisplayInternalComponents();
+            _shipObjectHandler.CreateInternalSelectionColliders();
+        }
+
+        private void ClearScrollView() {
+            GameObject container = GetScrollViewContentContainer();
+
+            for (int i = container.transform.childCount; i > 0; i--) {
+                Destroy(container.transform.GetChild(i-1).gameObject);
+            }
+        }
+
+        private GameObject CreateComponentCard(string cardSpecifier, ShipComponent shipComponent) {
+            GameObject componentCard = _prefabHandler.instantiateObject(_prefabHandler.loadPrefab(_cardPath + cardSpecifier), GetScrollViewContentContainer().transform);
+            CardShipComponentModifier componentModifier = componentCard.AddComponent<CardShipComponentModifier>();
+            componentModifier.Setup(shipComponent, this);
+            return componentCard;
+        }
+        
         private void DisplayThrusterComponents() {
             List<Thruster> thrusters = _outfittingService.AvailableComponents.Where(c => c.GetType().IsSubclassOf(typeof(Thruster))).Cast<Thruster>().ToList();
 
@@ -61,13 +124,12 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void DisplayThruster(Thruster thruster) {
-            GameObject thrusterCard = (GameObject)Resources.Load(_cardPath + _thrusterCardPath);
-            thrusterCard = Instantiate(thrusterCard, GetScrollViewContentContainer().transform);
+            GameObject thrusterCard = CreateComponentCard(_thrusterCardPath, thruster);
 
             Transform cardComponents = thrusterCard.transform.Find("Details");
 
             TextMeshProUGUI title = cardComponents.Find("ComponentName").GetComponent<TextMeshProUGUI>();
-            title.text = thruster.Name + " - " + thruster.ComponentSize;
+            title.text = thruster.ComponentName + " - " + thruster.ComponentSize;
             
             TextMeshProUGUI force = cardComponents.Find("Force").GetComponent<TextMeshProUGUI>();
             force.text = thruster.Force + " N";
@@ -87,14 +149,15 @@ namespace Code.GUI.SpaceStations.Services {
             }
         }
 
+        
+
         private void DisplayWeapon(Weapon weapon) {
-            GameObject weaponCard = (GameObject)Resources.Load(_cardPath + _weaponCardPath);
-            weaponCard = Instantiate(weaponCard, GetScrollViewContentContainer().transform);
+            GameObject weaponCard = CreateComponentCard(_weaponCardPath, weapon);
 
             Transform cardComponents = weaponCard.transform.Find("Details");
 
             TextMeshProUGUI title = cardComponents.Find("ComponentName").GetComponent<TextMeshProUGUI>();
-            title.text = weapon.Name + " - " + weapon.ComponentSize;
+            title.text = weapon.ComponentName + " - " + weapon.ComponentSize;
             
             TextMeshProUGUI damage = cardComponents.Find("Damage").GetComponent<TextMeshProUGUI>();
             damage.text = weapon.Damage + " DMG";
@@ -121,13 +184,12 @@ namespace Code.GUI.SpaceStations.Services {
         }
         
         private void DisplayPowerPlant(PowerPlant powerPlant) {
-            GameObject powerPlantCard = (GameObject)Resources.Load(_cardPath + _powerPlantCardPath);
-            powerPlantCard = Instantiate(powerPlantCard, GetScrollViewContentContainer().transform);
+            GameObject powerPlantCard = CreateComponentCard(_powerPlantCardPath, powerPlant);
 
             Transform cardComponents = powerPlantCard.transform.Find("Details");
 
             TextMeshProUGUI title = cardComponents.Find("ComponentName").GetComponent<TextMeshProUGUI>();
-            title.text = powerPlant.Name + " - " + powerPlant.ComponentSize;
+            title.text = powerPlant.ComponentName + " - " + powerPlant.ComponentSize;
             
             TextMeshProUGUI capacity = cardComponents.Find("Capacity").GetComponent<TextMeshProUGUI>();
             capacity.text = powerPlant.EnergyCapacity + " GW";
@@ -140,16 +202,57 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void DisplayCargoBay(CargoBay cargoBay) {
-            GameObject cargoBayCard = (GameObject)Resources.Load(_cardPath + _cargoBayCardPath);
-            cargoBayCard = Instantiate(cargoBayCard, GetScrollViewContentContainer().transform);
+            GameObject cargoBayCard = CreateComponentCard(_cargoBayCardPath, cargoBay);
 
             Transform cardComponents = cargoBayCard.transform.Find("Details");
 
             TextMeshProUGUI title = cardComponents.Find("ComponentName").GetComponent<TextMeshProUGUI>();
-            title.text = cargoBay.Name + " - " + cargoBay.ComponentSize;
+            title.text = cargoBay.ComponentName + " - " + cargoBay.ComponentSize;
             
             TextMeshProUGUI capacity = cardComponents.Find("Capacity").GetComponent<TextMeshProUGUI>();
             capacity.text = cargoBay.CargoVolume + " Units";
+        }
+
+        private void CheckSelectionColliders() {
+            Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out RaycastHit hit)) {
+                Collider bodyHit = hit.collider;
+
+                if (Input.GetMouseButtonDown(0)) {
+                    _selectedCollider = bodyHit;
+                    Debug.Log(bodyHit.name + " Collider selected");
+                }
+            }
+        }
+
+        private void ChangeSelectedShipExternalComponent(ExternalComponent newComponent) {
+            if (_selectedCollider != null) {
+                bool success = _shipObjectHandler.SetExternalComponent(_selectedCollider.gameObject.name, newComponent);
+                if (!success) {
+                    Debug.Log("Couldn't attach this component");
+                }
+            }
+            else {
+                Debug.Log("Need to select a slot to attach to!");
+            }
+        }
+        
+        class CardShipComponentModifier : MonoBehaviour, IPointerClickHandler {
+            private ShipComponent _shipComponent;
+            private OutfittingGUIController _outfittingGUIController;
+
+            public void Setup(ShipComponent shipComponent, OutfittingGUIController outfittingGUIController) {
+                _shipComponent = shipComponent;
+                _outfittingGUIController = outfittingGUIController;
+            }
+        
+            public void OnPointerClick(PointerEventData eventData) {
+                Debug.Log("Trying to assign: " + _shipComponent.ComponentName + " - " + _shipComponent.ComponentSize);
+                if (_shipComponent.GetType().IsSubclassOf(typeof(ExternalComponent))) {
+                    _outfittingGUIController.ChangeSelectedShipExternalComponent((ExternalComponent)_shipComponent);
+                }
+            }
         }
     }
 }

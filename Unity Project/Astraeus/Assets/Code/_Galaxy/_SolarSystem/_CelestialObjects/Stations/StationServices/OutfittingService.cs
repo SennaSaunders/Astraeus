@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Code._Ships;
 using Code._Ships.Hulls;
-using Code._Ships.Power_Plants;
-using Code._Ships.Storage;
-using Code._Ships.Thrusters;
-using Code._Ships.Weapons.Types;
+using Code._Ships.ShipComponents;
+using Code._Ships.ShipComponents.ExternalComponents.Thrusters.Types;
+using Code._Ships.ShipComponents.ExternalComponents.Weapons.Types;
+using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
+using Code._Ships.ShipComponents.InternalComponents.Storage;
 
 namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
     public class OutfittingService : StationService {
@@ -40,7 +42,6 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
         }
 
         private void AddPowerPlantHighRecharge() {
-            AvailableComponents.Add(new PowerPlantHighRecharge(ShipComponentTier.T1));
             AvailableComponents.Add(new PowerPlantHighRecharge(ShipComponentTier.T2));
             AvailableComponents.Add(new PowerPlantHighRecharge(ShipComponentTier.T3));
             AvailableComponents.Add(new PowerPlantHighRecharge(ShipComponentTier.T4));

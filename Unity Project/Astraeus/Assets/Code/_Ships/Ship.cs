@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using Code._Ships.Hulls;
-using Code._Ships.Storage;
-using Code._Ships.Thrusters;
-using Code._Ships.Weapons;
+using Code._Ships.ShipComponents;
+using Code._Ships.ShipComponents.ExternalComponent.Weapons;
+using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
+using Code._Ships.ShipComponents.ExternalComponents.Weapons;
+using Code._Ships.ShipComponents.InternalComponents.Storage;
 using UnityEngine;
 
 namespace Code._Ships {
     public class Ship : MonoBehaviour {
         public Hull ShipHull;
         public List<ShipComponent> ShipComponents; //list of all ship components - must be checked against hull to see if all components will fit
-        private ThrusterController _thrusterController;
+        private ThrustersController _thrustersController;
         private List<WeaponController> _weaponControllers = new List<WeaponController>();
         public Vector2 velocity;
         public bool Active { get; set; } = false;
@@ -23,7 +25,7 @@ namespace Code._Ships {
         }
 
         private void PlayerFlyShip() {
-            velocity = _thrusterController.velocity;
+            velocity = _thrustersController.velocity;
             bool up = Input.GetKey(KeyCode.W);
             bool down = Input.GetKey(KeyCode.S);
             bool left = Input.GetKey(KeyCode.A);
@@ -49,25 +51,25 @@ namespace Code._Ships {
                     moveVector += Vector2.right;
                 }
         
-                _thrusterController.FireThrusters(moveVector, Time.deltaTime);
+                _thrustersController.FireThrusters(moveVector, Time.deltaTime);
             }
         
             if (turnLeft && !turnRight) {
-                _thrusterController.TurnShip(Time.deltaTime, 1);
+                _thrustersController.TurnShip(Time.deltaTime, 1);
             }
             
             if (!turnLeft && turnRight) {
-                _thrusterController.TurnShip(Time.deltaTime, -1);
+                _thrustersController.TurnShip(Time.deltaTime, -1);
             }
         
-            transform.Translate(_thrusterController.velocity * Time.deltaTime, relativeTo:Space.World);
-            var rotation =Quaternion.Euler(0,0,_thrusterController.facingAngle);
+            transform.Translate(_thrustersController.velocity * Time.deltaTime, relativeTo:Space.World);
+            var rotation =Quaternion.Euler(0,0,_thrustersController.facingAngle);
             transform.rotation = rotation;
             UnityEngine.Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -30);
         }
 
         private void SetupShipControllers() {
-            _thrusterController = new ThrusterController(GetShipComponents<MainThruster>(), GetShipComponents<ManoeuvringThruster>(), GetShipMass());
+            _thrustersController = new ThrustersController(GetShipComponents<MainThruster>(), GetShipComponents<ManoeuvringThruster>(), GetShipMass());
             List<Weapon> weapons = GetShipComponents<Weapon>();
             foreach (Weapon weapon in weapons) {
                 _weaponControllers.Add(new WeaponController(weapon));

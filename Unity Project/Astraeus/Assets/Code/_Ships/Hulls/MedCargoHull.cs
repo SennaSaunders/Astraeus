@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Code._Ships.ShipComponents;
+using Code._Ships.ShipComponents.ExternalComponents;
 using UnityEngine;
 
 namespace Code._Ships.Hulls {
@@ -7,7 +9,7 @@ namespace Code._Ships.Hulls {
         private void Awake() {
             outfittingPosition = new Vector3(0, 0, 10);
             outfittingRotation = Quaternion.Euler(0, -90, 90);
-            SetupHull(internalComponents,5000);
+            SetupHull(5000);
         }
 
         private static List<(ShipComponentType, int maxSize, int maxNum)> internalComponents = new List<(ShipComponentType, int maxSize, int maxNum)>() {
@@ -16,29 +18,27 @@ namespace Code._Ships.Hulls {
             (ShipComponentType.Internal, 2, 2)
         };
         
-        protected override string GetHullPath() {
-            return "Cargo/CargoHullMedium";
+        protected override string GetHullFullPath() {
+            return BaseHullPath+"Cargo/CargoHullMedium";
         }
 
         public override void SetExternalComponents() {
             List<Transform> hullObjects = hullObject.GetComponentsInChildren<Transform>().ToList();
-            Transform frontLeftThruster = hullObjects.Find(g => g.name == "ThrusterHookFL");
-            Transform frontRightThruster = hullObjects.Find(g => g.name == "ThrusterHookFR");
-            Transform backLeftThruster = hullObjects.Find(g => g.name == "ThrusterHookBL");
-            Transform backRightThruster = hullObjects.Find(g => g.name == "ThrusterHookBR");
-            Transform backTurret = hullObjects.Find(g => g.name == "TurretHookB");
-            Transform frontTurret = hullObjects.Find(g => g.name == "TurretHookF");
             
-            List<(ShipComponentType, int maxSize, Transform parent)> externalComponents = new List<(ShipComponentType, int maxSize, Transform parent)>() {
-                (ShipComponentType.MainThruster, 2, frontLeftThruster),
-                (ShipComponentType.MainThruster, 2, frontRightThruster),
-                (ShipComponentType.MainThruster, 2, backLeftThruster),
-                (ShipComponentType.MainThruster, 2, backRightThruster),
-                (ShipComponentType.Weapon, 2, backTurret),
-                (ShipComponentType.Weapon, 2, frontTurret)
+            List<(ShipComponentType, ShipComponentTier maxSize, ExternalComponent concreteComponent, string parentTransformName)> externalComponents = new List<(ShipComponentType, ShipComponentTier maxSize, ExternalComponent concreteComponent, string parentTransformName)>() {
+                (ShipComponentType.MainThruster, ShipComponentTier.T2, null, "ThrusterHookFL"),
+                (ShipComponentType.MainThruster, ShipComponentTier.T2, null,"ThrusterHookFR"),
+                (ShipComponentType.MainThruster, ShipComponentTier.T2, null,"ThrusterHookBL"),
+                (ShipComponentType.MainThruster, ShipComponentTier.T2, null,"ThrusterHookBR"),
+                (ShipComponentType.Weapon,ShipComponentTier.T2, null,"TurretHookB"),
+                (ShipComponentType.Weapon, ShipComponentTier.T2, null,"TurretHookF")
             };
 
             ExternalComponents = externalComponents;
+        }
+
+        public override void SetInternalComponents() {
+            //throw new System.NotImplementedException();
         }
     }
 }
