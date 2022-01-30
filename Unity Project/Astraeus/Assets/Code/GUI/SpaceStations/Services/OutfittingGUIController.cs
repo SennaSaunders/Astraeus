@@ -48,7 +48,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void DisplayShip() {
-            _shipObjectHandler.ManagedShip = _outfittingService.Ships[1]; //needs to be changed to the player's current ship
+            _shipObjectHandler.ManagedShip = _outfittingService.Ships[0]; //needs to be changed to the player's current ship
             _shipObjectHandler.CreateShip();
 
             GameObject shipObject = _shipObjectHandler.ShipObject;

@@ -17,7 +17,7 @@ namespace Code._Ships.Hulls {
         public List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName,bool needsBracket)> ThrusterComponents;
         public float HullMass;
         public Vector3 outfittingPosition;
-        public Quaternion outfittingRotation = Quaternion.Euler(-30, -50, 30);
+        public Quaternion outfittingRotation = Quaternion.Euler(-10, -50, 30);
 
         protected abstract string GetHullFullPath();
 

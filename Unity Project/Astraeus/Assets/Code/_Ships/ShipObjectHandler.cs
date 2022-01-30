@@ -134,6 +134,19 @@ namespace Code._Ships {
                     slot.concreteComponent = mainThruster;
                     
                     if (slot.needsBracket) {
+                        if (holderTransform.childCount > 0) {//clear already assigned components
+                            for (int i = holderTransform.childCount; i > 0; i--) {
+                                Destroy(holderTransform.GetChild(i-1).gameObject);
+                            }
+                        }
+                        
+                        GameObject bracket = _prefabHandler.instantiateObject(_prefabHandler.loadPrefab("Ships/Thrusters/ThrusterBracket"), holderTransform);
+                        float scale = ShipComponent.GetTierMultipliedValue(1, slot.concreteComponent.ComponentSize);
+                        bracket.transform.localScale = new Vector3(scale,scale,scale);
+                        Transform bracketMountTransform = bracket.transform.Find("ThrusterBracket").transform.Find("ThrusterMount").transform;
+                        
+                        CreateExternalShipComponent(bracketMountTransform, slot.concreteComponent, 1);
+
                         //instantiate bracket
                         //get bracket hook
                         //use hook transform as parent for thruster
