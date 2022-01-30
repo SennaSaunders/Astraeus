@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Code._Ships.ShipComponents;
-using Code._Ships.ShipComponents.ExternalComponents;
+using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
+using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using UnityEngine;
 
 namespace Code._Ships.Hulls {
     public class SmallFighterHull:Hull {
         private void Awake() {
             outfittingPosition = new Vector3(0, 0, 10);
-            outfittingRotation = Quaternion.Euler(0, -90, 90);
             SetupHull(5000);
         }
 
@@ -21,16 +20,19 @@ namespace Code._Ships.Hulls {
             return BaseHullPath+"Fighters/SmallFighter";
         }
 
-        public override void SetExternalComponents() {
-            List<(ShipComponentType componentType, ShipComponentTier maxSize, ExternalComponent concreteComponent, string parentTransformName)> externalComponents = new List<(ShipComponentType componentType, ShipComponentTier maxSize, ExternalComponent concreteComponent, string parentTransformName)>() {
-                (ShipComponentType.MainThruster, ShipComponentTier.T1,null, "ThrusterInternalMount"),
+        public override void SetThrusterComponents() {
+            ThrusterComponents = new List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName, bool needsBracket)>() { (ShipComponentType.MainThruster, ShipComponentTier.T1, null, "ThrusterInternalMount", false) };
+        }
+
+        public override void SetWeaponComponents() {
+            List<(ShipComponentType componentType, ShipComponentTier maxSize, Weapon concreteComponent, string parentTransformName)> externalComponents = new List<(ShipComponentType componentType, ShipComponentTier maxSize, Weapon concreteComponent, string parentTransformName)>() {
                 (ShipComponentType.Weapon, ShipComponentTier.T2, null,"LWingTopTurretMount"),
                 (ShipComponentType.Weapon, ShipComponentTier.T2, null,"RWingTopTurretMount"),
                 (ShipComponentType.Weapon, ShipComponentTier.T2, null,"LWingBottomTurretMount"),
                 (ShipComponentType.Weapon, ShipComponentTier.T2, null,"RWingBottomTurretMount")
             };
 
-            ExternalComponents = externalComponents;
+            WeaponComponents = externalComponents;
         }
 
         public override void SetInternalComponents() {

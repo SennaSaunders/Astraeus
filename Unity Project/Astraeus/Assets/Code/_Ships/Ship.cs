@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using Code._Ships.Hulls;
-using Code._Ships.ShipComponents;
-using Code._Ships.ShipComponents.ExternalComponent.Weapons;
+﻿using Code._Ships.Hulls;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
-using Code._Ships.ShipComponents.ExternalComponents.Weapons;
-using Code._Ships.ShipComponents.InternalComponents.Storage;
 using UnityEngine;
 
 namespace Code._Ships {
     public class Ship : MonoBehaviour {
         public Hull ShipHull;
-        public List<ShipComponent> ShipComponents; //list of all ship components - must be checked against hull to see if all components will fit
         private ThrustersController _thrustersController;
-        private List<WeaponController> _weaponControllers = new List<WeaponController>();
         public Vector2 velocity;
         public bool Active { get; set; } = false;
         public bool PlayerControlled { get; set; } = false;
@@ -68,37 +60,37 @@ namespace Code._Ships {
             UnityEngine.Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -30);
         }
 
-        private void SetupShipControllers() {
-            _thrustersController = new ThrustersController(GetShipComponents<MainThruster>(), GetShipComponents<ManoeuvringThruster>(), GetShipMass());
-            List<Weapon> weapons = GetShipComponents<Weapon>();
-            foreach (Weapon weapon in weapons) {
-                _weaponControllers.Add(new WeaponController(weapon));
-            }
-        }
+        // private void SetupShipControllers() {
+        //     _thrustersController = new ThrustersController(GetShipComponents<MainThruster>(), GetShipComponents<ManoeuvringThruster>(), GetShipMass());
+        //     List<Weapon> weapons = GetShipComponents<Weapon>();
+        //     foreach (Weapon weapon in weapons) {
+        //         _weaponControllers.Add(new WeaponController(weapon));
+        //     }
+        // }
 
-        private float GetShipMass() {
-            float shipMass = 0;
-            shipMass += ShipHull.HullMass;
-            foreach (ShipComponent component in ShipComponents) {
-                shipMass += component.ComponentMass;
-
-                if (component.GetType() == typeof(CargoBay)) {
-                    shipMass += ((CargoBay)component).GetCargoMass();
-                }
-            }
-
-            return shipMass;
-        }
-
-        private List<T> GetShipComponents<T>() {
-            List<T> componentList = new List<T>();
-            foreach (ShipComponent shipComponent in ShipComponents) {
-                if (shipComponent.GetType() == typeof(T)) {
-                    componentList.Add((T)Convert.ChangeType(shipComponent, typeof(T)));
-                }
-            }
-
-            return componentList;
-        }
+        // private float GetShipMass() {
+        //     float shipMass = 0;
+        //     shipMass += ShipHull.HullMass;
+        //     foreach (ShipComponent component in ShipComponents) {
+        //         shipMass += component.ComponentMass;
+        //
+        //         if (component.GetType() == typeof(CargoBay)) {
+        //             shipMass += ((CargoBay)component).GetCargoMass();
+        //         }
+        //     }
+        //
+        //     return shipMass;
+        // }
+        //
+        // private List<T> GetShipComponents<T>() {
+        //     List<T> componentList = new List<T>();
+        //     foreach (ShipComponent shipComponent in ShipComponents) {
+        //         if (shipComponent.GetType() == typeof(T)) {
+        //             componentList.Add((T)Convert.ChangeType(shipComponent, typeof(T)));
+        //         }
+        //     }
+        //
+        //     return componentList;
+        // }
     }
 }

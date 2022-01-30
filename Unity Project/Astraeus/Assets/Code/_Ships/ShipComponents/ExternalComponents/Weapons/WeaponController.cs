@@ -3,11 +3,11 @@ using UnityEngine;
 
 namespace Code._Ships.ShipComponents.ExternalComponent.Weapons {
     public class WeaponController : MonoBehaviour {//should be individual weapon not a list of weapons
-        private Weapon _weapon; //holds the Weapons from ship components with their fire group
+        private ExternalComponents.Weapons.Weapon _externalComponent; //holds the Weapons from ship components with their fire group
         private float rotation = 0;
         
-        public WeaponController(Weapon weapon) {
-            _weapon = weapon;
+        public WeaponController(ExternalComponents.Weapons.Weapon externalComponent) {
+            _externalComponent = externalComponent;
         }
 
         //fire
