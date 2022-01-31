@@ -327,12 +327,12 @@ namespace Code.GUI.SpaceStations.Services {
 
             private void ChangeColourNotSelected() {
                 var image = gameObject.GetComponent<SVGImage>();
-                image.color = new Color(255,185,0);
+                image.color = new Color(255/255f,185/255f,0);
             }
             
             private void ChangeColourSelected() {
                 var image = gameObject.GetComponent<SVGImage>();
-                image.color = new Color(0,109,167);
+                image.color = new Color(53/255f,157/255f,255/255f);
             }
 
             public void Setup(Transform objectMountTransform, Transform selectionMountTransform, OutfittingGUIController outfittingGUIController) {
