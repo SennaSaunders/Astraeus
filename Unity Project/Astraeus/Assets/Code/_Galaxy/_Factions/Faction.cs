@@ -8,25 +8,25 @@ using Code._Galaxy.GalaxyComponents;
 
 namespace Code._Galaxy._Factions {
     public abstract class Faction {
-        public FactionTypeEnum FactionType { get; }
+        public FactionType factionType { get; }
         public SolarSystem HomeSystem { get; }
         public List<SolarSystem> Systems { get; }
         public List<Sector> Sectors { get; } = new List<Sector>();
         public string GroupName { get; }
 
-        protected Faction(SolarSystem homeSystem, FactionTypeEnum factionType) {
+        protected Faction(SolarSystem homeSystem, FactionType factionType) {
             HomeSystem = homeSystem;
             Systems = new List<SolarSystem>();
             AddSolarSystem(homeSystem);
-            FactionType = factionType;
+            this.factionType = factionType;
 
-            GroupName = factionType.GetFactionGroupNameList()[GalaxyGenerator.Rng.Next(FactionType.GetFactionGroupNameList().Count)];
+            GroupName = factionType.GetFactionGroupNameList()[GalaxyGenerator.Rng.Next(this.factionType.GetFactionGroupNameList().Count)];
         }
 
         //will affect the type of goods mass produced in this factions systems
         //planet types should also be modifiers to this
         //such as earth likes producing more food
-        public enum FactionTypeEnum {
+        public enum FactionType {
             Agriculture,
             Commerce,
             Industrial,
@@ -56,7 +56,7 @@ namespace Code._Galaxy._Factions {
 
         // attempts to grow the faction by 1 system
         public bool GrowFaction(Galaxy galaxy, bool encroachSectors) {
-            if (GalaxyGenerator.Rng.NextDouble() < FactionType.GetFactionGrowthChance()) {
+            if (GalaxyGenerator.Rng.NextDouble() < factionType.GetFactionGrowthChance()) {
                 List<(int desire, SolarSystem newSystem)> potentialNewSystems = new List<(int desire, SolarSystem newSystem)>();
 
                 foreach (Sector sector in Sectors) {
@@ -73,7 +73,7 @@ namespace Code._Galaxy._Factions {
                         }
 
                         if (!inThisFaction && !inOtherFaction) {
-                            potentialNewSystems.Add((FactionType.GetFactionSystemDesire(solarSystem), solarSystem));
+                            potentialNewSystems.Add((factionType.GetFactionSystemDesire(solarSystem), solarSystem));
                         }
                     }
                 }
@@ -86,7 +86,7 @@ namespace Code._Galaxy._Factions {
                 List<(int desire, Sector sector)> potentialNewSectors = new List<(int desire, Sector sector)>();
                 List<Sector> searchedSectors = new List<Sector>();
 
-                int searchDistance = FactionType.GetFactionSearchDistance();
+                int searchDistance = factionType.GetFactionSearchDistance();
 
                 int maxX = galaxy.Sectors.Select(s => s.SectorTile).Max(t => t.XIndex);
                 int maxY = galaxy.Sectors.Select(s => s.SectorTile).Max(t => t.YIndex);
@@ -116,7 +116,7 @@ namespace Code._Galaxy._Factions {
 
                     sectorsToSearchFrom.AddRange(newAdjacentSectors);
                     foreach (Sector newAdjacentSector in newAdjacentSectors) {
-                        potentialNewSectors.Add((FactionType.GetFactionSectorDesire(newAdjacentSector), newAdjacentSector));
+                        potentialNewSectors.Add((factionType.GetFactionSectorDesire(newAdjacentSector), newAdjacentSector));
                     }
                 }
 
@@ -131,7 +131,7 @@ namespace Code._Galaxy._Factions {
                 //add systems in valid sectors to potentials
                 foreach ((int desire, Sector sector) potentialNewSector in potentialNewSectors) {
                     foreach (SolarSystem solarSystem in potentialNewSector.sector.Systems) {
-                        potentialNewSystems.Add((FactionType.GetFactionSystemDesire(solarSystem), solarSystem));
+                        potentialNewSystems.Add((factionType.GetFactionSystemDesire(solarSystem), solarSystem));
                     }
                 }
                 
@@ -219,8 +219,8 @@ namespace Code._Galaxy._Factions {
                     if (bestSector.weightedDesire > bestSystem.weightedDesire) {
                         //choose the best system in the sector
 
-                        int maxDesire = bestSector.sector.Systems.Max(s => FactionType.GetFactionSystemDesire(s));
-                        SolarSystem bestInSector = bestSector.sector.Systems.Find(s => FactionType.GetFactionSystemDesire(s) == maxDesire);
+                        int maxDesire = bestSector.sector.Systems.Max(s => factionType.GetFactionSystemDesire(s));
+                        SolarSystem bestInSector = bestSector.sector.Systems.Find(s => factionType.GetFactionSystemDesire(s) == maxDesire);
                         AddSolarSystem(bestInSector);
                         return true;
                     }
@@ -239,27 +239,27 @@ namespace Code._Galaxy._Factions {
     }
 
     public static class FactionTypeExtension {
-        private static List<(Faction.FactionTypeEnum factionType, List<(int desire, SolarSystem system)> systemDesire)> factionSystemDesires = new List<(Faction.FactionTypeEnum, List<(int desire, SolarSystem system)>)>();
-        private static List<(Faction.FactionTypeEnum factionType, List<(int desire, Sector sector)> sectorDesire)> factionSectorDesires = new List<(Faction.FactionTypeEnum, List<(int desire, Sector sector)>)>();
+        private static List<(Faction.FactionType factionType, List<(int desire, SolarSystem system)> systemDesire)> factionSystemDesires = new List<(Faction.FactionType, List<(int desire, SolarSystem system)>)>();
+        private static List<(Faction.FactionType factionType, List<(int desire, Sector sector)> sectorDesire)> factionSectorDesires = new List<(Faction.FactionType, List<(int desire, Sector sector)>)>();
 
-        public static int GetFactionSearchDistance(this Faction.FactionTypeEnum factionType) {
-            if (factionType == Faction.FactionTypeEnum.Agriculture) return 2;
-            if (factionType == Faction.FactionTypeEnum.Commerce) return 2;
-            if (factionType == Faction.FactionTypeEnum.Industrial) return 2;
-            if (factionType == Faction.FactionTypeEnum.Military) return 3;
-            if (factionType == Faction.FactionTypeEnum.Pirate) return 1;
-            if (factionType == Faction.FactionTypeEnum.Technology) return 4;
+        public static int GetFactionSearchDistance(this Faction.FactionType factionType) {
+            if (factionType == Faction.FactionType.Agriculture) return 2;
+            if (factionType == Faction.FactionType.Commerce) return 2;
+            if (factionType == Faction.FactionType.Industrial) return 2;
+            if (factionType == Faction.FactionType.Military) return 3;
+            if (factionType == Faction.FactionType.Pirate) return 1;
+            if (factionType == Faction.FactionType.Technology) return 4;
             else return 0;
         }
 
         public static void PreCalcDesireValues(List<Sector> sectors) {
-            factionSectorDesires = new List<(Faction.FactionTypeEnum factionType, List<(int desire, Sector sector)> sectorDesire)>();
-            factionSystemDesires = new List<(Faction.FactionTypeEnum factionType, List<(int desire, SolarSystem system)> systemDesire)>();
-            int numFactionTypes = Enum.GetValues(typeof(Faction.FactionTypeEnum)).Length;
+            factionSectorDesires = new List<(Faction.FactionType factionType, List<(int desire, Sector sector)> sectorDesire)>();
+            factionSystemDesires = new List<(Faction.FactionType factionType, List<(int desire, SolarSystem system)> systemDesire)>();
+            int numFactionTypes = Enum.GetValues(typeof(Faction.FactionType)).Length;
 
             //could make multithreaded and calc a faction on each thread - need to ensure list stays in correct order - pre instantiate it?
             for (int i = 0; i < numFactionTypes; i++) { //for each faction type
-                Faction.FactionTypeEnum factionType = (Faction.FactionTypeEnum)i;
+                Faction.FactionType factionType = (Faction.FactionType)i;
 
                 List<(int desire, SolarSystem system)> systemDesires = new List<(int desire, SolarSystem system)>();
                 List<(int desire, Sector sector)> sectorDesires = new List<(int desire, Sector sector)>();
@@ -288,36 +288,36 @@ namespace Code._Galaxy._Factions {
             }
         }
 
-        public static Faction GetFactionObjectFromType(this Faction.FactionTypeEnum factionType, SolarSystem homeWorld) {
-            if (factionType == Faction.FactionTypeEnum.Agriculture) return new AgricultureFaction(homeWorld);
-            if (factionType == Faction.FactionTypeEnum.Commerce) return new CommerceFaction(homeWorld);
-            if (factionType == Faction.FactionTypeEnum.Industrial) return new IndustrialFaction(homeWorld);
-            if (factionType == Faction.FactionTypeEnum.Military) return new MilitaryFaction(homeWorld);
-            if (factionType == Faction.FactionTypeEnum.Pirate) return new PirateFaction(homeWorld);
-            if (factionType == Faction.FactionTypeEnum.Technology) return new TechnologyFaction(homeWorld);
+        public static Faction GetFactionObjectFromType(this Faction.FactionType factionType, SolarSystem homeWorld) {
+            if (factionType == Faction.FactionType.Agriculture) return new AgricultureFaction(homeWorld);
+            if (factionType == Faction.FactionType.Commerce) return new CommerceFaction(homeWorld);
+            if (factionType == Faction.FactionType.Industrial) return new IndustrialFaction(homeWorld);
+            if (factionType == Faction.FactionType.Military) return new MilitaryFaction(homeWorld);
+            if (factionType == Faction.FactionType.Pirate) return new PirateFaction(homeWorld);
+            if (factionType == Faction.FactionType.Technology) return new TechnologyFaction(homeWorld);
             else return null;
         }
 
-        public static List<(int desire, Sector sector)> GetFactionSectorPreferencesList(this Faction.FactionTypeEnum factionType) {
+        public static List<(int desire, Sector sector)> GetFactionSectorPreferencesList(this Faction.FactionType factionType) {
             return factionSectorDesires.Find(f => f.factionType == factionType).sectorDesire; //if generic unfocused factions are desired this can be increased to allow for them
         }
 
-        public static List<(int desire, SolarSystem solarSystem)> GetFactionSystemPreferencesList(this Faction.FactionTypeEnum factionType) {
+        public static List<(int desire, SolarSystem solarSystem)> GetFactionSystemPreferencesList(this Faction.FactionType factionType) {
             return factionSystemDesires.Find(f => f.factionType == factionType).systemDesire; //if generic unfocused factions are desired this can be increased to allow for them
         }
 
-        public static List<(int desire, Sector sector)> GetPercentileFactionSectorPreferencesList(this Faction.FactionTypeEnum factionType, float percentage) {
+        public static List<(int desire, Sector sector)> GetPercentileFactionSectorPreferencesList(this Faction.FactionType factionType, float percentage) {
             List<(int desire, Sector sector)> allFactionPreferences = factionType.GetFactionSectorPreferencesList();
             return allFactionPreferences.GetRange(0, (int)Math.Floor(allFactionPreferences.Count * percentage));
         }
 
-        public static List<(int desire, SolarSystem system)> GetPercentileFactionSystemPreferencesList(this Faction.FactionTypeEnum factionType, float percentage) {
+        public static List<(int desire, SolarSystem system)> GetPercentileFactionSystemPreferencesList(this Faction.FactionType factionType, float percentage) {
             List<(int desire, SolarSystem solarSystem)> allFactionPreferences = factionType.GetFactionSystemPreferencesList();
             return allFactionPreferences.GetRange(0, (int)Math.Floor(allFactionPreferences.Count * percentage));
         }
 
-        public static List<string> GetFactionGroupNameList(this Faction.FactionTypeEnum factionType) {
-            if (factionType == Faction.FactionTypeEnum.Agriculture)
+        public static List<string> GetFactionGroupNameList(this Faction.FactionType factionType) {
+            if (factionType == Faction.FactionType.Agriculture)
                 return new List<string> {
                     "Growers",
                     "Farmers",
@@ -326,7 +326,7 @@ namespace Code._Galaxy._Factions {
                     "Tillers",
                     "Cultivators"
                 };
-            if (factionType == Faction.FactionTypeEnum.Commerce)
+            if (factionType == Faction.FactionType.Commerce)
                 return new List<string> {
                     "Trading Company",
                     "Traders",
@@ -336,7 +336,7 @@ namespace Code._Galaxy._Factions {
                     "Enterprise",
                     "Firm"
                 };
-            if (factionType == Faction.FactionTypeEnum.Industrial)
+            if (factionType == Faction.FactionType.Industrial)
                 return new List<string> {
                     "Industrialists",
                     "Builders",
@@ -347,7 +347,7 @@ namespace Code._Galaxy._Factions {
                     "Mechanics",
                     "Technicians"
                 };
-            if (factionType == Faction.FactionTypeEnum.Military)
+            if (factionType == Faction.FactionType.Military)
                 return new List<string> {
                     "Empire",
                     "Hegemony",
@@ -360,7 +360,7 @@ namespace Code._Galaxy._Factions {
                     "Federation",
                     "League"
                 };
-            if (factionType == Faction.FactionTypeEnum.Pirate)
+            if (factionType == Faction.FactionType.Pirate)
                 return new List<string> {
                     "Horde",
                     "Gang",
@@ -373,7 +373,7 @@ namespace Code._Galaxy._Factions {
                     "Cabal",
                     "Mob"
                 };
-            if (factionType == Faction.FactionTypeEnum.Technology)
+            if (factionType == Faction.FactionType.Technology)
                 return new List<string> {
                     "Collective",
                     "Association",
@@ -387,55 +387,55 @@ namespace Code._Galaxy._Factions {
             else return new List<string> { "Faction" };
         }
 
-        public static int GetFactionRatio(this Faction.FactionTypeEnum factionType) {
-            if (factionType == Faction.FactionTypeEnum.Agriculture) return 8;
-            if (factionType == Faction.FactionTypeEnum.Commerce) return 7;
-            if (factionType == Faction.FactionTypeEnum.Industrial) return 5;
-            if (factionType == Faction.FactionTypeEnum.Military) return 4;
-            if (factionType == Faction.FactionTypeEnum.Pirate) return 8;
-            if (factionType == Faction.FactionTypeEnum.Technology) return 2;
+        public static int GetFactionRatio(this Faction.FactionType factionType) {
+            if (factionType == Faction.FactionType.Agriculture) return 8;
+            if (factionType == Faction.FactionType.Commerce) return 7;
+            if (factionType == Faction.FactionType.Industrial) return 5;
+            if (factionType == Faction.FactionType.Military) return 4;
+            if (factionType == Faction.FactionType.Pirate) return 8;
+            if (factionType == Faction.FactionType.Technology) return 2;
             else return 0; //if generic unfocused factions are desired this can be increased to allow for them
         }
 
-        public static int GetFactionSprawlRatio(this Faction.FactionTypeEnum factionType) {
-            if (factionType == Faction.FactionTypeEnum.Agriculture) return 5;
-            if (factionType == Faction.FactionTypeEnum.Commerce) return 5;
-            if (factionType == Faction.FactionTypeEnum.Industrial) return 5;
-            if (factionType == Faction.FactionTypeEnum.Military) return 10;
-            if (factionType == Faction.FactionTypeEnum.Pirate) return 2;
-            if (factionType == Faction.FactionTypeEnum.Technology) return 3;
+        public static int GetFactionSprawlRatio(this Faction.FactionType factionType) {
+            if (factionType == Faction.FactionType.Agriculture) return 5;
+            if (factionType == Faction.FactionType.Commerce) return 5;
+            if (factionType == Faction.FactionType.Industrial) return 5;
+            if (factionType == Faction.FactionType.Military) return 10;
+            if (factionType == Faction.FactionType.Pirate) return 2;
+            if (factionType == Faction.FactionType.Technology) return 3;
             else return 0; //if generic unfocused factions are desired this can be increased to allow for them
         }
 
-        public static float GetFactionGrowthChance(this Faction.FactionTypeEnum factionType) {
-            if (factionType == Faction.FactionTypeEnum.Agriculture) return 0.5f;
-            if (factionType == Faction.FactionTypeEnum.Commerce) return 0.6f;
-            if (factionType == Faction.FactionTypeEnum.Industrial) return 0.5f;
-            if (factionType == Faction.FactionTypeEnum.Military) return 0.75f;
-            if (factionType == Faction.FactionTypeEnum.Pirate) return 0.3f;
-            if (factionType == Faction.FactionTypeEnum.Technology) return 0.4f;
+        public static float GetFactionGrowthChance(this Faction.FactionType factionType) {
+            if (factionType == Faction.FactionType.Agriculture) return 0.5f;
+            if (factionType == Faction.FactionType.Commerce) return 0.6f;
+            if (factionType == Faction.FactionType.Industrial) return 0.5f;
+            if (factionType == Faction.FactionType.Military) return 0.75f;
+            if (factionType == Faction.FactionType.Pirate) return 0.3f;
+            if (factionType == Faction.FactionType.Technology) return 0.4f;
             else return 0;
         }
 
-        public static int GetFactionSectorDesire(this Faction.FactionTypeEnum factionType, Sector sector) {
+        public static int GetFactionSectorDesire(this Faction.FactionType factionType, Sector sector) {
             (int desire, Sector sector) sectorDesire = factionSectorDesires.Find(f => f.factionType == factionType).sectorDesire.Find(s => s.sector == sector);
 
             return sectorDesire.desire;
         }
 
-        public static int GetFactionSystemDesire(this Faction.FactionTypeEnum factionType, SolarSystem system) {
+        public static int GetFactionSystemDesire(this Faction.FactionType factionType, SolarSystem system) {
             (int desire, SolarSystem system) systemDesire = factionSystemDesires.Find(f => f.factionType == factionType).systemDesire.Find(s => s.system == system);
             return systemDesire.desire;
         }
 
         //this is private as it is only used in precalculating the desire values for systems/sectors
-        private static int FactionSystemDesire(this Faction.FactionTypeEnum factionType, SolarSystem solarSystem) {
-            if (factionType == Faction.FactionTypeEnum.Agriculture) return AgricultureFaction.GetAgricultureFactionSystemDesire(solarSystem);
-            if (factionType == Faction.FactionTypeEnum.Commerce) return CommerceFaction.GetCommerceFactionSystemDesire(solarSystem);
-            if (factionType == Faction.FactionTypeEnum.Industrial) return IndustrialFaction.GetIndustrialSystemDesire(solarSystem);
-            if (factionType == Faction.FactionTypeEnum.Military) return MilitaryFaction.GetMilitaryFactionSystemDesire(solarSystem);
-            if (factionType == Faction.FactionTypeEnum.Pirate) return PirateFaction.GetPirateFactionSystemDesire(solarSystem);
-            if (factionType == Faction.FactionTypeEnum.Technology) return TechnologyFaction.GetTechnologyFactionSystemDesire(solarSystem);
+        private static int FactionSystemDesire(this Faction.FactionType factionType, SolarSystem solarSystem) {
+            if (factionType == Faction.FactionType.Agriculture) return AgricultureFaction.GetAgricultureFactionSystemDesire(solarSystem);
+            if (factionType == Faction.FactionType.Commerce) return CommerceFaction.GetCommerceFactionSystemDesire(solarSystem);
+            if (factionType == Faction.FactionType.Industrial) return IndustrialFaction.GetIndustrialSystemDesire(solarSystem);
+            if (factionType == Faction.FactionType.Military) return MilitaryFaction.GetMilitaryFactionSystemDesire(solarSystem);
+            if (factionType == Faction.FactionType.Pirate) return PirateFaction.GetPirateFactionSystemDesire(solarSystem);
+            if (factionType == Faction.FactionType.Technology) return TechnologyFaction.GetTechnologyFactionSystemDesire(solarSystem);
             else return 0; //if generic factions are desired this can be altered to allow for them
         }
     }

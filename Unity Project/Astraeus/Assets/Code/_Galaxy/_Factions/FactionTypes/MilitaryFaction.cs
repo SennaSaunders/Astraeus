@@ -5,7 +5,7 @@ using Code.TextureGen;
 
 namespace Code._Galaxy._Factions.FactionTypes {
     public class MilitaryFaction : Faction {
-        public MilitaryFaction(SolarSystem homeSystem) : base(homeSystem, FactionTypeEnum.Military) {
+        public MilitaryFaction(SolarSystem homeSystem) : base(homeSystem, FactionType.Military) {
         }
 
         public static int EarthWorldDesire = 20;

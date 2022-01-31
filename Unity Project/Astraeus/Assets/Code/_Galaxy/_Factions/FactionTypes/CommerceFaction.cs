@@ -5,7 +5,7 @@ using Code._Galaxy._SolarSystem._CelestialObjects.Planet;
 
 namespace Code._Galaxy._Factions.FactionTypes {
     public class CommerceFaction : Faction {
-        public CommerceFaction(SolarSystem homeSystem) : base(homeSystem, FactionTypeEnum.Commerce) {
+        public CommerceFaction(SolarSystem homeSystem) : base(homeSystem, FactionType.Commerce) {
         }
 
         public static int BlackHoleDesire = -100;

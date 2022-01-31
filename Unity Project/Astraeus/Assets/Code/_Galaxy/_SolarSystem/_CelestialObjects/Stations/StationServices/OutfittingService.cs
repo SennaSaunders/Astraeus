@@ -42,6 +42,7 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
         }
 
         private void AddPowerPlantHighRecharge() {
+            AvailableComponents.Add(new PowerPlantHighRecharge(ShipComponentTier.T1));
             AvailableComponents.Add(new PowerPlantHighRecharge(ShipComponentTier.T2));
             AvailableComponents.Add(new PowerPlantHighRecharge(ShipComponentTier.T3));
             AvailableComponents.Add(new PowerPlantHighRecharge(ShipComponentTier.T4));
@@ -96,9 +97,9 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
 
         //weapons
         private void AddAllWeapons() {
-            AddAllRailguns();
             AddAllLaserCannons();
             AddAllBallisticCannons();
+            AddAllRailguns();
         }
 
         private void AddAllRailguns() {

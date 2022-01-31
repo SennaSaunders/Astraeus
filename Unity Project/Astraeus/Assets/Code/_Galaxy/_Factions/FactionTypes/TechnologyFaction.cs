@@ -7,7 +7,7 @@ using Code.TextureGen;
 
 namespace Code._Galaxy._Factions.FactionTypes {
     public class TechnologyFaction : Faction {
-        public TechnologyFaction(SolarSystem homeSystem) : base(homeSystem, FactionTypeEnum.Technology) {
+        public TechnologyFaction(SolarSystem homeSystem) : base(homeSystem, FactionType.Technology) {
         }
 
         public static int BlackHoleValue = 30;

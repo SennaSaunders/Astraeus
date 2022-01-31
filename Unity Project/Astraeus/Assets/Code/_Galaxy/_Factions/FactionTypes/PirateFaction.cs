@@ -5,7 +5,7 @@ using Code.TextureGen;
 
 namespace Code._Galaxy._Factions.FactionTypes {
     public class PirateFaction : Faction {
-        public PirateFaction(SolarSystem homeSystem) : base(homeSystem, FactionTypeEnum.Pirate) {
+        public PirateFaction(SolarSystem homeSystem) : base(homeSystem, FactionType.Pirate) {
         }
 
         public static int EarthlikeDesire = -10;

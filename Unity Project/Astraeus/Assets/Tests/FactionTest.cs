@@ -247,146 +247,146 @@ namespace Tests {
 
         [Test]
         public void AgriFactionTest() {
-            Assert.AreEqual(0, FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[0]));
-            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[1]));
-            Assert.AreEqual(750,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[2]));
-            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[3]));
-            Assert.AreEqual(450,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[4]));
-            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[5]));
-            Assert.AreEqual(200,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[6]));
-            Assert.AreEqual(400,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[7]));
-            Assert.AreEqual(451,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[8]));
-            Assert.AreEqual(-894,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[9]));
-            Assert.AreEqual(-700,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[10]));
-            Assert.AreEqual(-497,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[11]));
-            Assert.AreEqual(-900,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[12]));
-            Assert.AreEqual(-447,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[13]));
-            Assert.AreEqual(903,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[14]));
+            Assert.AreEqual(0, FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[0]));
+            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[1]));
+            Assert.AreEqual(750,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[2]));
+            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[3]));
+            Assert.AreEqual(450,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[4]));
+            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[5]));
+            Assert.AreEqual(200,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[6]));
+            Assert.AreEqual(400,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[7]));
+            Assert.AreEqual(451,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[8]));
+            Assert.AreEqual(-894,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[9]));
+            Assert.AreEqual(-700,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[10]));
+            Assert.AreEqual(-497,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[11]));
+            Assert.AreEqual(-900,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[12]));
+            Assert.AreEqual(-447,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[13]));
+            Assert.AreEqual(903,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[14]));
             
-            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[15]));
-            Assert.AreEqual(1212,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[16]));
-            Assert.AreEqual(-543,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[17]));
-            Assert.AreEqual(-941,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Agriculture, _sectors[18]));
+            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[15]));
+            Assert.AreEqual(1212,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[16]));
+            Assert.AreEqual(-543,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[17]));
+            Assert.AreEqual(-941,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Agriculture, _sectors[18]));
         }
         
         [Test]
         public void CommerceFactionTest() {
-            Assert.AreEqual(0, FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[0]));
-            Assert.AreEqual(14,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[1]));
-            Assert.AreEqual(77,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[2]));
-            Assert.AreEqual(14,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[3]));
-            Assert.AreEqual(41,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[4]));
-            Assert.AreEqual(14,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[5]));
-            Assert.AreEqual(16,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[6]));
-            Assert.AreEqual(26,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[7]));
-            Assert.AreEqual(42,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[8]));
-            Assert.AreEqual(-886,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[9]));
-            Assert.AreEqual(-884,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[10]));
-            Assert.AreEqual(-857,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[11]));
-            Assert.AreEqual(-900,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[12]));
-            Assert.AreEqual(-850,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[13]));
-            Assert.AreEqual(91,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[14]));
+            Assert.AreEqual(0, FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[0]));
+            Assert.AreEqual(14,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[1]));
+            Assert.AreEqual(77,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[2]));
+            Assert.AreEqual(14,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[3]));
+            Assert.AreEqual(41,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[4]));
+            Assert.AreEqual(14,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[5]));
+            Assert.AreEqual(16,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[6]));
+            Assert.AreEqual(26,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[7]));
+            Assert.AreEqual(42,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[8]));
+            Assert.AreEqual(-886,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[9]));
+            Assert.AreEqual(-884,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[10]));
+            Assert.AreEqual(-857,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[11]));
+            Assert.AreEqual(-900,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[12]));
+            Assert.AreEqual(-850,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[13]));
+            Assert.AreEqual(91,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[14]));
             
-            Assert.AreEqual(14,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[15]));
-            Assert.AreEqual(146,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[16]));
-            Assert.AreEqual(-1686,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[17]));
-            Assert.AreEqual(-2516,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Commerce, _sectors[18]));
+            Assert.AreEqual(14,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[15]));
+            Assert.AreEqual(146,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[16]));
+            Assert.AreEqual(-1686,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[17]));
+            Assert.AreEqual(-2516,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Commerce, _sectors[18]));
         }
         
         [Test]
         public void IndustrialFactionTest() {
-            Assert.AreEqual(0, FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[0]));
-            Assert.AreEqual(180,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[1]));
-            Assert.AreEqual(77,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[2]));
-            Assert.AreEqual(180,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[3]));
-            Assert.AreEqual(91,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[4]));
-            Assert.AreEqual(180,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[5]));
-            Assert.AreEqual(16,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[6]));
-            Assert.AreEqual(76,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[7]));
-            Assert.AreEqual(121,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[8]));
-            Assert.AreEqual(-270,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[9]));
-            Assert.AreEqual(-434,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[10]));
-            Assert.AreEqual(-290,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[11]));
-            Assert.AreEqual(-450,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[12]));
-            Assert.AreEqual(-269,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[13]));
-            Assert.AreEqual(262,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[14]));
+            Assert.AreEqual(0, FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[0]));
+            Assert.AreEqual(180,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[1]));
+            Assert.AreEqual(77,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[2]));
+            Assert.AreEqual(180,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[3]));
+            Assert.AreEqual(91,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[4]));
+            Assert.AreEqual(180,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[5]));
+            Assert.AreEqual(16,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[6]));
+            Assert.AreEqual(76,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[7]));
+            Assert.AreEqual(121,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[8]));
+            Assert.AreEqual(-270,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[9]));
+            Assert.AreEqual(-434,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[10]));
+            Assert.AreEqual(-290,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[11]));
+            Assert.AreEqual(-450,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[12]));
+            Assert.AreEqual(-269,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[13]));
+            Assert.AreEqual(262,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[14]));
             
-            Assert.AreEqual(180,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[15]));
-            Assert.AreEqual(528,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[16]));
-            Assert.AreEqual(-491,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[17]));
-            Assert.AreEqual(-747,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Industrial, _sectors[18]));
+            Assert.AreEqual(180,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[15]));
+            Assert.AreEqual(528,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[16]));
+            Assert.AreEqual(-491,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[17]));
+            Assert.AreEqual(-747,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Industrial, _sectors[18]));
         }
         
         [Test]
         public void MilitaryFactionTest() {
-            Assert.AreEqual(0, FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[0]));
-            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[1]));
-            Assert.AreEqual(300,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[2]));
-            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[3]));
-            Assert.AreEqual(85,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[4]));
-            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[5]));
-            Assert.AreEqual(80,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[6]));
-            Assert.AreEqual(84,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[7]));
-            Assert.AreEqual(86,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[8]));
-            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[9]));
-            Assert.AreEqual(80,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[10]));
-            Assert.AreEqual(106,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[11]));
-            Assert.AreEqual(0,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[12]));
-            Assert.AreEqual(88,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[13]));
-            Assert.AreEqual(211,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[14]));
+            Assert.AreEqual(0, FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[0]));
+            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[1]));
+            Assert.AreEqual(300,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[2]));
+            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[3]));
+            Assert.AreEqual(85,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[4]));
+            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[5]));
+            Assert.AreEqual(80,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[6]));
+            Assert.AreEqual(84,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[7]));
+            Assert.AreEqual(86,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[8]));
+            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[9]));
+            Assert.AreEqual(80,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[10]));
+            Assert.AreEqual(106,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[11]));
+            Assert.AreEqual(0,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[12]));
+            Assert.AreEqual(88,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[13]));
+            Assert.AreEqual(211,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[14]));
             
-            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[15]));
-            Assert.AreEqual(397,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[16]));
-            Assert.AreEqual(336,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[17]));
-            Assert.AreEqual(405,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Military, _sectors[18]));
+            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[15]));
+            Assert.AreEqual(397,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[16]));
+            Assert.AreEqual(336,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[17]));
+            Assert.AreEqual(405,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Military, _sectors[18]));
         }
         
         [Test]
         public void PirateFactionTest() {
-            Assert.AreEqual(0, FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[0]));
-            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[1]));
-            Assert.AreEqual(-150,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[2]));
-            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[3]));
-            Assert.AreEqual(-35,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[4]));
-            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[5]));
-            Assert.AreEqual(-40,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[6]));
-            Assert.AreEqual(-36,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[7]));
-            Assert.AreEqual(-34,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[8]));
-            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[9]));
-            Assert.AreEqual(-40,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[10]));
-            Assert.AreEqual(-44,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[11]));
-            Assert.AreEqual(0,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[12]));
-            Assert.AreEqual(-32,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[13]));
-            Assert.AreEqual(-89,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[14]));
+            Assert.AreEqual(0, FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[0]));
+            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[1]));
+            Assert.AreEqual(-150,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[2]));
+            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[3]));
+            Assert.AreEqual(-35,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[4]));
+            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[5]));
+            Assert.AreEqual(-40,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[6]));
+            Assert.AreEqual(-36,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[7]));
+            Assert.AreEqual(-34,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[8]));
+            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[9]));
+            Assert.AreEqual(-40,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[10]));
+            Assert.AreEqual(-44,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[11]));
+            Assert.AreEqual(0,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[12]));
+            Assert.AreEqual(-32,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[13]));
+            Assert.AreEqual(-89,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[14]));
             
-            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[15]));
-            Assert.AreEqual(-173,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[16]));
-            Assert.AreEqual(-144,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[17]));
-            Assert.AreEqual(-165,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Pirate, _sectors[18]));
+            Assert.AreEqual(6,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[15]));
+            Assert.AreEqual(-173,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[16]));
+            Assert.AreEqual(-144,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[17]));
+            Assert.AreEqual(-165,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Pirate, _sectors[18]));
         }
         
         [Test]
         public void TechnologyFactionTest() {
-            Assert.AreEqual(70, FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[0]));
-            Assert.AreEqual(76,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[1]));
-            Assert.AreEqual(520,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[2]));
-            Assert.AreEqual(126,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[3]));
-            Assert.AreEqual(390,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[4]));
-            Assert.AreEqual(186,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[5]));
-            Assert.AreEqual(300,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[6]));
-            Assert.AreEqual(420,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[7]));
-            Assert.AreEqual(451,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[8]));
-            Assert.AreEqual(276,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[9]));
-            Assert.AreEqual(390,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[10]));
-            Assert.AreEqual(513,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[11]));
-            Assert.AreEqual(640,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[12]));
-            Assert.AreEqual(913,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[13]));
-            Assert.AreEqual(613,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[14]));
+            Assert.AreEqual(70, FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[0]));
+            Assert.AreEqual(76,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[1]));
+            Assert.AreEqual(520,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[2]));
+            Assert.AreEqual(126,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[3]));
+            Assert.AreEqual(390,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[4]));
+            Assert.AreEqual(186,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[5]));
+            Assert.AreEqual(300,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[6]));
+            Assert.AreEqual(420,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[7]));
+            Assert.AreEqual(451,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[8]));
+            Assert.AreEqual(276,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[9]));
+            Assert.AreEqual(390,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[10]));
+            Assert.AreEqual(513,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[11]));
+            Assert.AreEqual(640,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[12]));
+            Assert.AreEqual(913,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[13]));
+            Assert.AreEqual(613,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[14]));
             
-            Assert.AreEqual(146,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[15]));
-            Assert.AreEqual(1222,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[16]));
-            Assert.AreEqual(1837,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[17]));
-            Assert.AreEqual(2679,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionTypeEnum.Technology, _sectors[18]));
+            Assert.AreEqual(146,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[15]));
+            Assert.AreEqual(1222,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[16]));
+            Assert.AreEqual(1837,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[17]));
+            Assert.AreEqual(2679,FactionTypeExtension.GetFactionSectorDesire(Faction.FactionType.Technology, _sectors[18]));
         }
     }
 }

@@ -76,12 +76,12 @@ namespace Code._Galaxy {
             List<Sector> sectorsWithBodies = sectors.FindAll(s => s.Systems.Count > 0);
 
             //find the ratio of factions to sectors
-            int numFactionTypes = Enum.GetValues(typeof(Faction.FactionTypeEnum)).Length;
+            int numFactionTypes = Enum.GetValues(typeof(Faction.FactionType)).Length;
             int maxFactionSprawl = 0;
             int maxTotalFactionSprawl = 0;
 
             for (int i = 0; i < numFactionTypes; i++) {
-                Faction.FactionTypeEnum factionType = (Faction.FactionTypeEnum)i;
+                Faction.FactionType factionType = (Faction.FactionType)i;
                 int factionSprawl = factionType.GetFactionSprawlRatio();
                 maxFactionSprawl = factionSprawl > maxFactionSprawl ? factionSprawl : maxFactionSprawl;
                 maxTotalFactionSprawl += factionType.GetFactionRatio() * factionSprawl;
@@ -91,9 +91,9 @@ namespace Code._Galaxy {
             float maxPopulationDensity = .7f;
             float factionRatioMultiplier = (sectorsWithBodies.Count * maxPopulationDensity) / maxTotalFactionSprawl;
 
-            List<(Faction.FactionTypeEnum type, int maxFactionsOfType)> maxFactionAmounts = new List<(Faction.FactionTypeEnum type, int maxFactionsOfType)>();
+            List<(Faction.FactionType type, int maxFactionsOfType)> maxFactionAmounts = new List<(Faction.FactionType type, int maxFactionsOfType)>();
             for (int i = 0; i < numFactionTypes; i++) {
-                Faction.FactionTypeEnum factionType = (Faction.FactionTypeEnum)i;
+                Faction.FactionType factionType = (Faction.FactionType)i;
                 maxFactionAmounts.Add((factionType, (int)Math.Ceiling(factionRatioMultiplier * factionType.GetFactionRatio())));
             }
 
@@ -109,9 +109,9 @@ namespace Code._Galaxy {
 
             for (int factionNum = 0; factionNum < largestTypeNum; factionNum++) {
                 for (int factionTypeIndex = 0; factionTypeIndex < numFactionTypes; factionTypeIndex++) {
-                    int maxFactionsOfType = maxFactionAmounts.Find(f => f.type == (Faction.FactionTypeEnum)factionTypeIndex).maxFactionsOfType;
+                    int maxFactionsOfType = maxFactionAmounts.Find(f => f.type == (Faction.FactionType)factionTypeIndex).maxFactionsOfType;
                     if (factionNum < maxFactionsOfType) {
-                        Faction.FactionTypeEnum factionType = (Faction.FactionTypeEnum)factionTypeIndex;
+                        Faction.FactionType factionType = (Faction.FactionType)factionTypeIndex;
                         //section of the top results and pick from those - so that all the best sectors aren't always chosen
                         float percentile = .05f; //get the top 5%
                         List<(int desire, Sector sector)> topSectors = factionType.GetPercentileFactionSectorPreferencesList(percentile).FindAll(s => !pickedSectors.Contains(s.sector)); //gets all top sectors for a faction other than those already picked
@@ -138,8 +138,8 @@ namespace Code._Galaxy {
                 for (int factionIndex = 0; factionIndex < factions.Count; factionIndex++) {
                     Faction faction = factions[factionIndex];
 
-                    if (sprawlRoll < faction.FactionType.GetFactionSprawlRatio()) { //if this faction is still allowed to grow
-                        if (Rng.NextDouble() < faction.FactionType.GetFactionGrowthChance()) { //if this factions successfully rolls for a chance to grow
+                    if (sprawlRoll < faction.factionType.GetFactionSprawlRatio()) { //if this faction is still allowed to grow
+                        if (Rng.NextDouble() < faction.factionType.GetFactionGrowthChance()) { //if this factions successfully rolls for a chance to grow
                             bool factionGrew = faction.GrowFaction(galaxy, false);
                         }
                     }

@@ -6,7 +6,7 @@ using Code.TextureGen;
 
 namespace Code._Galaxy._Factions.FactionTypes {
     public class IndustrialFaction : Faction {
-        public IndustrialFaction(SolarSystem homeSystem) : base(homeSystem,FactionTypeEnum.Industrial) {
+        public IndustrialFaction(SolarSystem homeSystem) : base(homeSystem,FactionType.Industrial) {
         }
 
         public static int WaterWorldDesire = 15;

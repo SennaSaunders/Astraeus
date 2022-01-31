@@ -6,7 +6,7 @@ using Code.TextureGen;
 
 namespace Code._Galaxy._Factions.FactionTypes {
     public class AgricultureFaction : Faction {
-        public AgricultureFaction(SolarSystem homeSystem) : base(homeSystem, FactionTypeEnum.Agriculture) {
+        public AgricultureFaction(SolarSystem homeSystem) : base(homeSystem, FactionType.Agriculture) {
         }
 
         public static int OrganicWorldDesire = 50;

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
+using Code._Ships.ShipComponents.InternalComponents;
 using UnityEngine;
 
 namespace Code._Ships.Hulls {
@@ -11,8 +11,6 @@ namespace Code._Ships.Hulls {
             outfittingPosition = new Vector3(0, 0, 10);
             SetupHull(5000);
         }
-
-        private static List<(ShipComponentType, int maxSize, int maxNum)> internalComponents = new List<(ShipComponentType, int maxSize, int maxNum)>() { (ShipComponentType.Internal, 1, 4), (ShipComponentType.Internal, 3, 2), (ShipComponentType.Internal, 2, 2) };
 
         protected override string GetHullFullPath() {
             return BaseHullPath + "Cargo/CargoHullMedium";
@@ -38,7 +36,15 @@ namespace Code._Ships.Hulls {
         }
 
         public override void SetInternalComponents() {
-            //throw new System.NotImplementedException();
+            List<(ShipComponentType, ShipComponentTier maxSize, InternalComponent concreteComponent, string parentTransformName)> internalComponents = new List<(ShipComponentType, ShipComponentTier maxSize, InternalComponent concreteComponent, string parentTransformName)>() {
+                (ShipComponentType.Internal, ShipComponentTier.T1, null, "InternalFL"),
+                (ShipComponentType.Internal, ShipComponentTier.T1, null, "InternalFR"),
+                (ShipComponentType.Internal, ShipComponentTier.T2, null, "InternalMF"),
+                (ShipComponentType.Internal, ShipComponentTier.T2, null, "InternalMB"),
+                (ShipComponentType.Internal, ShipComponentTier.T3, null, "InternalB")
+            };
+
+            InternalComponents = internalComponents;
         }
     }
 }

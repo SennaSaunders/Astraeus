@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
 using Code._Ships;
 using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
+using Code._Ships.ShipComponents.InternalComponents;
 using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
 using Code._Ships.ShipComponents.InternalComponents.Storage;
 using Code._Utility;
 using Code.GUI.Utility;
 using TMPro;
+using Unity.VectorGraphics;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -263,6 +264,18 @@ namespace Code.GUI.SpaceStations.Services {
                 Debug.Log("Need to select a slot to attach to!");
             }
         }
+        
+        private void ChangeSelectedInternal(InternalComponent newComponent) {
+            if (selectedSlot != null) {
+                bool success = _shipObjectHandler.SetInternalComponent(selectedSlot._objectMountTransform.gameObject.name, newComponent);
+                if (!success) {
+                    Debug.Log("Couldn't attach this component");
+                }
+            }
+            else {
+                Debug.Log("Need to select a slot to attach to!");
+            }
+        }
 
         class CardShipComponentModifier : MonoBehaviour, IPointerClickHandler {
             private ShipComponent _shipComponent;
@@ -281,6 +294,9 @@ namespace Code.GUI.SpaceStations.Services {
                 else if (_shipComponent.GetType().IsSubclassOf(typeof(MainThruster))) {
                     _outfittingGUIController.ChangeSelectedShipMainThruster((MainThruster)_shipComponent);
                 }
+                else if (_shipComponent.GetType().IsSubclassOf(typeof(InternalComponent))) {
+                    _outfittingGUIController.ChangeSelectedInternal((InternalComponent)_shipComponent);
+                }
             }
         }
 
@@ -288,9 +304,35 @@ namespace Code.GUI.SpaceStations.Services {
             public Transform _selectionMountTransform { get; private set; }
             public Transform _objectMountTransform { get; private set; }
             private OutfittingGUIController _outfittingGUIController;
+            private bool selected = false;
+
+            private void Awake() {
+                ChangeColourNotSelected();
+            }
 
             private void Update() {
                 PositionSelf();
+                CheckSelected();
+            }
+
+            private void CheckSelected() {
+                if (selected) {
+                    if (_outfittingGUIController.selectedSlot != this) {
+                        selected = false;
+                        ChangeColourNotSelected();
+                    }
+                }
+                
+            }
+
+            private void ChangeColourNotSelected() {
+                var image = gameObject.GetComponent<SVGImage>();
+                image.color = new Color(255,185,0);
+            }
+            
+            private void ChangeColourSelected() {
+                var image = gameObject.GetComponent<SVGImage>();
+                image.color = new Color(0,109,167);
             }
 
             public void Setup(Transform objectMountTransform, Transform selectionMountTransform, OutfittingGUIController outfittingGUIController) {
@@ -301,6 +343,8 @@ namespace Code.GUI.SpaceStations.Services {
 
             public void OnPointerClick(PointerEventData eventData) {
                 _outfittingGUIController.selectedSlot = this;
+                selected = true;
+                ChangeColourSelected();
                 Debug.Log("Set selected slot to: " + _objectMountTransform.name);
             }
 

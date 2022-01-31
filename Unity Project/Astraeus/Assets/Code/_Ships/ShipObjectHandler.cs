@@ -4,6 +4,7 @@ using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.ExternalComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
+using Code._Ships.ShipComponents.InternalComponents;
 using Code._Utility;
 using UnityEngine;
 
@@ -25,6 +26,17 @@ namespace Code._Ships {
             CreateHull();
             CreateWeaponComponents();
             CreateMainThrusterComponents();
+            CreateInternalComponents();
+        }
+
+        private void CreateInternalComponents() {
+            ShipComponentType componentType = ShipComponentType.Internal;
+            List<(ShipComponentType componentType, ShipComponentTier maxSize, InternalComponent concreteComponent, string parentTransformName)> componentSlots = ManagedShip.ShipHull.InternalComponents.Where(c => c.componentType == componentType).ToList();
+
+            foreach (var slot in componentSlots) {
+                SetInternalComponent(slot.parentTransformName, slot.concreteComponent);
+            }
+            
         }
 
         private void CreateHull() {
@@ -154,6 +166,31 @@ namespace Code._Ships {
                     else {
                         CreateExternalShipComponent(holderTransform, slot.concreteComponent, ShipComponent.GetTierMultipliedValue(1, slot.concreteComponent.ComponentSize));
                     }
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        
+        public bool SetInternalComponent(string parentName, InternalComponent internalComponent) {
+            //get ShipComponent slot
+            (ShipComponentType componentType, ShipComponentTier maxSize, InternalComponent concreteComponent, string parentTransformName) slot = ManagedShip.ShipHull.InternalComponents.Find(w => w.parentTransformName == parentName);
+
+            //get object transform
+            Transform selectionTransform = MapPrefabTransformStringToTransformObject(parentName);
+            
+            if (InternalComponents.Select(wc => wc.mountTransform).Contains(selectionTransform)) {
+                InternalComponents.Remove(WeaponComponents.Find(wc => wc.mountTransform == selectionTransform));
+            }
+            
+            InternalComponents.Add((selectionTransform,selectionTransform, "Internal - " + slot.maxSize));
+
+            if (selectionTransform != null&&internalComponent!=null) {
+                if (internalComponent.ComponentType == slot.componentType && internalComponent.ComponentSize <= slot.maxSize) {
+                    
+                    //assign & instantiate new component
+                    slot.concreteComponent = internalComponent;
                     return true;
                 }
             }
