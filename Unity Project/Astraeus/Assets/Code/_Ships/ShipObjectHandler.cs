@@ -84,6 +84,7 @@ namespace Code._Ships {
         public bool SetWeaponComponent(string parentName, Weapon weapon) {
             //get ShipComponent slot
             (ShipComponentType componentType, ShipComponentTier maxSize, Weapon concreteComponent, string parentTransformName) slot = ManagedShip.ShipHull.WeaponComponents.Find(w => w.parentTransformName == parentName);
+            
 
             //get object transform
             Transform slotTransform = MapPrefabTransformStringToTransformObject(parentName);
@@ -103,7 +104,10 @@ namespace Code._Ships {
                     }
 
                     //assign & instantiate new component
+                    int slotIndex = ManagedShip.ShipHull.WeaponComponents.IndexOf(slot);
                     slot.concreteComponent = weapon;
+                    ManagedShip.ShipHull.WeaponComponents[slotIndex] = slot;
+                    
                     CreateExternalShipComponent(holderTransform, slot.concreteComponent, ShipComponent.GetTierMultipliedValue(1, slot.concreteComponent.ComponentSize));
                     
                     return true;
@@ -143,8 +147,10 @@ namespace Code._Ships {
                         holderTransform = componentHolder.transform;
                     }
 
+                    int slotIndex = ManagedShip.ShipHull.ThrusterComponents.IndexOf(slot);
                     slot.concreteComponent = mainThruster;
-                    
+                    ManagedShip.ShipHull.ThrusterComponents[slotIndex] = slot;
+
                     if (slot.needsBracket) {
                         if (holderTransform.childCount > 0) {//clear already assigned components
                             for (int i = holderTransform.childCount; i > 0; i--) {
@@ -188,9 +194,10 @@ namespace Code._Ships {
 
             if (selectionTransform != null&&internalComponent!=null) {
                 if (internalComponent.ComponentType == slot.componentType && internalComponent.ComponentSize <= slot.maxSize) {
-                    
-                    //assign & instantiate new component
+                    //assign new component
+                    int slotIndex = ManagedShip.ShipHull.InternalComponents.IndexOf(slot);
                     slot.concreteComponent = internalComponent;
+                    ManagedShip.ShipHull.InternalComponents[slotIndex] = slot;
                     return true;
                 }
             }
