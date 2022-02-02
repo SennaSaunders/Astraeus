@@ -1,4 +1,6 @@
-﻿using Code._Galaxy._SolarSystem;
+﻿using System.Collections.Generic;
+using Code._Galaxy._Factions;
+using Code._Galaxy._SolarSystem;
 using UnityEngine;
 
 namespace Code._Galaxy {
@@ -56,6 +58,10 @@ namespace Code._Galaxy {
                 }
                 Debug.DrawLine(hit.transform.position, _camera.transform.position);
             }
+        }
+
+        public List<Faction> GetFactions() {
+            return _galaxy.Factions;
         }
         
         //also should contain functions that advance and control the galaxy's state e.g. public void ChangeGalaxyState(){}

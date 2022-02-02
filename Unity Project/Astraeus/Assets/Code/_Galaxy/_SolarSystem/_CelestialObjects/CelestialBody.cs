@@ -2,10 +2,10 @@
 
 namespace Code._Galaxy._SolarSystem._CelestialObjects {
     public abstract class CelestialBody : Body {
-        protected CelestialBody(Body primary, Vector2 coordinate, BodyTier tier) : base(primary, coordinate, tier) {
+        protected CelestialBody(Body primary, Vector2 coordinate, BodyTier tier) : base(primary, coordinate, tier) {//constructor for CelestialBody as a system primary
         }
 
-        protected CelestialBody(Body primary, BodyTier tier) : base(primary, tier) {
+        protected CelestialBody(Body primary, BodyTier tier) : base(primary, tier) {//constructor for CelestialBody as a satellite
         }
         
         public override GameObject GetSystemObject() {

@@ -164,10 +164,6 @@ namespace Code._Ships {
                         Transform bracketMountTransform = bracket.transform.Find("ThrusterBracket").transform.Find("ThrusterMount").transform;
                         
                         CreateExternalShipComponent(bracketMountTransform, slot.concreteComponent, 1);
-
-                        //instantiate bracket
-                        //get bracket hook
-                        //use hook transform as parent for thruster
                     }
                     else {
                         CreateExternalShipComponent(holderTransform, slot.concreteComponent, ShipComponent.GetTierMultipliedValue(1, slot.concreteComponent.ComponentSize));

@@ -15,6 +15,7 @@ namespace Code._Ships.Hulls {
         public List<(ShipComponentType componentType, ShipComponentTier maxSize, InternalComponent concreteComponent, string parentTransformName)> InternalComponents;
         public List<(ShipComponentType componentType, ShipComponentTier maxSize, Weapon concreteComponent, string parentTransformName)> WeaponComponents;
         public List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName,bool needsBracket)> ThrusterComponents;
+        public List<List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName,bool needsBracket)>> TiedThrustersSets = new List<List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName,bool needsBracket)>>();  
         public float HullMass;
         public Vector3 outfittingPosition;
         public Quaternion outfittingRotation = Quaternion.Euler(-10, -50, 30);

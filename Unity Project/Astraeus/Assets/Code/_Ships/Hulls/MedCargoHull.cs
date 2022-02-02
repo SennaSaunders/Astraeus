@@ -24,6 +24,8 @@ namespace Code._Ships.Hulls {
                 (ShipComponentType.MainThruster, ShipComponentTier.T2, null, "ThrusterHookBR", true)
             };
             ThrusterComponents = thrusterComponents;
+            TiedThrustersSets.Add(new List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName,bool needsBracket)>(){thrusterComponents[0], thrusterComponents[1]});
+            TiedThrustersSets.Add(new List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName,bool needsBracket)>(){thrusterComponents[2], thrusterComponents[3]});
         }
 
         public override void SetWeaponComponents() {

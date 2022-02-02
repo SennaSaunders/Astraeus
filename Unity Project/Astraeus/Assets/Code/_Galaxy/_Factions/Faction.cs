@@ -5,9 +5,14 @@ using Code._Galaxy._Factions.FactionTypes;
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._Galaxy.GalaxyComponents;
+using Code._Ships;
+using Code._Ships.ShipComponents;
+using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
+using Code._Ships.ShipComponents.ExternalComponents.Weapons;
+using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
 
 namespace Code._Galaxy._Factions {
-    public abstract class Faction {
+    public abstract class Faction : IFactionShipComponentSpecifier {
         public FactionType factionType { get; }
         public SolarSystem HomeSystem { get; }
         public List<SolarSystem> Systems { get; }
@@ -236,6 +241,10 @@ namespace Code._Galaxy._Factions {
 
             return false;
         }
+
+        public abstract List<(Weapon weapon, int spawnWeighting)> GetAllowedWeapons(ShipComponentTier tier);
+        public abstract List<(MainThruster mainThruster, int spawnWeighting)> GetAllowedMainThrusters(ShipComponentTier tier);
+        public abstract List<(PowerPlant powerPlant, int spawnWeighting)> GetAllowedPowerPlants(ShipComponentTier tier);
     }
 
     public static class FactionTypeExtension {
