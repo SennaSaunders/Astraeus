@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._Galaxy._SolarSystem._CelestialObjects.BlackHole;
-using Code._Galaxy._SolarSystem._CelestialObjects.Planet;
 using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters.Types;
@@ -16,28 +16,13 @@ namespace Code._Galaxy._Factions.FactionTypes {
         public AgricultureFaction(SolarSystem homeSystem) : base(homeSystem, FactionType.Agriculture) {
         }
 
-        public static int OrganicWorldDesire = 50;
-        public static int BlackHoleDesire = -100;
-
-        public static int GetAgricultureFactionSystemDesire(SolarSystem system) {
-            //assign high values to earth-likes & water worlds - these are the most prized
-            int desireValue = 0;
-            foreach (Body body in GetCelestialBodiesInSystem(system)) {
-                if (body.GetType() == typeof(Planet)) {
-                    Planet planet = (Planet)body;
-                    if (planet.PlanetGen.GetType() == typeof(EarthWorldGen) || planet.PlanetGen.GetType() == typeof(WaterWorldGen)) {
-                        desireValue += AgricultureFaction.OrganicWorldDesire * (int)planet.Tier;
-                    }
-                    else {
-                        desireValue += (int)body.Tier;
-                    }
-                }
-                else if (body.GetType() == typeof(BlackHole)) {
-                    desireValue += AgricultureFaction.BlackHoleDesire * (int)body.Tier;
-                }
-            }
-
-            return desireValue;
+        public static int GetAgricultureFactionCelestialBodyDesire(CelestialBody celestialBody) {
+            List<(Type type, Body.BodyTier tier, int desire)> desiredTypes = new List<(Type type, Body.BodyTier tier, int desire)>() {
+                (typeof(EarthWorldGen),0, 50),
+                (typeof(WaterWorldGen),0, 50),
+                (typeof(BlackHole), 0,-100)
+            };
+            return GetCelestialBodyDesireValue(desiredTypes,celestialBody);
         }
 
         public override List<(Weapon weapon, int spawnWeighting)> GetAllowedWeapons(ShipComponentTier tier) {
@@ -62,5 +47,7 @@ namespace Code._Galaxy._Factions.FactionTypes {
 
             return powerPlants;
         }
+
+        
     }
 }

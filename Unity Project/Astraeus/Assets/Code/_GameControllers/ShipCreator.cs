@@ -47,10 +47,6 @@ namespace Code._GameControllers {
             _shipObjectHandler.ManagedShip = ship;
             _shipObjectHandler.CreateShip();
 
-            //if the slot efficiency is 1 all slots can be used
-            //if the slot efficiency is 0 then only the minimum amount of slots should be used
-            //in between should define whether 
-
             //choose thrusters
             List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName, bool needsBracket)> mainThrusterSlots = _shipObjectHandler.ManagedShip.ShipHull.ThrusterComponents;
 

@@ -4,6 +4,8 @@ using System.Linq;
 using Code._Galaxy._Factions.FactionTypes;
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
+using Code._Galaxy._SolarSystem._CelestialObjects.Planet;
+using Code._Galaxy._SolarSystem._CelestialObjects.Star;
 using Code._Galaxy.GalaxyComponents;
 using Code._Ships;
 using Code._Ships.ShipComponents;
@@ -13,24 +15,6 @@ using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
 
 namespace Code._Galaxy._Factions {
     public abstract class Faction : IFactionShipComponentSpecifier {
-        public FactionType factionType { get; }
-        public SolarSystem HomeSystem { get; }
-        public List<SolarSystem> Systems { get; }
-        public List<Sector> Sectors { get; } = new List<Sector>();
-        public string GroupName { get; }
-
-        protected Faction(SolarSystem homeSystem, FactionType factionType) {
-            HomeSystem = homeSystem;
-            Systems = new List<SolarSystem>();
-            AddSolarSystem(homeSystem);
-            this.factionType = factionType;
-
-            GroupName = factionType.GetFactionGroupNameList()[GalaxyGenerator.Rng.Next(this.factionType.GetFactionGroupNameList().Count)];
-        }
-
-        //will affect the type of goods mass produced in this factions systems
-        //planet types should also be modifiers to this
-        //such as earth likes producing more food
         public enum FactionType {
             Agriculture,
             Commerce,
@@ -39,8 +23,21 @@ namespace Code._Galaxy._Factions {
             Pirate,
             Technology
         }
+        protected Faction(SolarSystem homeSystem, FactionType factionType) {
+            HomeSystem = homeSystem;
+            Systems = new List<SolarSystem>();
+            AddSolarSystem(homeSystem);
+            this.factionType = factionType;
 
-
+            GroupName = factionType.GetFactionGroupNameList()[GalaxyGenerator.Rng.Next(this.factionType.GetFactionGroupNameList().Count)];
+        }
+        
+        public FactionType factionType { get; }
+        public SolarSystem HomeSystem { get; }
+        public List<SolarSystem> Systems { get; }
+        public List<Sector> Sectors { get; } = new List<Sector>();
+        public string GroupName { get; }
+        
         public void AddSector(Sector sector) {
             if (!Sectors.Contains(sector)) {
                 Sectors.Add(sector);
@@ -54,6 +51,34 @@ namespace Code._Galaxy._Factions {
             AddSector(solarSystem.Sector);
         }
 
+        // public abstract List<(Type type, int desire)> GetCelestialBodyDesireValues();
+
+        public static int GetCelestialBodyDesireValue(List<(Type type, Body.BodyTier tier, int desire)> desireValues, CelestialBody body) {
+            if (body.GetType() == typeof(Planet)) {
+                Planet planet = (Planet)body;
+                foreach ((Type type, Body.BodyTier tier, int desire) typeDesire in desireValues) {
+                    if (planet.PlanetGen.GetType() == typeDesire.type) {
+                        return typeDesire.desire*(int)body.Tier;
+                    }
+                }
+            }
+            else if (body.GetType() == typeof(Star) && desireValues.Select(dv => dv.tier).Contains(body.Tier)) {
+                foreach ((Type type, Body.BodyTier tier, int desire) typeDesire in desireValues) {
+                    if (body.Tier == typeDesire.tier && body.GetType() == typeDesire.type) {
+                        return typeDesire.desire*(int)body.Tier;
+                    }
+                }
+            }
+            else {
+                foreach ((Type type, Body.BodyTier tier, int desire) typeDesire in desireValues) {
+                    if (body.GetType() == typeDesire.type) {
+                        return typeDesire.desire*(int)body.Tier;
+                    }
+                }
+            }
+
+            return (int)body.Tier;
+        }
 
         protected static List<Body> GetCelestialBodiesInSystem(SolarSystem solarSystem) {
             return solarSystem.Bodies.FindAll(b => b.GetType().IsSubclassOf(typeof(CelestialBody)));
@@ -78,7 +103,7 @@ namespace Code._Galaxy._Factions {
                         }
 
                         if (!inThisFaction && !inOtherFaction) {
-                            potentialNewSystems.Add((factionType.GetFactionSystemDesire(solarSystem), solarSystem));
+                            potentialNewSystems.Add((factionType.GetPreCalcSystemDesire(solarSystem), solarSystem));
                         }
                     }
                 }
@@ -121,7 +146,7 @@ namespace Code._Galaxy._Factions {
 
                     sectorsToSearchFrom.AddRange(newAdjacentSectors);
                     foreach (Sector newAdjacentSector in newAdjacentSectors) {
-                        potentialNewSectors.Add((factionType.GetFactionSectorDesire(newAdjacentSector), newAdjacentSector));
+                        potentialNewSectors.Add((factionType.GetPreCalcSectorDesire(newAdjacentSector), newAdjacentSector));
                     }
                 }
 
@@ -136,7 +161,7 @@ namespace Code._Galaxy._Factions {
                 //add systems in valid sectors to potentials
                 foreach ((int desire, Sector sector) potentialNewSector in potentialNewSectors) {
                     foreach (SolarSystem solarSystem in potentialNewSector.sector.Systems) {
-                        potentialNewSystems.Add((factionType.GetFactionSystemDesire(solarSystem), solarSystem));
+                        potentialNewSystems.Add((factionType.GetPreCalcSystemDesire(solarSystem), solarSystem));
                     }
                 }
                 
@@ -224,8 +249,8 @@ namespace Code._Galaxy._Factions {
                     if (bestSector.weightedDesire > bestSystem.weightedDesire) {
                         //choose the best system in the sector
 
-                        int maxDesire = bestSector.sector.Systems.Max(s => factionType.GetFactionSystemDesire(s));
-                        SolarSystem bestInSector = bestSector.sector.Systems.Find(s => factionType.GetFactionSystemDesire(s) == maxDesire);
+                        int maxDesire = bestSector.sector.Systems.Max(s => factionType.GetPreCalcSystemDesire(s));
+                        SolarSystem bestInSector = bestSector.sector.Systems.Find(s => factionType.GetPreCalcSystemDesire(s) == maxDesire);
                         AddSolarSystem(bestInSector);
                         return true;
                     }
@@ -308,11 +333,11 @@ namespace Code._Galaxy._Factions {
         }
 
         public static List<(int desire, Sector sector)> GetFactionSectorPreferencesList(this Faction.FactionType factionType) {
-            return factionSectorDesires.Find(f => f.factionType == factionType).sectorDesire; //if generic unfocused factions are desired this can be increased to allow for them
+            return factionSectorDesires.Find(f => f.factionType == factionType).sectorDesire;
         }
 
         public static List<(int desire, SolarSystem solarSystem)> GetFactionSystemPreferencesList(this Faction.FactionType factionType) {
-            return factionSystemDesires.Find(f => f.factionType == factionType).systemDesire; //if generic unfocused factions are desired this can be increased to allow for them
+            return factionSystemDesires.Find(f => f.factionType == factionType).systemDesire;
         }
 
         public static List<(int desire, Sector sector)> GetPercentileFactionSectorPreferencesList(this Faction.FactionType factionType, float percentage) {
@@ -426,25 +451,33 @@ namespace Code._Galaxy._Factions {
             else return 0;
         }
 
-        public static int GetFactionSectorDesire(this Faction.FactionType factionType, Sector sector) {
+        public static int GetPreCalcSectorDesire(this Faction.FactionType factionType, Sector sector) {
             (int desire, Sector sector) sectorDesire = factionSectorDesires.Find(f => f.factionType == factionType).sectorDesire.Find(s => s.sector == sector);
 
             return sectorDesire.desire;
         }
 
-        public static int GetFactionSystemDesire(this Faction.FactionType factionType, SolarSystem system) {
+        public static int GetPreCalcSystemDesire(this Faction.FactionType factionType, SolarSystem system) {
             (int desire, SolarSystem system) systemDesire = factionSystemDesires.Find(f => f.factionType == factionType).systemDesire.Find(s => s.system == system);
             return systemDesire.desire;
         }
 
         //this is private as it is only used in precalculating the desire values for systems/sectors
-        private static int FactionSystemDesire(this Faction.FactionType factionType, SolarSystem solarSystem) {
-            if (factionType == Faction.FactionType.Agriculture) return AgricultureFaction.GetAgricultureFactionSystemDesire(solarSystem);
-            if (factionType == Faction.FactionType.Commerce) return CommerceFaction.GetCommerceFactionSystemDesire(solarSystem);
-            if (factionType == Faction.FactionType.Industrial) return IndustrialFaction.GetIndustrialSystemDesire(solarSystem);
-            if (factionType == Faction.FactionType.Military) return MilitaryFaction.GetMilitaryFactionSystemDesire(solarSystem);
-            if (factionType == Faction.FactionType.Pirate) return PirateFaction.GetPirateFactionSystemDesire(solarSystem);
-            if (factionType == Faction.FactionType.Technology) return TechnologyFaction.GetTechnologyFactionSystemDesire(solarSystem);
+        public static int FactionSystemDesire(this Faction.FactionType factionType, SolarSystem solarSystem) {
+            int desireSum = 0;
+            foreach (Body body in solarSystem.Bodies) {
+                desireSum += factionType.CelestialBodyDesire((CelestialBody)body);
+            }
+            return desireSum; //if generic factions are desired this can be altered to allow for them
+        }
+
+        public static int CelestialBodyDesire(this Faction.FactionType factionType, CelestialBody celestialBody) {
+            if (factionType == Faction.FactionType.Agriculture) return AgricultureFaction.GetAgricultureFactionCelestialBodyDesire(celestialBody);
+            if (factionType == Faction.FactionType.Commerce) return CommerceFaction.GetCommerceFactionCelestialBodyDesire(celestialBody);
+            if (factionType == Faction.FactionType.Industrial) return IndustrialFaction.GetIndustrialCelestialBodyDesire(celestialBody);
+            if (factionType == Faction.FactionType.Military) return MilitaryFaction.GetMilitaryFactionCelestialBodyDesire(celestialBody);
+            if (factionType == Faction.FactionType.Pirate) return PirateFaction.GetPirateFactionCelestialBodyDesire(celestialBody);
+            if (factionType == Faction.FactionType.Technology) return TechnologyFaction.GetTechnologyFactionCelestialBodyDesire(celestialBody);
             else return 0; //if generic factions are desired this can be altered to allow for them
         }
     }

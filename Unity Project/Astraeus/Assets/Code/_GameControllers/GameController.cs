@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using Code._Galaxy;
 using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem;
@@ -11,9 +11,14 @@ using UnityEngine;
 namespace Code._GameControllers {
     public class GameController : MonoBehaviour {
         private static GalaxyController _galaxyController;
+        private static GameGUIController _guiController;
         private SolarSystem _currentSolarSystem;
         private IStation _currentStation;
         private ShipCreator _shipCreator;
+
+        private void Awake() {
+            SetupGameGUIController();
+        }
 
         public void SetupGalaxyController(Galaxy galaxy) {
             _galaxyController = FindObjectOfType<GalaxyController>();
@@ -30,8 +35,13 @@ namespace Code._GameControllers {
             _currentStation = GetStartingStation(_currentSolarSystem);
 
             _shipCreator = gameObject.AddComponent<ShipCreator>();
-            ShipCreatorTest();
+            //ShipCreatorTest();
         }
+
+        private void SetupGameGUIController() {
+            _guiController = gameObject.AddComponent<GameGUIController>();
+            _guiController.SetupGameController(this);
+        } 
 
         public void ShipCreatorTest() {
             List<Faction> factions = _galaxyController.GetFactions();

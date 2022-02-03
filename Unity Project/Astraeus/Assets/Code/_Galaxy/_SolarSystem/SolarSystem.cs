@@ -9,7 +9,7 @@ namespace Code._Galaxy._SolarSystem {
     public class SolarSystem {
         public Sector Sector { get; set; }
         public Vector2 Coordinate { get; }
-        public List<Body> Bodies { get; }
+        public List<Body> Bodies { get; set; }
         public Body Primary { get; }
 
         public Faction OwnerFaction { get; set; }

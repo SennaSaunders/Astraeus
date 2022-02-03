@@ -7,6 +7,7 @@ using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._Galaxy._SolarSystem._CelestialObjects.BlackHole;
 using Code._Galaxy._SolarSystem._CelestialObjects.Planet;
 using Code._Galaxy._SolarSystem._CelestialObjects.Star;
+using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
 using Code._Galaxy.GalaxyComponents;
 using Code.TextureGen;
 using UnityEngine;
@@ -67,8 +68,32 @@ namespace Code._Galaxy {
             Galaxy galaxy = new Galaxy(solarSystems, GetSectors(solarSystems));
 
             GenGalaxyFactions(galaxy);
+            GenSpaceStations(galaxy.Factions);
+
+            for (int i = 0; i< galaxy.Systems.Count;i++) {//sets the position of all planets and space stations
+                galaxy.Systems[i].Bodies = SetupRotations(SetupPositions(galaxy.Systems[i].Bodies));
+            }
 
             return galaxy;
+        }
+
+        private void GenSpaceStations(List<Faction> factions) {
+            //for each faction for each solar system get the most desirable planet and add a space station to it
+            foreach (Faction faction in factions) {
+                foreach (SolarSystem solarSystem in faction.Systems) {
+                    Body bestBody = null;
+                    int highestDesire = Int32.MinValue;
+                    foreach (Body body in solarSystem.Bodies) {
+                        int currentDesire = faction.factionType.CelestialBodyDesire((CelestialBody)body);
+                        if (currentDesire > highestDesire) {
+                            highestDesire = currentDesire;
+                            bestBody = body;
+                        }
+                    }
+                    
+                    solarSystem.Bodies.Add(new SpaceStation(bestBody));
+                }
+            }
         }
 
         private void GenGalaxyFactions(Galaxy galaxy) {
@@ -248,7 +273,7 @@ namespace Code._Galaxy {
                 stats.smallestSystem = systemSize;
             }
 
-            return new SolarSystem(systemCoordinate, primary, SetupRotations(SetupPositions(celestialBodies)));
+            return new SolarSystem(systemCoordinate, primary, celestialBodies);
         }
 
         private List<Body> SetupPositions(List<Body> bodies) {

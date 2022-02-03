@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._Galaxy._SolarSystem._CelestialObjects.BlackHole;
@@ -19,28 +20,13 @@ namespace Code._Galaxy._Factions.FactionTypes {
         public static int WaterWorldDesire = 15;
         public static int RockyWorldDesire = 30;
         public static int BlackHoleDesire = -50;
-
-        public static int GetIndustrialSystemDesire(SolarSystem system) {
-            int desireValue = 0;
-            foreach (Body body in GetCelestialBodiesInSystem(system)) {
-                if (body.GetType() == typeof(Planet)) {
-                    Planet planet = (Planet)body;
-                    if (planet.PlanetGen.GetType() == typeof(WaterWorldGen)) {
-                        desireValue += IndustrialFaction.WaterWorldDesire * (int)planet.Tier;
-                    }
-                    else if (planet.PlanetGen.GetType() == typeof(RockyWorldGen)) {
-                        desireValue += IndustrialFaction.RockyWorldDesire * (int)planet.Tier;
-                    }
-                    else {
-                        desireValue += (int)body.Tier * (int)body.Tier;
-                    }
-                }
-                else if (body.GetType() == typeof(BlackHole)) {
-                    desireValue += IndustrialFaction.BlackHoleDesire * (int)body.Tier;
-                }
-            }
-
-            return desireValue;
+        public static int GetIndustrialCelestialBodyDesire(CelestialBody celestialBody) {
+            List<(Type type, Body.BodyTier tier, int desire)> desiredTypes = new List<(Type type, Body.BodyTier tier, int desire)>() {
+                (typeof(WaterWorldGen),0, 15),
+                (typeof(RockyWorldGen),0, 30),
+                (typeof(BlackHole),0, -50)
+            };
+            return GetCelestialBodyDesireValue(desiredTypes,celestialBody);
         }
 
         public override List<(Weapon weapon, int spawnWeighting)> GetAllowedWeapons(ShipComponentTier tier) {
@@ -66,5 +52,7 @@ namespace Code._Galaxy._Factions.FactionTypes {
             
             return powerPlants;
         }
+
+        
     }
 }

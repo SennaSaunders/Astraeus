@@ -21,7 +21,7 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations {
             throw new System.NotImplementedException();
         }
 
-        public SpaceStation(Body primary, BodyTier tier) : base(primary, tier) {
+        public SpaceStation(Body primary) : base(primary, BodyTier.T0) {
         }
     }
 }
