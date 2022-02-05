@@ -1,16 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Code._GameControllers;
 using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.ExternalComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.InternalComponents;
-using Code._Utility;
 using UnityEngine;
 
 namespace Code._Ships {
     public class ShipObjectHandler : MonoBehaviour {
-        private PrefabHandler _prefabHandler;
         public Ship ManagedShip { get; set; }
         public GameObject ShipObject { get; private set; }
 
@@ -18,9 +17,6 @@ namespace Code._Ships {
         public List<(Transform mountTransform, Transform selectionTransform, string slotName)> ThrusterComponents = new List<(Transform slotTransform, Transform selectionTransform, string slotName)>();
         public List<(Transform mountTransform, Transform selectionTransform, string slotName)> InternalComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName)>();
 
-        private void Awake() {
-            _prefabHandler = gameObject.AddComponent<PrefabHandler>();
-        }
 
         public void CreateShip() {
             CreateHull();
@@ -40,7 +36,7 @@ namespace Code._Ships {
         }
 
         private void CreateHull() {
-            ShipObject = _prefabHandler.instantiateObject(ManagedShip.ShipHull.HullObject);
+            ShipObject = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(ManagedShip.ShipHull.GetHullFullPath()), GameObject.Find("ShipPanel").transform);
         }
         
         
@@ -53,7 +49,7 @@ namespace Code._Ships {
 
             string path = component.GetFullPath();
 
-            GameObject newComponentObject = _prefabHandler.instantiateObject(_prefabHandler.loadPrefab(path), parent);
+            GameObject newComponentObject = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(path), parent);
             newComponentObject.transform.localScale = new Vector3(scale, scale, scale);
         }
         
@@ -158,7 +154,7 @@ namespace Code._Ships {
                             }
                         }
                         
-                        GameObject bracket = _prefabHandler.instantiateObject(_prefabHandler.loadPrefab("Ships/Thrusters/ThrusterBracket"), holderTransform);
+                        GameObject bracket = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab("Ships/Thrusters/ThrusterBracket"), holderTransform);
                         float scale = ShipComponent.GetTierMultipliedValue(1, slot.concreteComponent.ComponentSize);
                         bracket.transform.localScale = new Vector3(scale,scale,scale);
                         Transform bracketMountTransform = bracket.transform.Find("ThrusterBracket").transform.Find("ThrusterMount").transform;

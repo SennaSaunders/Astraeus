@@ -12,7 +12,7 @@ namespace Code._Ships.Hulls {
             SetupHull(5000);
         }
 
-        protected override string GetHullFullPath() {
+        public override string GetHullFullPath() {
             return BaseHullPath + "Cargo/CargoHullMedium";
         }
 

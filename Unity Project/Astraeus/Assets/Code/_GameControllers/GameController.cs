@@ -6,16 +6,13 @@ using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
 using Code._Ships;
 using Code._Ships.ShipComponents;
+using Code._Utility;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Code._GameControllers {
     public class GameController : MonoBehaviour {
-        public enum GameFocus {
-            Map,
-            SolarSystem,
-            Paused
-        }
-        
+        public static PrefabHandler _prefabHandler; 
         private static GalaxyController _galaxyController;
         private static GameGUIController _guiController;
         private static SolarSystem _currentSolarSystem;
@@ -23,11 +20,12 @@ namespace Code._GameControllers {
         private static IStation _currentStation;
         private static ShipCreator _shipCreator;
         
-        public static GameFocus GameStateFocus;
 
         private void Awake() {
+            gameObject.AddComponent<EventSystem>();
+            gameObject.AddComponent<StandaloneInputModule>();
+            _prefabHandler = gameObject.AddComponent<PrefabHandler>();
             SetupGameGUIController();
-            
         }
 
         private void SetupShip() {

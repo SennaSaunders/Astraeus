@@ -9,7 +9,6 @@ using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.InternalComponents;
 using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
 using Code._Ships.ShipComponents.InternalComponents.Storage;
-using Code._Utility;
 using Code.GUI.Utility;
 using TMPro;
 using Unity.VectorGraphics;
@@ -19,9 +18,9 @@ using UnityEngine.UI;
 
 namespace Code.GUI.SpaceStations.Services {
     public class OutfittingGUIController : MonoBehaviour {
+        private StationGUIController _stationGUIController;
         private OutfittingService _outfittingService;
         private GameObject _guiGameObject;
-        private PrefabHandler _prefabHandler;
         private ShipObjectHandler _shipObjectHandler;
         private SlotSelector selectedSlot;
         private List<GameObject> _selectionMarkers = new List<GameObject>();
@@ -36,19 +35,30 @@ namespace Code.GUI.SpaceStations.Services {
         private string _thrusterCardPath = "ThrusterCard";
         private string _powerPlantCardPath = "PowerPlantCard";
 
-        private void SetHandlers() {
-            _prefabHandler = gameObject.AddComponent<PrefabHandler>();
-            _shipObjectHandler = gameObject.AddComponent<ShipObjectHandler>();
+        private void SetShipObjectHandler() {
+            _shipObjectHandler = _guiGameObject.AddComponent<ShipObjectHandler>();
         }
         
-        public void SetupOutfittingService(OutfittingService outfittingService) {
+        public void StartOutfitting(OutfittingService outfittingService, StationGUIController stationGUIController) {
             _outfittingService = outfittingService;
+            _stationGUIController = stationGUIController;
+            _stationGUIController.stationGUI.SetActive(false);
             _camera = UnityEngine.Camera.main;
-            SetHandlers();
-            SetGUIGameObject();
+            
+            SetupGUI();
             DisplayShip();
-            AddDraggableToShip();
-            SetupComponentBtns();
+            SetupBtns();
+        }
+
+        private void SetupHomeBtn() {
+            Button homeBtn = GameObject.Find("HomeBtn").GetComponent<Button>();
+            homeBtn.onClick.AddListener(ExitOutfitting);
+        }
+
+        private void ExitOutfitting() {
+            _stationGUIController.stationGUI.SetActive(true);
+            Destroy(_guiGameObject);
+            Destroy(this);
         }
 
         private void DisplayShip() {
@@ -58,16 +68,23 @@ namespace Code.GUI.SpaceStations.Services {
             GameObject shipObject = _shipObjectHandler.ShipObject;
             shipObject.transform.position = _shipObjectHandler.ManagedShip.ShipHull.outfittingPosition;
             shipObject.transform.rotation = _shipObjectHandler.ManagedShip.ShipHull.outfittingRotation;
+            AddDraggableToShip();
         }
 
         
 
-        private void SetGUIGameObject() {
-            _guiGameObject = _prefabHandler.instantiateObject(_prefabHandler.loadPrefab(_outfittingPath + _outfittingGUIpath));
+        private void SetupGUI() {
+            _guiGameObject = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(_outfittingPath + _outfittingGUIpath));
+            SetShipObjectHandler();
         }
 
         private Transform GetScrollViewContentContainer() {
             return  _guiGameObject.transform.Find("Canvas/MainPanel/ComponentsPanel/ComponentsInteractablePanel/ComponentScrollView/Viewport/ComponentContent");
+        }
+
+        private void SetupBtns() {
+            SetupComponentBtns();
+            SetupHomeBtn();
         }
 
         private void SetupComponentBtns() {
@@ -82,7 +99,8 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void AddDraggableToShip() {
-            ShipRotatable shipRotatable = _guiGameObject.AddComponent<ShipRotatable>();
+            GameObject shipPanel = GameObject.Find("ShipPanel");
+            ShipRotatable shipRotatable = shipPanel.AddComponent<ShipRotatable>();
             shipRotatable.rotateableObject = _shipObjectHandler.ShipObject;
         }
 
@@ -95,12 +113,12 @@ namespace Code.GUI.SpaceStations.Services {
 
             foreach ((Transform mountTransform, Transform selectionTransform, string  slotName) selection in shipComponents) {
                 Transform canvas = _guiGameObject.transform.Find("Canvas");
-                GameObject marker = _prefabHandler.instantiateObject(_prefabHandler.loadPrefab(_outfittingPath + "ShipComponentMarker"), canvas.Find("SelectionMarkers"));
+                GameObject marker = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(_outfittingPath + "ShipComponentMarker"), canvas.Find("SelectionMarkers"));
                 _selectionMarkers.Add(marker);
                 SlotSelector slotSelector = marker.AddComponent<SlotSelector>();
                 slotSelector.Setup(selection.mountTransform, selection.selectionTransform, this);
 
-                GameObject markerText = _prefabHandler.instantiateObject(_prefabHandler.loadPrefab(_outfittingPath + "ShipComponentMarkerName"), marker.transform);
+                GameObject markerText = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(_outfittingPath + "ShipComponentMarkerName"), marker.transform);
                 TextMeshProUGUI slotName = markerText.transform.GetComponentInChildren<TextMeshProUGUI>();
                 slotName.text = selection.slotName;
 
@@ -134,7 +152,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private GameObject CreateComponentCard(string cardSpecifier, ShipComponent shipComponent) {
-            GameObject componentCard = _prefabHandler.instantiateObject(_prefabHandler.loadPrefab(_outfittingPath + cardSpecifier), GetScrollViewContentContainer().transform);
+            GameObject componentCard = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(_outfittingPath + cardSpecifier), GetScrollViewContentContainer().transform);
 
             CardShipComponentModifier componentModifier = componentCard.AddComponent<CardShipComponentModifier>();
 
