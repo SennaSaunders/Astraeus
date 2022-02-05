@@ -8,7 +8,9 @@ using Code._Galaxy._SolarSystem._CelestialObjects.BlackHole;
 using Code._Galaxy._SolarSystem._CelestialObjects.Planet;
 using Code._Galaxy._SolarSystem._CelestialObjects.Star;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
+using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
 using Code._Galaxy.GalaxyComponents;
+using Code._Ships.ShipComponents;
 using Code.TextureGen;
 using UnityEngine;
 using Random = System.Random;
@@ -90,8 +92,28 @@ namespace Code._Galaxy {
                             bestBody = body;
                         }
                     }
+
+                    SpaceStation spaceStation = new SpaceStation(bestBody);
+                    //need to decided how to choose whether there is an outfitting service and a shipyard
+                    //only refuel and repair should be everywhere
+                    //for the moment just instantiate the outfitter with the faction specific parts
+
+                    OutfittingService outfittingService = new OutfittingService();
+
+                    //add faction specific components to outfitting
+                    for (int i = 0; i < Enum.GetValues(typeof(ShipComponentTier)).Length; i++) {
+                        outfittingService.AvailableComponents.AddRange(faction.GetAllowedWeapons((ShipComponentTier)i).Select(aw=>aw.weapon));
+                        outfittingService.AvailableComponents.AddRange(faction.GetAllowedMainThrusters((ShipComponentTier)i).Select(aw=>aw.mainThruster));
+                        outfittingService.AvailableComponents.AddRange(faction.GetAllowedPowerPlants((ShipComponentTier)i).Select(aw=>aw.powerPlant));
+                    }
                     
-                    solarSystem.Bodies.Add(new SpaceStation(bestBody));
+                    spaceStation.StationServices = new List<StationService>() {
+                        new RefuelService(),
+                        new RepairService(),
+                        new ShipyardService(),
+                        outfittingService
+                    };
+                    solarSystem.Bodies.Add(spaceStation);
                 }
             }
         }

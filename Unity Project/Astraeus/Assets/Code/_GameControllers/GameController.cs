@@ -1,23 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Code._Galaxy;
 using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
+using Code._Ships;
 using Code._Ships.ShipComponents;
 using UnityEngine;
 
 namespace Code._GameControllers {
     public class GameController : MonoBehaviour {
+        public enum GameFocus {
+            Map,
+            SolarSystem,
+            Paused
+        }
+        
         private static GalaxyController _galaxyController;
         private static GameGUIController _guiController;
-        private SolarSystem _currentSolarSystem;
-        private IStation _currentStation;
-        private ShipCreator _shipCreator;
+        private static SolarSystem _currentSolarSystem;
+        public static Ship _currentShip { get; set; }
+        private static IStation _currentStation;
+        private static ShipCreator _shipCreator;
+        
+        public static GameFocus GameStateFocus;
 
         private void Awake() {
             SetupGameGUIController();
+            
+        }
+
+        private void SetupShip() {
+            _shipCreator = gameObject.AddComponent<ShipCreator>();
+            _currentShip = _shipCreator.CreateDefaultShip();
+        }
+
+        public void StartGame() {
+            _guiController.SetupStationGUI(_currentStation);
+            SetupShip();
         }
 
         public void SetupGalaxyController(Galaxy galaxy) {
@@ -34,7 +54,7 @@ namespace Code._GameControllers {
             _currentSolarSystem = GetStartingSystem();
             _currentStation = GetStartingStation(_currentSolarSystem);
 
-            _shipCreator = gameObject.AddComponent<ShipCreator>();
+            
             //ShipCreatorTest();
         }
 
@@ -49,9 +69,9 @@ namespace Code._GameControllers {
             int offset = 0;
             int offsetChange = 20;
             foreach (Faction faction in factions) {
-                _shipCreator.CreateShip(ShipCreator.ShipClass.Fighter, ShipComponentTier.T5, .5f, faction);
+                _shipCreator.CreateFactionShip(ShipCreator.ShipClass.Fighter, ShipComponentTier.T5, .5f, faction);
                 _shipCreator._shipObjectHandler.ShipObject.transform.position = new Vector3(offset, 0, 0);
-                _shipCreator.CreateShip(ShipCreator.ShipClass.Transport, ShipComponentTier.T5, .5f, faction);
+                _shipCreator.CreateFactionShip(ShipCreator.ShipClass.Transport, ShipComponentTier.T5, .5f, faction);
                 _shipCreator._shipObjectHandler.ShipObject.transform.position = new Vector3(offset, 0, 20);
                 offset += offsetChange;
             }
@@ -60,17 +80,6 @@ namespace Code._GameControllers {
 
         public static void ShowGalaxy() {
             _galaxyController.DisplayGalaxy();
-        }
-
-        public enum GameFocus {
-            Map,
-            SolarSystem,
-            Paused
-        }
-
-        public static GameFocus GameStateFocus;
-
-        private void StartGame() {
         }
 
         private SolarSystem GetStartingSystem() {

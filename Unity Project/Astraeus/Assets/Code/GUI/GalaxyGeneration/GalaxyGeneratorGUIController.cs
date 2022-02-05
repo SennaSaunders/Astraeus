@@ -144,6 +144,8 @@ namespace Code.GUI.GalaxyGeneration {
             GameObject gameControllerObj = new GameObject(gameControllerObjName);
             GameController gameController = gameControllerObj.AddComponent<GameController>();
             gameController.SetupGalaxyController(_galaxy);
+            gameController.StartGame();
+            
             GameController.ShowGalaxy();
             Destroy(_guiGameObject);
         }

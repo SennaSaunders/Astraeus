@@ -24,7 +24,14 @@ namespace Code._GameControllers {
             Fighter
         }
 
-        public Ship CreateShip(ShipClass shipClass, ShipComponentTier maxComponentTier, float loadoutEfficiency, Faction faction) { // slotEfficiency should define how likely a slot is to be fully-utilised
+        public Ship CreateDefaultShip() {
+            Ship ship = gameObject.AddComponent<Ship>();
+            ship.ShipHull = gameObject.AddComponent<SmallFighterHull>();
+
+            return ship;
+        }
+
+        public Ship CreateFactionShip(ShipClass shipClass, ShipComponentTier maxComponentTier, float loadoutEfficiency, Faction faction) { // slotEfficiency should define how likely a slot is to be fully-utilised
             List<Hull> hulls = new List<Hull>();
 
             switch (shipClass) {

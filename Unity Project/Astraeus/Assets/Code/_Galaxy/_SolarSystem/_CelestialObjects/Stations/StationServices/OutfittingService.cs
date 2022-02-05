@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Code._Ships;
 using Code._Ships.Hulls;
 using Code._Ships.ShipComponents;
@@ -10,24 +9,28 @@ using Code._Ships.ShipComponents.InternalComponents.Storage;
 
 namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
     public class OutfittingService : StationService {
-        public List<Ship> Ships { get; private set; }
-
-        public void AddAllShips() {
-            Ships = new List<Ship>();
-            Ship newShip = gameObject.AddComponent<Ship>();
-            newShip.ShipHull = gameObject.AddComponent<MedCargoHull>();
-            Ships.Add(newShip);
-            
-            newShip = gameObject.AddComponent<Ship>();
-            newShip.ShipHull = gameObject.AddComponent<SmallFighterHull>();
-            Ships.Add(newShip);
-        }
         
-        public List<ShipComponent> AvailableComponents { get; private set; }
+        protected override void SetGUIStrings() {
+            serviceName = "Outfitting";
+            guiString = "GUIPrefabs/Station/Services/Outfitting/OutfittingGUI";
+        }
+        public Ship Ship { get; private set; }
+
+        // public void AddShips() {
+        //     Ships = new List<Ship>();
+        //     Ship newShip = gameObject.AddComponent<Ship>();
+        //     newShip.ShipHull = gameObject.AddComponent<MedCargoHull>();
+        //     Ships.Add(newShip);
+        //     
+        //     newShip = gameObject.AddComponent<Ship>();
+        //     newShip.ShipHull = gameObject.AddComponent<SmallFighterHull>();
+        //     Ships.Add(newShip);
+        // }
+
+        public List<ShipComponent> AvailableComponents { get; } = new List<ShipComponent>();
         
         //generate a list of all components for ship combat test
         public void SetAllAvailableComponents() {
-            AvailableComponents = new List<ShipComponent>();
             AddAllPowerPlants();
             AddAllThrusters();
             AddAllWeapons();
