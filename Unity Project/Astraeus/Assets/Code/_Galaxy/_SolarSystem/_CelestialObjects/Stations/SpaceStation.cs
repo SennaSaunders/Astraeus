@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationIndustries;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
+using Code._GameControllers;
 using UnityEngine;
 
 namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations {
-    public class SpaceStation : Body, IStation{
+    public class SpaceStation : Body, IStation {
+        private string spaceStationPath = "SpaceStations/SpaceStation";
         public List<StationService> StationServices { get; set; }
         public List<StationIndustry> StationIndustries { get; set; }
 
@@ -18,7 +20,7 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations {
 
 
         public override GameObject GetSystemObject() {
-            throw new System.NotImplementedException();
+            return GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(spaceStationPath));
         }
 
         public SpaceStation(Body primary) : base(primary, BodyTier.T0) {

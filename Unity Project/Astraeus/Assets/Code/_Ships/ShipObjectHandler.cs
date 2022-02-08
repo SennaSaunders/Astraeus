@@ -11,18 +11,24 @@ using UnityEngine;
 namespace Code._Ships {
     public class ShipObjectHandler : MonoBehaviour {
         public Ship ManagedShip { get; set; }
-        public GameObject ShipObject { get; private set; }
 
         public List<(Transform mountTransform, Transform selectionTransform, string slotName)> WeaponComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName)>();
         public List<(Transform mountTransform, Transform selectionTransform, string slotName)> ThrusterComponents = new List<(Transform slotTransform, Transform selectionTransform, string slotName)>();
         public List<(Transform mountTransform, Transform selectionTransform, string slotName)> InternalComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName)>();
 
 
-        public void CreateShip() {
+        public GameObject CreateShip(Transform parent) {
             CreateHull();
             CreateWeaponComponents();
             CreateMainThrusterComponents();
             CreateInternalComponents();
+            SetDefaultShipRotation();
+            ManagedShip.ShipObject.transform.SetParent(parent);
+            return ManagedShip.ShipObject;
+        }
+        
+        private void SetDefaultShipRotation() {
+            ManagedShip.ShipObject.transform.rotation = Quaternion.Euler(0,-90,90);
         }
 
         private void CreateInternalComponents() {
@@ -36,7 +42,7 @@ namespace Code._Ships {
         }
 
         private void CreateHull() {
-            ShipObject = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(ManagedShip.ShipHull.GetHullFullPath()), GameObject.Find("ShipPanel").transform);
+            ManagedShip.ShipObject = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(ManagedShip.ShipHull.GetHullFullPath()));
         }
         
         
@@ -198,7 +204,7 @@ namespace Code._Ships {
         }
 
         private Transform MapPrefabTransformStringToTransformObject(string parentTransformNames) {
-            List<Transform> allShipTransforms = ShipObject.GetComponentsInChildren<Transform>().ToList();
+            List<Transform> allShipTransforms = ManagedShip.ShipObject.GetComponentsInChildren<Transform>().ToList();
             Transform parentTransform = allShipTransforms.Find(t => t.name == parentTransformNames);
 
             return parentTransform;

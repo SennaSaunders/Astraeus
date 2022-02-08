@@ -58,28 +58,28 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects {
 
     public static class BodyTierExtension {
         public static float BaseDistance(this Body.BodyTier tier) {
-            if (tier == Body.BodyTier.T9) return 160;
-            if (tier == Body.BodyTier.T8) return 130;
-            if (tier == Body.BodyTier.T7) return 100;
-            if (tier == Body.BodyTier.T6) return 90;
-            if (tier == Body.BodyTier.T5) return 60;
-            if (tier == Body.BodyTier.T4) return 50;
-            if (tier == Body.BodyTier.T3) return 40;
-            if (tier == Body.BodyTier.T2) return 30;
-            if (tier == Body.BodyTier.T1) return 20;
+            if (tier == Body.BodyTier.T9) return 1600;
+            if (tier == Body.BodyTier.T8) return 1300;
+            if (tier == Body.BodyTier.T7) return 1000;
+            if (tier == Body.BodyTier.T6) return 900;
+            if (tier == Body.BodyTier.T5) return 600;
+            if (tier == Body.BodyTier.T4) return 500;
+            if (tier == Body.BodyTier.T3) return 400;
+            if (tier == Body.BodyTier.T2) return 300;
+            if (tier == Body.BodyTier.T1) return 200;
             else return 5;
         }
 
         public static float SystemScale(this Body.BodyTier tier) {
-            if (tier == Body.BodyTier.T9) return 45;
-            if (tier == Body.BodyTier.T8) return 36;
-            if (tier == Body.BodyTier.T7) return 27;
-            if (tier == Body.BodyTier.T6) return 17;
-            if (tier == Body.BodyTier.T5) return 12;
-            if (tier == Body.BodyTier.T4) return 7.5f;
-            if (tier == Body.BodyTier.T3) return 5;
-            if (tier == Body.BodyTier.T2) return 2.5f;
-            if (tier == Body.BodyTier.T1) return 1;
+            if (tier == Body.BodyTier.T9) return 450;
+            if (tier == Body.BodyTier.T8) return 360;
+            if (tier == Body.BodyTier.T7) return 270;
+            if (tier == Body.BodyTier.T6) return 170;
+            if (tier == Body.BodyTier.T5) return 120;
+            if (tier == Body.BodyTier.T4) return 75;
+            if (tier == Body.BodyTier.T3) return 50;
+            if (tier == Body.BodyTier.T2) return 25;
+            if (tier == Body.BodyTier.T1) return 10;
             else return 1;
         }
 

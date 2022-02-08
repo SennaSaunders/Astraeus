@@ -7,9 +7,7 @@ using UnityEngine;
 
 namespace Code._Ships.Hulls {
     public class MedCargoHull : Hull {
-        private void Awake() {
-            outfittingPosition = new Vector3(0, 0, 10);
-            SetupHull(5000);
+        public MedCargoHull() : base(new Vector3(0, 0, 20), 5000) {
         }
 
         public override string GetHullFullPath() {
@@ -48,5 +46,7 @@ namespace Code._Ships.Hulls {
 
             InternalComponents = internalComponents;
         }
+
+        
     }
 }

@@ -1,12 +1,16 @@
 ﻿using System.Collections.Generic;
 using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem;
+using Code._Galaxy._SolarSystem._CelestialObjects;
 using UnityEngine;
 
 namespace Code._Galaxy {
     public class GalaxyController : MonoBehaviour {
         private Galaxy _galaxy;
-        private static GalaxyView _view;
+        private GameObject _galaxyHolder;
+        private SolarSystemController _activeSystemController;
+        private List<SolarSystemController> _solarSystemControllers = new List<SolarSystemController>();
+        private UnityEngine.Camera _camera;
 
         private void Start() {
             _camera = UnityEngine.Camera.main;
@@ -19,26 +23,46 @@ namespace Code._Galaxy {
         public void SetGalaxy(Galaxy galaxy) {
             _galaxy = galaxy;
         }
+        
+        
 
-        private void SetupGalaxyView() {
-            _view = FindObjectOfType<GalaxyView>();
+        public void SetupGalaxyHolder() {
+            string holderName = "Galaxy";
+            _galaxyHolder = GameObject.Find(holderName);
             if (Application.isEditor) {
-                DestroyImmediate(_view);
+                DestroyImmediate(_galaxyHolder);
             }
             else {
-                Destroy(_view);
+                Destroy(_galaxyHolder);
             }
-            _view = gameObject.AddComponent<GalaxyView>();
-            _view.SetupGalaxyView();
+            _galaxyHolder = new GameObject(holderName);
         }
         
-        public void DisplayGalaxy() {
-            SetupGalaxyView();
-            _view.DisplayGalaxy(_galaxy);
+        private void DisplaySolarSystemPrimary(SolarSystem solarSystem, int num) {
+            CelestialBody primary = (CelestialBody)solarSystem.Bodies[0];
+            GameObject primaryObject = primary.GetMapObject();  //change out for Instantiate() when prefabs are made
+            primaryObject.transform.SetParent(_galaxyHolder.transform);
+            primaryObject.transform.localPosition = new Vector3(solarSystem.Coordinate.x, solarSystem.Coordinate.y);
+            primaryObject.name = "System: " + num + " Tier: " + primary.Tier;
+            SolarSystemController controller = primaryObject.AddComponent<SolarSystemController>();
+            controller.AssignSystem(solarSystem);
+            _solarSystemControllers.Add(controller);
         }
 
-        private SolarSystemController _activeSystemController;
-        private UnityEngine.Camera _camera;
+        public void DisplayGalaxy(Galaxy galaxy) {
+            for (int i = 0; i < galaxy.Systems.Count; i++) {   //can potentially be changed to only display some systems later e.g. hidden systems/maybe culling?
+                DisplaySolarSystemPrimary(galaxy.Systems[i], i+1);
+            }
+        }
+
+        public SolarSystemController GetSolarSystemController(SolarSystem solarSystem) {
+            return _solarSystemControllers.Find(ssc => ssc.solarSystem == solarSystem);
+        }
+
+        public void DisplayGalaxy() {
+            SetupGalaxyHolder();
+            DisplayGalaxy(_galaxy);
+        }
 
         private void SolarSystemRaycast() {
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);

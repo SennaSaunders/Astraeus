@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Code._GameControllers;
 using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
@@ -8,23 +7,28 @@ using UnityEngine;
 
 namespace Code._Ships.Hulls {
     //ship blueprint for the components allowed on a particular hull 
-    public abstract class Hull : MonoBehaviour {
+    public abstract class Hull {
+        protected Hull(Vector3 outfittingPosition, float hullMass) {
+            OutfittingPosition = outfittingPosition;
+            HullMass = hullMass;
+            SetupHull();
+        }
+
         protected const string BaseHullPath = "Ships/Hulls/";
         public List<(ShipComponentType componentType, ShipComponentTier maxSize, InternalComponent concreteComponent, string parentTransformName)> InternalComponents;
         public List<(ShipComponentType componentType, ShipComponentTier maxSize, Weapon concreteComponent, string parentTransformName)> WeaponComponents;
         public List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName,bool needsBracket)> ThrusterComponents;
         public List<List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName,bool needsBracket)>> TiedThrustersSets = new List<List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName,bool needsBracket)>>();  
         public float HullMass;
-        public Vector3 outfittingPosition;
-        public Quaternion outfittingRotation = Quaternion.Euler(-10, -50, 30);
+        public Vector3 OutfittingPosition { get; set; }
+        public Quaternion OutfittingRotation { get; } = Quaternion.Euler(-10, -50, 30);
 
         public abstract string GetHullFullPath();
 
-        protected void SetupHull(float hullMass) {
+        protected void SetupHull() {
             SetWeaponComponents();
             SetThrusterComponents();
             SetInternalComponents();
-            HullMass = hullMass;
         }
 
         public abstract void SetThrusterComponents();

@@ -321,10 +321,12 @@ namespace Code._Galaxy {
                     float clearPreviousBodyChildrenDistance = 0;
                     if (currentBody.Primary != null) { //if not system primary
                         float primaryBaseDistance = currentBody.Primary.Tier.BaseDistance();
-                        if (j != 0) { //if not first child of primary
-                            Body previousBody = samePrimaryBodiesLists[i][j - 1];
-                            clearPreviousBodyDistance = previousBody.Coordinate.x;
-                            clearPreviousBodyChildrenDistance = GetSumMaxChildDistances(previousBody);
+                        if (currentBody.Tier != BodyTier.T0) {
+                            if (j != 0) { //if not first child of primary
+                                Body previousBody = samePrimaryBodiesLists[i][j - 1];
+                                clearPreviousBodyDistance = previousBody.Coordinate.x;
+                                clearPreviousBodyChildrenDistance = GetSumMaxChildDistances(previousBody);
+                            }
                         }
 
                         distance += primaryBaseDistance + clearChildrenDistance + clearPreviousBodyDistance + clearPreviousBodyChildrenDistance;

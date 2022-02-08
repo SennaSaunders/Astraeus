@@ -4,7 +4,9 @@ using UnityEngine;
 
 namespace Code._Ships {
     public class Ship : MonoBehaviour {
-        public Hull ShipHull;
+        public Hull ShipHull { get; set; }
+        public GameObject ShipObject { get; set; }
+        
         private ThrustersController _thrustersController;
         public Vector2 velocity;
         public bool Active { get; set; } = false;

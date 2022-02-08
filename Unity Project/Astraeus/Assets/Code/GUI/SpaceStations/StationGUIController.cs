@@ -10,14 +10,16 @@ using UnityEngine.UI;
 namespace Code.GUI.SpaceStations {
     public class StationGUIController : MonoBehaviour {
         private IStation _station;
+        private GameController _gameController;
 
         private string _stationGUIBasePath = "GUIPrefabs/Station/";
         private string _serviceButtonPathSpecifier = "ServiceButton"; 
         private string _stationGUIPathSpecifier = "StationGUI";
         public GameObject stationGUI;
 
-        public void Setup(IStation station) {
+        public void Setup(IStation station, GameController gameController) {
             _station = station;
+            _gameController = gameController;
             SetupGUI();
         }
 
@@ -50,7 +52,7 @@ namespace Code.GUI.SpaceStations {
             Debug.Log("Outfitting Button Clicked");
             OutfittingGUIController outfittingGUIController = gameObject.AddComponent<OutfittingGUIController>();
             OutfittingService outfittingService = (OutfittingService)_station.StationServices.Find(s => s.GetType() == typeof(OutfittingService));
-            outfittingGUIController.StartOutfitting(outfittingService, this);
+            outfittingGUIController.StartOutfitting(outfittingService, this, _gameController);
         }
     }
 }

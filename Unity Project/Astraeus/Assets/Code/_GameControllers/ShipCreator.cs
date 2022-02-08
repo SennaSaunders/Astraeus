@@ -23,14 +23,17 @@ namespace Code._GameControllers {
             Fighter
         }
 
-        public Ship CreateDefaultShip() {
-            Ship ship = gameObject.AddComponent<Ship>();
-            ship.ShipHull = gameObject.AddComponent<SmallFighterHull>();
-
+        public Ship CreateDefaultShip(GameObject objectContainer) {
+            Ship ship = objectContainer.AddComponent<Ship>();
+            ship.ShipHull = new SmallFighterHull();
+            _shipObjectHandler.ManagedShip = ship;
+            ship.ShipObject = _shipObjectHandler.CreateShip(objectContainer.transform);
             return ship;
         }
 
-        public Ship CreateFactionShip(ShipClass shipClass, ShipComponentTier maxComponentTier, float loadoutEfficiency, Faction faction) { // slotEfficiency should define how likely a slot is to be fully-utilised
+        
+
+        public Ship CreateFactionShip(ShipClass shipClass, ShipComponentTier maxComponentTier, float loadoutEfficiency, Faction faction, GameObject objectContainer) { // slotEfficiency should define how likely a slot is to be fully-utilised
             List<Hull> hulls = new List<Hull>();
 
             switch (shipClass) {
@@ -48,10 +51,10 @@ namespace Code._GameControllers {
             int hullIdx = r.Next(0, hulls.Count);
             Hull chosenHull = hulls[hullIdx];
 
-            Ship ship = gameObject.AddComponent<Ship>();
+            Ship ship = objectContainer.AddComponent<Ship>();
             ship.ShipHull = chosenHull;
             _shipObjectHandler.ManagedShip = ship;
-            _shipObjectHandler.CreateShip();
+            _shipObjectHandler.CreateShip(objectContainer.transform);
 
             //choose thrusters
             List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName, bool needsBracket)> mainThrusterSlots = _shipObjectHandler.ManagedShip.ShipHull.ThrusterComponents;
@@ -122,7 +125,6 @@ namespace Code._GameControllers {
 
             //choose a power plant
             //choose a shield
-
 
             return _shipObjectHandler.ManagedShip;
         }
@@ -203,11 +205,11 @@ namespace Code._GameControllers {
         }
 
         private List<Hull> GetTransportHulls() {
-            return new List<Hull>() { gameObject.AddComponent<MedCargoHull>() };
+            return new List<Hull>() { new MedCargoHull() };
         }
 
         private List<Hull> GetFighterHulls() {
-            return new List<Hull>() { gameObject.AddComponent<SmallFighterHull>() };
+            return new List<Hull>() { new SmallFighterHull() };
         }
     }
 }

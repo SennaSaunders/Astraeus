@@ -7,35 +7,69 @@ using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
 using Code._Ships;
 using Code._Ships.ShipComponents;
 using Code._Utility;
+using Code.Camera;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Code._GameControllers {
     public class GameController : MonoBehaviour {
-        public static PrefabHandler _prefabHandler; 
+        public static PrefabHandler _prefabHandler;
         private static GalaxyController _galaxyController;
         private static GameGUIController _guiController;
         private static SolarSystem _currentSolarSystem;
         public static Ship _currentShip { get; set; }
+        private GameObject playerShipContainer;
+        
+        public List<Ship> _npcShips = new List<Ship>();
+
         private static IStation _currentStation;
+
         private static ShipCreator _shipCreator;
         
+        private UnityEngine.Camera _camera;
+
 
         private void Awake() {
+            _camera = UnityEngine.Camera.main;
             gameObject.AddComponent<EventSystem>();
             gameObject.AddComponent<StandaloneInputModule>();
             _prefabHandler = gameObject.AddComponent<PrefabHandler>();
+            playerShipContainer = new GameObject("Player Ship Container");
             SetupGameGUIController();
+            _shipCreator = gameObject.AddComponent<ShipCreator>();
         }
 
         private void SetupShip() {
-            _shipCreator = gameObject.AddComponent<ShipCreator>();
-            _currentShip = _shipCreator.CreateDefaultShip();
+            _currentShip = _shipCreator.CreateDefaultShip(playerShipContainer);
+            _currentShip.ShipObject.transform.SetParent(playerShipContainer.transform);
+        }
+
+        public void RefreshPlayerShip() {
+            if (playerShipContainer.transform.childCount > 0) {
+                for (int i = playerShipContainer.transform.childCount - 1; i >= 0; i--) {
+                    Destroy(playerShipContainer.transform.GetChild(i).gameObject);
+                }
+            }
+            
+            _shipCreator._shipObjectHandler.ManagedShip = _currentShip;
+            _shipCreator._shipObjectHandler.CreateShip(playerShipContainer.transform);
         }
 
         public void StartGame() {
+            
+
             _guiController.SetupStationGUI(_currentStation);
             SetupShip();
+            SetupCameraControllers();
+            _galaxyController.DisplayGalaxy();
+            SolarSystemController solarSystemController = _galaxyController.GetSolarSystemController(_currentSolarSystem);
+            solarSystemController.DisplaySolarSystem();
+        }
+
+        private void SetupCameraControllers() {
+            _camera.gameObject.AddComponent<GalaxyCameraController>();
+            ShipCameraController shipCameraController = _currentShip.ShipObject.AddComponent<ShipCameraController>();
+            shipCameraController.TakeCameraControl();
         }
 
         public void SetupGalaxyController(Galaxy galaxy) {
@@ -52,32 +86,31 @@ namespace Code._GameControllers {
             _currentSolarSystem = GetStartingSystem();
             _currentStation = GetStartingStation(_currentSolarSystem);
 
-            
-            //ShipCreatorTest();
+            ShipCreatorTest();
         }
 
         private void SetupGameGUIController() {
             _guiController = gameObject.AddComponent<GameGUIController>();
             _guiController.SetupGameController(this);
-        } 
+        }
 
         public void ShipCreatorTest() {
             List<Faction> factions = _galaxyController.GetFactions();
 
             int offset = 0;
             int offsetChange = 20;
+            GameObject npcShipContainer = new GameObject("NPC Ships");
             foreach (Faction faction in factions) {
-                _shipCreator.CreateFactionShip(ShipCreator.ShipClass.Fighter, ShipComponentTier.T5, .5f, faction);
-                _shipCreator._shipObjectHandler.ShipObject.transform.position = new Vector3(offset, 0, 0);
-                _shipCreator.CreateFactionShip(ShipCreator.ShipClass.Transport, ShipComponentTier.T5, .5f, faction);
-                _shipCreator._shipObjectHandler.ShipObject.transform.position = new Vector3(offset, 0, 20);
+                Ship newShip = _shipCreator.CreateFactionShip(ShipCreator.ShipClass.Fighter, ShipComponentTier.T5, .5f, faction, npcShipContainer);
+                newShip.ShipObject.transform.SetParent(npcShipContainer.transform);
+                newShip.ShipObject.transform.position = new Vector3(offset, 20, 0);
+                _npcShips.Add(newShip);
+                newShip = _shipCreator.CreateFactionShip(ShipCreator.ShipClass.Transport, ShipComponentTier.T5, .5f, faction, npcShipContainer);
+                newShip.ShipObject.transform.SetParent(npcShipContainer.transform);
+                newShip.ShipObject.transform.position = new Vector3(offset, 40, 0);
+                _npcShips.Add(newShip);
                 offset += offsetChange;
             }
-            
-        }
-
-        public static void ShowGalaxy() {
-            _galaxyController.DisplayGalaxy();
         }
 
         private SolarSystem GetStartingSystem() {
@@ -87,10 +120,9 @@ namespace Code._GameControllers {
             List<Faction> allFactions = _galaxyController.GetFactions();
             List<Faction> eligibleFactions = new List<Faction>();
 
-            foreach (Faction faction in allFactions) {//get factions of startingFactionTypes
-                bool eligibleFactionType = false;
+            foreach (Faction faction in allFactions) { //get factions of startingFactionTypes
                 foreach (Faction.FactionType factionType in startingFactionTypes) {
-                    eligibleFactionType = factionType == faction.factionType ? true : false;
+                    bool eligibleFactionType = factionType == faction.factionType;
                     if (eligibleFactionType) {
                         eligibleFactions.Add(faction);
                         break;
@@ -99,8 +131,8 @@ namespace Code._GameControllers {
             }
 
             if (eligibleFactions.Count > 0) {
-                int chosenFactionIndex = GalaxyGenerator.Rng.Next(eligibleFactions.Count);//get a random eligible faction - using galaxy generator RNG so it's fixed by the galaxy generating seed
-            
+                int chosenFactionIndex = GalaxyGenerator.Rng.Next(eligibleFactions.Count); //get a random eligible faction - using galaxy generator RNG so it's fixed by the galaxy generating seed
+
                 return eligibleFactions[chosenFactionIndex].HomeSystem;
             }
 
@@ -121,12 +153,8 @@ namespace Code._GameControllers {
                 int chosenStationIndex = GalaxyGenerator.Rng.Next(spaceStations.Count);
                 return spaceStations[chosenStationIndex];
             }
-            
+
             return null;
         }
-        //start of game stuff
-        //pick starting system
-        //pick space station in system
-        //spawn player in system
     }
 }

@@ -34,14 +34,16 @@ namespace Code.GUI.SpaceStations.Services {
         private string _weaponCardPath = "WeaponCard";
         private string _thrusterCardPath = "ThrusterCard";
         private string _powerPlantCardPath = "PowerPlantCard";
+        private GameController _gameController;
 
         private void SetShipObjectHandler() {
             _shipObjectHandler = _guiGameObject.AddComponent<ShipObjectHandler>();
         }
         
-        public void StartOutfitting(OutfittingService outfittingService, StationGUIController stationGUIController) {
+        public void StartOutfitting(OutfittingService outfittingService, StationGUIController stationGUIController, GameController gameController) {
             _outfittingService = outfittingService;
             _stationGUIController = stationGUIController;
+            _gameController = gameController;
             _stationGUIController.stationGUI.SetActive(false);
             _camera = UnityEngine.Camera.main;
             
@@ -56,6 +58,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void ExitOutfitting() {
+            _gameController.RefreshPlayerShip();
             _stationGUIController.stationGUI.SetActive(true);
             Destroy(_guiGameObject);
             Destroy(this);
@@ -63,11 +66,12 @@ namespace Code.GUI.SpaceStations.Services {
 
         private void DisplayShip() {
             _shipObjectHandler.ManagedShip = GameController._currentShip; //needs to be changed to the player's current ship
-            _shipObjectHandler.CreateShip();
+            
+            _shipObjectHandler.CreateShip(GameObject.Find("ShipPanel").transform);
 
-            GameObject shipObject = _shipObjectHandler.ShipObject;
-            shipObject.transform.position = _shipObjectHandler.ManagedShip.ShipHull.outfittingPosition;
-            shipObject.transform.rotation = _shipObjectHandler.ManagedShip.ShipHull.outfittingRotation;
+            GameObject shipObject = _shipObjectHandler.ManagedShip.ShipObject;
+            shipObject.transform.position = _shipObjectHandler.ManagedShip.ShipHull.OutfittingPosition;
+            shipObject.transform.rotation = _shipObjectHandler.ManagedShip.ShipHull.OutfittingRotation;
             AddDraggableToShip();
         }
 
@@ -101,7 +105,7 @@ namespace Code.GUI.SpaceStations.Services {
         private void AddDraggableToShip() {
             GameObject shipPanel = GameObject.Find("ShipPanel");
             ShipRotatable shipRotatable = shipPanel.AddComponent<ShipRotatable>();
-            shipRotatable.rotateableObject = _shipObjectHandler.ShipObject;
+            shipRotatable.rotateableObject = _shipObjectHandler.ManagedShip.ShipObject;
         }
 
         private void CreateSelectionMarkers(List<(Transform, Transform, string)> shipComponents) {
