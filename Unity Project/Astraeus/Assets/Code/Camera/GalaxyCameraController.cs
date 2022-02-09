@@ -2,7 +2,7 @@
 using UnityEngine;
 
 namespace Code.Camera {
-    public class GalaxyCameraController : MonoBehaviour, ICameraController {
+    public class GalaxyCameraController : CameraController {
         
         private float _x;
         private float _y;
@@ -158,10 +158,6 @@ namespace Code.Camera {
 
         private float GetZoomRatio() {
             return (_z - _minZoomInDistance) / (_maxZoomOutDistance - _minZoomInDistance);
-        }
-        public void TakeCameraControl() {
-            FindObjectOfType<ShipCameraController>().enabled = false;
-            FindObjectOfType<GalaxyCameraController>().enabled = true;
         }
 
         public void SetupCamera(float x2, float y2) {

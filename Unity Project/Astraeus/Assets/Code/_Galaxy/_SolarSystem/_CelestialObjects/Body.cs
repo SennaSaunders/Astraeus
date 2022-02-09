@@ -58,28 +58,19 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects {
 
     public static class BodyTierExtension {
         public static float BaseDistance(this Body.BodyTier tier) {
-            if (tier == Body.BodyTier.T9) return 1600;
-            if (tier == Body.BodyTier.T8) return 1300;
-            if (tier == Body.BodyTier.T7) return 1000;
-            if (tier == Body.BodyTier.T6) return 900;
-            if (tier == Body.BodyTier.T5) return 600;
-            if (tier == Body.BodyTier.T4) return 500;
-            if (tier == Body.BodyTier.T3) return 400;
-            if (tier == Body.BodyTier.T2) return 300;
-            if (tier == Body.BodyTier.T1) return 200;
-            else return 5;
+            return tier.SystemScale()*4;
         }
 
         public static float SystemScale(this Body.BodyTier tier) {
-            if (tier == Body.BodyTier.T9) return 450;
-            if (tier == Body.BodyTier.T8) return 360;
-            if (tier == Body.BodyTier.T7) return 270;
-            if (tier == Body.BodyTier.T6) return 170;
-            if (tier == Body.BodyTier.T5) return 120;
-            if (tier == Body.BodyTier.T4) return 75;
-            if (tier == Body.BodyTier.T3) return 50;
-            if (tier == Body.BodyTier.T2) return 25;
-            if (tier == Body.BodyTier.T1) return 10;
+            if (tier == Body.BodyTier.T9) return 1500;
+            if (tier == Body.BodyTier.T8) return 1100;
+            if (tier == Body.BodyTier.T7) return 700;
+            if (tier == Body.BodyTier.T6) return 350;
+            if (tier == Body.BodyTier.T5) return 300;
+            if (tier == Body.BodyTier.T4) return 250;
+            if (tier == Body.BodyTier.T3) return 200;
+            if (tier == Body.BodyTier.T2) return 150;
+            if (tier == Body.BodyTier.T1) return 100;
             else return 1;
         }
 

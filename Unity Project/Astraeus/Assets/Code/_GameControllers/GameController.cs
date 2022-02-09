@@ -17,12 +17,14 @@ namespace Code._GameControllers {
         private static GalaxyController _galaxyController;
         private static GameGUIController _guiController;
         private static SolarSystem _currentSolarSystem;
+        public const int ShipZ = SolarSystemController.ZOffset-10;
         public static Ship _currentShip { get; set; }
         private GameObject playerShipContainer;
         
         public List<Ship> _npcShips = new List<Ship>();
 
         private static IStation _currentStation;
+        private Vector3 playerPosition;
 
         private static ShipCreator _shipCreator;
         
@@ -39,9 +41,18 @@ namespace Code._GameControllers {
             _shipCreator = gameObject.AddComponent<ShipCreator>();
         }
 
-        private void SetupShip() {
+        private void SetShipPosition() {
+            if (_currentStation != null) {
+                Vector3 stationPos = _galaxyController.GetSolarSystemController(_currentSolarSystem).GetBodyGameObject((Body)_currentStation).transform.position;
+                _currentShip.ShipObject.transform.position = new Vector3(stationPos.x, stationPos.y, ShipZ);
+            }
+        }
+
+        private void SetupDefaultShip() {
             _currentShip = _shipCreator.CreateDefaultShip(playerShipContainer);
             _currentShip.ShipObject.transform.SetParent(playerShipContainer.transform);
+            SetShipPosition();
+            SetupShipCamera();
         }
 
         public void RefreshPlayerShip() {
@@ -53,21 +64,21 @@ namespace Code._GameControllers {
             
             _shipCreator._shipObjectHandler.ManagedShip = _currentShip;
             _shipCreator._shipObjectHandler.CreateShip(playerShipContainer.transform);
+            
+            SetShipPosition();
+            SetupShipCamera();
         }
 
         public void StartGame() {
-            
-
             _guiController.SetupStationGUI(_currentStation);
-            SetupShip();
-            SetupCameraControllers();
             _galaxyController.DisplayGalaxy();
             SolarSystemController solarSystemController = _galaxyController.GetSolarSystemController(_currentSolarSystem);
             solarSystemController.DisplaySolarSystem();
+            SetupDefaultShip();
         }
 
-        private void SetupCameraControllers() {
-            _camera.gameObject.AddComponent<GalaxyCameraController>();
+
+        private void SetupShipCamera() {
             ShipCameraController shipCameraController = _currentShip.ShipObject.AddComponent<ShipCameraController>();
             shipCameraController.TakeCameraControl();
         }
@@ -103,11 +114,11 @@ namespace Code._GameControllers {
             foreach (Faction faction in factions) {
                 Ship newShip = _shipCreator.CreateFactionShip(ShipCreator.ShipClass.Fighter, ShipComponentTier.T5, .5f, faction, npcShipContainer);
                 newShip.ShipObject.transform.SetParent(npcShipContainer.transform);
-                newShip.ShipObject.transform.position = new Vector3(offset, 20, 0);
+                newShip.ShipObject.transform.position = new Vector3(offset, 20, ShipZ);
                 _npcShips.Add(newShip);
                 newShip = _shipCreator.CreateFactionShip(ShipCreator.ShipClass.Transport, ShipComponentTier.T5, .5f, faction, npcShipContainer);
                 newShip.ShipObject.transform.SetParent(npcShipContainer.transform);
-                newShip.ShipObject.transform.position = new Vector3(offset, 40, 0);
+                newShip.ShipObject.transform.position = new Vector3(offset, 40, ShipZ);
                 _npcShips.Add(newShip);
                 offset += offsetChange;
             }

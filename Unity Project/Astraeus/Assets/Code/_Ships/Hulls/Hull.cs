@@ -3,13 +3,14 @@ using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.InternalComponents;
+using Code.Camera;
 using UnityEngine;
 
 namespace Code._Ships.Hulls {
     //ship blueprint for the components allowed on a particular hull 
     public abstract class Hull {
         protected Hull(Vector3 outfittingPosition, float hullMass) {
-            OutfittingPosition = outfittingPosition;
+            OutfittingPosition = new Vector3(outfittingPosition.x, outfittingPosition.y, outfittingPosition.z + OutfittingCameraController.zOffset);
             HullMass = hullMass;
             SetupHull();
         }

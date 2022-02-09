@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 namespace Code.Camera {
-    public class ShipCameraController : MonoBehaviour, ICameraController {
+    public class ShipCameraController : CameraController {
         private UnityEngine.Camera _camera;
 
         private float _maxZOffset = -1000; //camera is furthest from ship
@@ -16,7 +16,7 @@ namespace Code.Camera {
         private float _scrollRate = 10;
 
         private void Awake() {
-            _camera = UnityEngine.Camera.current;
+            _camera = UnityEngine.Camera.main;
             _shipZ = transform.position.z;
             _minZ = _shipZ + _minZOffset;
             _maxZ = _shipZ + _maxZOffset;
@@ -30,11 +30,6 @@ namespace Code.Camera {
             ControlZoom();
         }
 
-        public void TakeCameraControl() {
-            FindObjectOfType<GalaxyCameraController>().enabled = false;
-            FindObjectOfType<ShipCameraController>().enabled = true;
-        }
-        
         private void FollowShip() {
             Vector3 shipPos = gameObject.transform.position;
             _camera.transform.position = new Vector3(shipPos.x, shipPos.y, _currentZ);

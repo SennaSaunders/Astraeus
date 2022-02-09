@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Code._Galaxy {
     public class GalaxyController : MonoBehaviour {
+        public const int zOffset = 2500; 
         private Galaxy _galaxy;
         private GameObject _galaxyHolder;
         private SolarSystemController _activeSystemController;
@@ -16,15 +17,13 @@ namespace Code._Galaxy {
             _camera = UnityEngine.Camera.main;
         }
 
-        void Update() {
-            SolarSystemRaycast();
-        }
+        // void Update() {
+        //     SolarSystemRaycast();
+        // }
 
         public void SetGalaxy(Galaxy galaxy) {
             _galaxy = galaxy;
         }
-        
-        
 
         public void SetupGalaxyHolder() {
             string holderName = "Galaxy";
@@ -36,6 +35,7 @@ namespace Code._Galaxy {
                 Destroy(_galaxyHolder);
             }
             _galaxyHolder = new GameObject(holderName);
+            _galaxyHolder.transform.position = new Vector3(0, 0, zOffset);
         }
         
         private void DisplaySolarSystemPrimary(SolarSystem solarSystem, int num) {

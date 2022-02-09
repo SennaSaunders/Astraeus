@@ -25,11 +25,27 @@ namespace Code.GUI.SpaceStations {
 
         private void SetupGUI() {
             stationGUI = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(_stationGUIBasePath+_stationGUIPathSpecifier));
-            CreateServiceButtons();
+            SetupButtons();
         }
 
         private Transform GetScrollContainer() {
             return stationGUI.transform.Find("MainContainer/Menu/Scroll View/Viewport/Content");
+        }
+
+        private void SetupButtons() {
+            CreateServiceButtons();
+            SetupExitBtn();
+        }
+        
+        private void SetupExitBtn() {
+            Button btn = GameObject.Find("ExitBtn").GetComponent<Button>();
+            btn.onClick.AddListener(ExitBtnCLick);
+        }
+
+        private void ExitBtnCLick() {
+            Debug.Log("Clicked - Exit Station Btn");
+            Destroy(stationGUI);
+            Destroy(this);
         }
         
         private void CreateServiceButtons() {

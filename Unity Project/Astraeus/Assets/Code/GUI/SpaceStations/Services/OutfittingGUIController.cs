@@ -9,6 +9,7 @@ using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.InternalComponents;
 using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
 using Code._Ships.ShipComponents.InternalComponents.Storage;
+using Code.Camera;
 using Code.GUI.Utility;
 using TMPro;
 using Unity.VectorGraphics;
@@ -26,6 +27,7 @@ namespace Code.GUI.SpaceStations.Services {
         private List<GameObject> _selectionMarkers = new List<GameObject>();
 
         private UnityEngine.Camera _camera;
+        private OutfittingCameraController _cameraController;
 
         
         private string _outfittingPath = "GUIPrefabs/Station/Services/Outfitting/";
@@ -45,11 +47,17 @@ namespace Code.GUI.SpaceStations.Services {
             _stationGUIController = stationGUIController;
             _gameController = gameController;
             _stationGUIController.stationGUI.SetActive(false);
-            _camera = UnityEngine.Camera.main;
-            
+            SetupCamera();
             SetupGUI();
             DisplayShip();
             SetupBtns();
+        }
+
+        private void SetupCamera() {
+            _camera = UnityEngine.Camera.main;
+            _cameraController = _camera.gameObject.AddComponent<OutfittingCameraController>();
+            _cameraController.TakeCameraControl();
+            _cameraController.SetCameraPos();
         }
 
         private void SetupHomeBtn() {
@@ -60,6 +68,8 @@ namespace Code.GUI.SpaceStations.Services {
         private void ExitOutfitting() {
             _gameController.RefreshPlayerShip();
             _stationGUIController.stationGUI.SetActive(true);
+            FindObjectOfType<ShipCameraController>().enabled = true;
+            Destroy(_cameraController);
             Destroy(_guiGameObject);
             Destroy(this);
         }

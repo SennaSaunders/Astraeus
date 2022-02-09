@@ -72,7 +72,7 @@ namespace Code._Galaxy {
             GenGalaxyFactions(galaxy);
             GenSpaceStations(galaxy.Factions);
 
-            for (int i = 0; i< galaxy.Systems.Count;i++) {//sets the position of all planets and space stations
+            for (int i = 0; i < galaxy.Systems.Count; i++) { //sets the position of all planets and space stations
                 galaxy.Systems[i].Bodies = SetupRotations(SetupPositions(galaxy.Systems[i].Bodies));
             }
 
@@ -102,17 +102,12 @@ namespace Code._Galaxy {
 
                     //add faction specific components to outfitting
                     for (int i = 0; i < Enum.GetValues(typeof(ShipComponentTier)).Length; i++) {
-                        outfittingService.AvailableComponents.AddRange(faction.GetAllowedWeapons((ShipComponentTier)i).Select(aw=>aw.weapon));
-                        outfittingService.AvailableComponents.AddRange(faction.GetAllowedMainThrusters((ShipComponentTier)i).Select(aw=>aw.mainThruster));
-                        outfittingService.AvailableComponents.AddRange(faction.GetAllowedPowerPlants((ShipComponentTier)i).Select(aw=>aw.powerPlant));
+                        outfittingService.AvailableComponents.AddRange(faction.GetAllowedWeapons((ShipComponentTier)i).Select(aw => aw.weapon));
+                        outfittingService.AvailableComponents.AddRange(faction.GetAllowedMainThrusters((ShipComponentTier)i).Select(aw => aw.mainThruster));
+                        outfittingService.AvailableComponents.AddRange(faction.GetAllowedPowerPlants((ShipComponentTier)i).Select(aw => aw.powerPlant));
                     }
-                    
-                    spaceStation.StationServices = new List<StationService>() {
-                        new RefuelService(),
-                        new RepairService(),
-                        new ShipyardService(),
-                        outfittingService
-                    };
+
+                    spaceStation.StationServices = new List<StationService>() { new RefuelService(), new RepairService(), new ShipyardService(), outfittingService };
                     solarSystem.Bodies.Add(spaceStation);
                 }
             }
@@ -168,7 +163,6 @@ namespace Code._Galaxy {
                             pickedSectors.Add(pickedSector.sector);
                             SolarSystem preferredSolarSystemInSector = factionType.GetFactionSystemPreferencesList().Find(s => pickedSector.sector.Systems.Contains(s.solarSystem)).solarSystem;
                             if (preferredSolarSystemInSector != null) {
-                                
                                 Faction faction = factionType.GetFactionObjectFromType(preferredSolarSystemInSector);
                                 factions.Add(faction);
                                 faction.AddSector(pickedSector.sector);
@@ -212,6 +206,7 @@ namespace Code._Galaxy {
                 foreach (SolarSystem solarSystem in systems) {
                     solarSystem.Sector = sector;
                 }
+
                 sector.SetSolarSystems(systems);
             }
 
@@ -232,7 +227,7 @@ namespace Code._Galaxy {
 
         private static StarType PickRandomStarType(StarType type) {
             int min = (int)type;
-            int max = Enum.GetValues(typeof(StarType)).Length+1;
+            int max = Enum.GetValues(typeof(StarType)).Length + 1;
             StarType starType = (StarType)Rng.Next(min, max);
             return starType;
         }
@@ -310,33 +305,37 @@ namespace Code._Galaxy {
 
                 samePrimaryBodiesLists.Add(samePrimaryBodies);
             }
-
+            
             for (int i = samePrimaryBodiesLists.Count - 1; i >= 0; i--) {
                 for (int j = 0; j < samePrimaryBodiesLists[i].Count; j++) {
                     Body currentBody = samePrimaryBodiesLists[i][j];
-                    Vector2 c;
-                    float distance = currentBody.Tier.BaseDistance();
-                    float clearChildrenDistance = GetSumMaxChildDistances(currentBody);
-                    float clearPreviousBodyDistance = 0;
-                    float clearPreviousBodyChildrenDistance = 0;
-                    if (currentBody.Primary != null) { //if not system primary
-                        float primaryBaseDistance = currentBody.Primary.Tier.BaseDistance();
-                        if (currentBody.Tier != BodyTier.T0) {
+                    Vector2 bodyCoordinate;
+                    if (currentBody.GetType() == typeof(SpaceStation)) {
+                        bodyCoordinate = new Vector2(currentBody.Primary.Tier.SystemScale(), 0);
+                    }
+                    else {
+                        float distance = currentBody.Tier.BaseDistance();
+                        float clearChildrenDistance = GetSumMaxChildDistances(currentBody);
+                        float clearPreviousBodyDistance = 0;
+                        float clearPreviousBodyChildrenDistance = 0;
+                        if (currentBody.Primary != null) { //if not system primary
+                            float primaryBaseDistance = currentBody.Primary.Tier.BaseDistance();
+
                             if (j != 0) { //if not first child of primary
                                 Body previousBody = samePrimaryBodiesLists[i][j - 1];
                                 clearPreviousBodyDistance = previousBody.Coordinate.x;
                                 clearPreviousBodyChildrenDistance = GetSumMaxChildDistances(previousBody);
                             }
+
+                            distance += primaryBaseDistance + clearChildrenDistance + clearPreviousBodyDistance + clearPreviousBodyChildrenDistance;
+                            bodyCoordinate = new Vector2(distance, 0);
                         }
-
-                        distance += primaryBaseDistance + clearChildrenDistance + clearPreviousBodyDistance + clearPreviousBodyChildrenDistance;
-                        c = new Vector2(distance, 0);
-                    }
-                    else {
-                        c = new Vector2(0, 0);
+                        else {
+                            bodyCoordinate = new Vector2(0, 0);
+                        }
                     }
 
-                    currentBody.Coordinate = c;
+                    currentBody.Coordinate = bodyCoordinate;
                 }
             }
 

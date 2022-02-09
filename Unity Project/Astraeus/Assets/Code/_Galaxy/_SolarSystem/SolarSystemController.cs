@@ -7,22 +7,20 @@ namespace Code._Galaxy._SolarSystem {
         public SolarSystem solarSystem;
         private GameObject _solarSystemHolder;
         private List<(Body body, GameObject bodyObject)> bodyObjectMap = new List<(Body body, GameObject bodyObject)>();
-        private const int ZOffset = 2500;
+        public const int ZOffset = 0;
         public bool Active { get; set; }
         private Vector3 position;
-
-        
 
         public void DisplaySolarSystem() {
             SetupSolarSystemHolder();
             DisplaySolarSystem(solarSystem);
         }
-        
+
         //update the rotation of planets
         public void AssignSystem(SolarSystem solarSystem) {
             this.solarSystem = solarSystem;
         }
-        
+
         private void SetupSolarSystemHolder() {
             const string systemName = "SolarSystem";
             _solarSystemHolder = GameObject.Find(systemName);
@@ -39,7 +37,7 @@ namespace Code._Galaxy._SolarSystem {
         public GameObject GetBodyGameObject(Body body) {
             return bodyObjectMap.Find(m => m.body == body).bodyObject;
         }
-        
+
         public void DisplaySolarSystem(SolarSystem solarSystem) {
             SetupSolarSystemHolder();
             _solarSystemHolder.transform.position = new Vector3(0, 0, ZOffset);
@@ -50,7 +48,7 @@ namespace Code._Galaxy._SolarSystem {
                 Body body = solarSystem.Bodies[i];
                 GameObject bodyObject = body.GetSystemObject();
                 bodyObjectMap.Add((body, bodyObject));
-                bodyObject.transform.localPosition = new Vector3(0, 0, body.Tier.SystemScale());
+                bodyObject.transform.localPosition = new Vector3(0, 0, body.Tier.SystemScale() / 2); //sets the forwards most part of all bodies so that they are on the same Z level
                 bodyObject.name = "Body: " + i + " Tier: " + body.Tier;
                 GameObject bodyHolder = new GameObject("Holder - " + body.Tier + " Body");
                 bodyObject.transform.SetParent(bodyHolder.transform);
@@ -67,7 +65,7 @@ namespace Code._Galaxy._SolarSystem {
                     int parentIndex = solarSystem.Bodies.IndexOf(currentBody.Primary);
                     GameObject parentObject = bodyHolders[parentIndex];
                     GameObject rotationHolder = new GameObject(i.ToString());
-                    
+
                     rotationHolder.transform.localEulerAngles = new Vector3(0, 0, currentBody.RotationCurrent * 360);
                     rotationHolder.transform.SetParent(parentObject.transform, false);
                     bodyHolder.transform.SetParent(rotationHolder.transform, false);
