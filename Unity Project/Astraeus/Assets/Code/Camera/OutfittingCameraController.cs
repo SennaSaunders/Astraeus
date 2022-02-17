@@ -3,10 +3,10 @@ using UnityEngine;
 
 namespace Code.Camera {
     public class OutfittingCameraController : CameraController {
-        public const int zOffset = -SolarSystemController.ZOffset - 3000;
+        public const int ZOffset = -SolarSystemController.ZOffset - 3000;
 
         public void SetCameraPos() {
-            transform.position = new Vector3(0, 0, zOffset);
+            transform.position = new Vector3(0, 0, ZOffset);
         }
     }
 }

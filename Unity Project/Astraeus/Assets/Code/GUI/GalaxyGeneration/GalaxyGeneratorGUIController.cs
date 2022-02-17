@@ -148,13 +148,13 @@ namespace Code.GUI.GalaxyGeneration {
             Destroy(_guiGameObject);
         }
 
-        private bool startedMsg = false;
+        private bool _startedMsg;
         public void Update() {
             if (_generationThread != null) {
                 if (_generationThread.IsAlive) {
-                    if (!startedMsg) {
+                    if (!_startedMsg) {
                         Debug.Log("Running Generation in separate thread..");
-                        startedMsg = !startedMsg;
+                        _startedMsg = !_startedMsg;
                     }
                 }
                 else {

@@ -1,13 +1,12 @@
-﻿using Code._Ships.ShipComponents.ExternalComponents.Weapons;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Code._Ships.ShipComponents.ExternalComponent.Weapons {
+namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
     public class WeaponController : MonoBehaviour {//should be individual weapon not a list of weapons
-        private ExternalComponents.Weapons.Weapon _externalComponent; //holds the Weapons from ship components with their fire group
+        private Weapon _weapon; //holds the Weapons from ship components with their fire group
         private float rotation = 0;
         
-        public WeaponController(ExternalComponents.Weapons.Weapon externalComponent) {
-            _externalComponent = externalComponent;
+        public WeaponController(Weapon weapon) {
+            _weapon = weapon;
         }
 
         //fire

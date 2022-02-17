@@ -7,11 +7,11 @@ using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._Galaxy._SolarSystem._CelestialObjects.Planet;
 using Code._Galaxy._SolarSystem._CelestialObjects.Star;
 using Code._Galaxy.GalaxyComponents;
-using Code._Ships;
 using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
+using Code._Ships.ShipComponents.InternalComponents.Shields;
 
 namespace Code._Galaxy._Factions {
     public abstract class Faction : IFactionShipComponentSpecifier {
@@ -270,11 +270,12 @@ namespace Code._Galaxy._Factions {
         public abstract List<(Weapon weapon, int spawnWeighting)> GetAllowedWeapons(ShipComponentTier tier);
         public abstract List<(MainThruster mainThruster, int spawnWeighting)> GetAllowedMainThrusters(ShipComponentTier tier);
         public abstract List<(PowerPlant powerPlant, int spawnWeighting)> GetAllowedPowerPlants(ShipComponentTier tier);
+        public abstract List<(Shield shield, int spawnWeighting)> GetAllowedShields(ShipComponentTier tier);
     }
 
     public static class FactionTypeExtension {
-        private static List<(Faction.FactionType factionType, List<(int desire, SolarSystem system)> systemDesire)> factionSystemDesires = new List<(Faction.FactionType, List<(int desire, SolarSystem system)>)>();
-        private static List<(Faction.FactionType factionType, List<(int desire, Sector sector)> sectorDesire)> factionSectorDesires = new List<(Faction.FactionType, List<(int desire, Sector sector)>)>();
+        private static List<(Faction.FactionType factionType, List<(int desire, SolarSystem system)> systemDesire)> _factionSystemDesires = new List<(Faction.FactionType, List<(int desire, SolarSystem system)>)>();
+        private static List<(Faction.FactionType factionType, List<(int desire, Sector sector)> sectorDesire)> _factionSectorDesires = new List<(Faction.FactionType, List<(int desire, Sector sector)>)>();
 
         public static int GetFactionSearchDistance(this Faction.FactionType factionType) {
             if (factionType == Faction.FactionType.Agriculture) return 2;
@@ -287,8 +288,8 @@ namespace Code._Galaxy._Factions {
         }
 
         public static void PreCalcDesireValues(List<Sector> sectors) {
-            factionSectorDesires = new List<(Faction.FactionType factionType, List<(int desire, Sector sector)> sectorDesire)>();
-            factionSystemDesires = new List<(Faction.FactionType factionType, List<(int desire, SolarSystem system)> systemDesire)>();
+            _factionSectorDesires = new List<(Faction.FactionType factionType, List<(int desire, Sector sector)> sectorDesire)>();
+            _factionSystemDesires = new List<(Faction.FactionType factionType, List<(int desire, SolarSystem system)> systemDesire)>();
             int numFactionTypes = Enum.GetValues(typeof(Faction.FactionType)).Length;
 
             //could make multithreaded and calc a faction on each thread - need to ensure list stays in correct order - pre instantiate it?
@@ -317,8 +318,8 @@ namespace Code._Galaxy._Factions {
 
                 systemDesires = systemDesires.OrderByDescending(s => s.desire).ToList();
                 sectorDesires = sectorDesires.OrderByDescending(s => s.desire).ToList();
-                factionSystemDesires.Add((factionType, systemDesires));
-                factionSectorDesires.Add((factionType, sectorDesires));
+                _factionSystemDesires.Add((factionType, systemDesires));
+                _factionSectorDesires.Add((factionType, sectorDesires));
             }
         }
 
@@ -333,11 +334,11 @@ namespace Code._Galaxy._Factions {
         }
 
         public static List<(int desire, Sector sector)> GetFactionSectorPreferencesList(this Faction.FactionType factionType) {
-            return factionSectorDesires.Find(f => f.factionType == factionType).sectorDesire;
+            return _factionSectorDesires.Find(f => f.factionType == factionType).sectorDesire;
         }
 
         public static List<(int desire, SolarSystem solarSystem)> GetFactionSystemPreferencesList(this Faction.FactionType factionType) {
-            return factionSystemDesires.Find(f => f.factionType == factionType).systemDesire;
+            return _factionSystemDesires.Find(f => f.factionType == factionType).systemDesire;
         }
 
         public static List<(int desire, Sector sector)> GetPercentileFactionSectorPreferencesList(this Faction.FactionType factionType, float percentage) {
@@ -452,13 +453,13 @@ namespace Code._Galaxy._Factions {
         }
 
         public static int GetPreCalcSectorDesire(this Faction.FactionType factionType, Sector sector) {
-            (int desire, Sector sector) sectorDesire = factionSectorDesires.Find(f => f.factionType == factionType).sectorDesire.Find(s => s.sector == sector);
+            (int desire, Sector sector) sectorDesire = _factionSectorDesires.Find(f => f.factionType == factionType).sectorDesire.Find(s => s.sector == sector);
 
             return sectorDesire.desire;
         }
 
         public static int GetPreCalcSystemDesire(this Faction.FactionType factionType, SolarSystem system) {
-            (int desire, SolarSystem system) systemDesire = factionSystemDesires.Find(f => f.factionType == factionType).systemDesire.Find(s => s.system == system);
+            (int desire, SolarSystem system) systemDesire = _factionSystemDesires.Find(f => f.factionType == factionType).systemDesire.Find(s => s.system == system);
             return systemDesire.desire;
         }
 

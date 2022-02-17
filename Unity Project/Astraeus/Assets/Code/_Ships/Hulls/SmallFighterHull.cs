@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Code._Ships.Hulls {
     public class SmallFighterHull : Hull {
-        public SmallFighterHull() : base(new Vector3(0, 0, 20), 5000) {
+        public SmallFighterHull() : base(new Vector3(0, 0, 20), 4000) {
         }
 
         public override string GetHullFullPath() {
@@ -15,7 +15,10 @@ namespace Code._Ships.Hulls {
         }
 
         public override void SetThrusterComponents() {
-            ThrusterComponents = new List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName, bool needsBracket)>() { (ShipComponentType.MainThruster, ShipComponentTier.T1, null, "ThrusterInternalMount", false) };
+            MainThrusterComponents = new List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string selectionTransformName, bool needsBracket)>() { (ShipComponentType.MainThruster, ShipComponentTier.T1, null, "ThrusterInternalMount", false) };
+            ManoeuvringThrusterComponents = (componentType: ShipComponentType.ManoeuvringThruster, maxSize: ShipComponentTier.T3, null, "ThrusterManoeuvringSelector", new List<(string parentTransformName, float centerOffset)>() {
+                ("ManThrusterBL",0), ("ManThrusterBR",0), ("ManThrusterFL",0), ("ManThrusterFR",0)
+            });
         }
 
         public override void SetWeaponComponents() {

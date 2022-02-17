@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Code._Galaxy._Factions;
-using Code._Galaxy._Factions.FactionTypes;
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._Galaxy._SolarSystem._CelestialObjects.BlackHole;

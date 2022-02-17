@@ -31,8 +31,15 @@ namespace Code.Camera {
         }
 
         private void FollowShip() {
-            Vector3 shipPos = gameObject.transform.position;
-            _camera.transform.position = new Vector3(shipPos.x, shipPos.y, _currentZ);
+            Transform shipTransform = gameObject.transform;
+            Transform cameraTransform = _camera.transform;
+            Vector3 shipPos = shipTransform.position;
+            cameraTransform.position = new Vector3(shipPos.x, shipPos.y, _currentZ);
+            
+            Quaternion shipRotation = shipTransform.rotation;
+            Quaternion camRotation = Quaternion.Euler(shipRotation.eulerAngles.x, shipRotation.eulerAngles.y, shipRotation.eulerAngles.z-90);
+            cameraTransform.rotation = camRotation;
+
         }
 
         private void ControlZoom() {

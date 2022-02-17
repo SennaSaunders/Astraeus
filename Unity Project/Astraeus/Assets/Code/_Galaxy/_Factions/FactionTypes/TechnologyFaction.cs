@@ -10,6 +10,7 @@ using Code._Ships.ShipComponents.ExternalComponents.Thrusters.Types;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons.Types;
 using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
+using Code._Ships.ShipComponents.InternalComponents.Shields;
 using Code.TextureGen;
 
 namespace Code._Galaxy._Factions.FactionTypes {
@@ -30,26 +31,19 @@ namespace Code._Galaxy._Factions.FactionTypes {
         }
 
         public override List<(Weapon weapon, int spawnWeighting)> GetAllowedWeapons(ShipComponentTier tier) {
-            List<(Weapon weapon, int spawnWeighting)> weapons = new List<(Weapon weapon, int spawnWeighting)>();
-            weapons.Add((new Railgun(tier), 1));
-            weapons.Add((new LaserCannon(tier), 5));
-
-            return weapons;
+            return new List<(Weapon weapon, int spawnWeighting)> { (new Railgun(tier), 1), (new LaserCannon(tier), 5) };
         }
 
         public override List<(MainThruster mainThruster, int spawnWeighting)> GetAllowedMainThrusters(ShipComponentTier tier) {
-            List<(MainThruster mainThruster, int spawnWeighting)> thrusters = new List<(MainThruster mainThruster, int spawnWeighting)>();
-            thrusters.Add((new TechThruster(tier), 1));
-
-            return thrusters;
+            return new List<(MainThruster mainThruster, int spawnWeighting)> { (new TechThruster(tier), 1) };
         }
 
         public override List<(PowerPlant powerPlant, int spawnWeighting)> GetAllowedPowerPlants(ShipComponentTier tier) {
-            List<(PowerPlant powerPlant, int spawnWeighting)> powerPlants = new List<(PowerPlant powerPlant, int spawnWeighting)>();
-            powerPlants.Add((new PowerPlantHighCapacity(tier), 1));
-            powerPlants.Add((new PowerPlantHighRecharge(tier), 3));
+            return new List<(PowerPlant powerPlant, int spawnWeighting)> { (new PowerPlantHighCapacity(tier), 1), (new PowerPlantHighRecharge(tier), 3) };
+        }
 
-            return powerPlants;
+        public override List<(Shield shield, int spawnWeighting)> GetAllowedShields(ShipComponentTier tier) {
+            return new List<(Shield shield, int spawnWeighting)>() { (new ShieldHighRecharge(tier), 1), (new ShieldHighCapacity(tier), 1) };
         }
     }
 }

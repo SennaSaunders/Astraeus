@@ -1,7 +1,6 @@
 ﻿using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
 using Code._GameControllers;
-using Code._Utility;
 using Code.GUI.SpaceStations.Services;
 using TMPro;
 using UnityEngine;
@@ -20,10 +19,10 @@ namespace Code.GUI.SpaceStations {
         public void Setup(IStation station, GameController gameController) {
             _station = station;
             _gameController = gameController;
-            SetupGUI();
+            LoadGUI();
         }
 
-        private void SetupGUI() {
+        private void LoadGUI() {
             stationGUI = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(_stationGUIBasePath+_stationGUIPathSpecifier));
             SetupButtons();
         }
@@ -44,6 +43,7 @@ namespace Code.GUI.SpaceStations {
 
         private void ExitBtnCLick() {
             Debug.Log("Clicked - Exit Station Btn");
+            GameController.CurrentShip.Active = true;
             Destroy(stationGUI);
             Destroy(this);
         }
@@ -61,7 +61,6 @@ namespace Code.GUI.SpaceStations {
                 TextMeshProUGUI text = buttonPrefab.transform.Find("Text").GetComponent<TextMeshProUGUI>();
                 text.text = stationService.serviceName;
             }
-            ;
         }
 
         private void OutfittingBtnClick() {

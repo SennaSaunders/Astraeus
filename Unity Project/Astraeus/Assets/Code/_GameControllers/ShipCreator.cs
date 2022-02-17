@@ -5,6 +5,7 @@ using Code._Ships;
 using Code._Ships.Hulls;
 using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
+using Code._Ships.ShipComponents.ExternalComponents.Thrusters.Types;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.InternalComponents;
 using UnityEngine;
@@ -25,13 +26,18 @@ namespace Code._GameControllers {
 
         public Ship CreateDefaultShip(GameObject objectContainer) {
             Ship ship = objectContainer.AddComponent<Ship>();
-            ship.ShipHull = new SmallFighterHull();
+            ship.ShipHull = new SmallCargoHull();
+            ship.ShipHull.ManoeuvringThrusterComponents.concreteComponent = new ManoeuvringThruster(ShipComponentTier.T1);
+            MainThruster mainThruster = new PrimitiveThruster(ShipComponentTier.T1);
+            for (int i = 0; i< ship.ShipHull.MainThrusterComponents.Count; i++) {
+                var thrusterComponent = ship.ShipHull.MainThrusterComponents[i]; 
+                thrusterComponent.concreteComponent = mainThruster;
+                ship.ShipHull.MainThrusterComponents[i] = thrusterComponent;
+            }
             _shipObjectHandler.ManagedShip = ship;
             ship.ShipObject = _shipObjectHandler.CreateShip(objectContainer.transform);
             return ship;
         }
-
-        
 
         public Ship CreateFactionShip(ShipClass shipClass, ShipComponentTier maxComponentTier, float loadoutEfficiency, Faction faction, GameObject objectContainer) { // slotEfficiency should define how likely a slot is to be fully-utilised
             List<Hull> hulls = new List<Hull>();
@@ -57,7 +63,7 @@ namespace Code._GameControllers {
             _shipObjectHandler.CreateShip(objectContainer.transform);
 
             //choose thrusters
-            List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName, bool needsBracket)> mainThrusterSlots = _shipObjectHandler.ManagedShip.ShipHull.ThrusterComponents;
+            List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string parentTransformName, bool needsBracket)> mainThrusterSlots = _shipObjectHandler.ManagedShip.ShipHull.MainThrusterComponents;
 
             mainThrusterSlots = mainThrusterSlots.OrderBy(t => r.Next()).ToList(); //randomize the slots so that different configurations will be chosen on each ship with multiple thrusters
 
@@ -75,7 +81,7 @@ namespace Code._GameControllers {
                 
                 var slot = mainThrusterSlots[slotIdx];
                 
-                List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName, bool needsBracket)> currentTiedThrusters = new List<(ShipComponentType componentType, ShipComponentTier maxSize, Thruster concreteComponent, string parentTransformName, bool needsBracket)>();
+                List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string parentTransformName, bool needsBracket)> currentTiedThrusters = new List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string parentTransformName, bool needsBracket)>();
                 foreach (var tiedThrusters in ship.ShipHull.TiedThrustersSets) {//for all tied thruster sets
                     if (tiedThrusters.Contains(slot)) {//if the current slot is a tied thruster
                         currentTiedThrusters = tiedThrusters;
@@ -205,7 +211,7 @@ namespace Code._GameControllers {
         }
 
         private List<Hull> GetTransportHulls() {
-            return new List<Hull>() { new MedCargoHull() };
+            return new List<Hull>() { new SmallCargoHull() };
         }
 
         private List<Hull> GetFighterHulls() {

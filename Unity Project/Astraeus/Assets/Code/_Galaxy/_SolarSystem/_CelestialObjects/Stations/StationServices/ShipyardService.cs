@@ -10,7 +10,7 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
         }
         void SetShipHulls() {
             hulls = new List<Hull>();
-            hulls.Add(new MedCargoHull());
+            hulls.Add(new SmallCargoHull());
             hulls.Add(new SmallFighterHull());
         }
 

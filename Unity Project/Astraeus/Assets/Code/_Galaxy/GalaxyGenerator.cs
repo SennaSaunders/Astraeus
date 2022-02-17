@@ -102,10 +102,14 @@ namespace Code._Galaxy {
 
                     //add faction specific components to outfitting
                     for (int i = 0; i < Enum.GetValues(typeof(ShipComponentTier)).Length; i++) {
-                        outfittingService.AvailableComponents.AddRange(faction.GetAllowedWeapons((ShipComponentTier)i).Select(aw => aw.weapon));
-                        outfittingService.AvailableComponents.AddRange(faction.GetAllowedMainThrusters((ShipComponentTier)i).Select(aw => aw.mainThruster));
-                        outfittingService.AvailableComponents.AddRange(faction.GetAllowedPowerPlants((ShipComponentTier)i).Select(aw => aw.powerPlant));
+                        outfittingService.AddAvailableComponents(faction.GetAllowedWeapons((ShipComponentTier)i).Select(aw => aw.weapon).Cast<ShipComponent>().ToList());
+                        outfittingService.AddAvailableComponents(faction.GetAllowedMainThrusters((ShipComponentTier)i).Select(mt => mt.mainThruster).Cast<ShipComponent>().ToList());
+                        outfittingService.AddAvailableComponents(faction.GetAllowedPowerPlants((ShipComponentTier)i).Select(pp => pp.powerPlant).Cast<ShipComponent>().ToList());
+                        outfittingService.AddAvailableComponents(faction.GetAllowedShields((ShipComponentTier)i).Select(s=> s.shield).Cast<ShipComponent>().ToList());
                     }
+                    
+                    outfittingService.AddAllManoeuvringThrusters();
+                    outfittingService.AddAllCargoBays();
 
                     spaceStation.StationServices = new List<StationService>() { new RefuelService(), new RepairService(), new ShipyardService(), outfittingService };
                     solarSystem.Bodies.Add(spaceStation);

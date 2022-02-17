@@ -18,13 +18,14 @@ namespace Code._GameControllers {
         private static GameGUIController _guiController;
         private static SolarSystem _currentSolarSystem;
         public const int ShipZ = SolarSystemController.ZOffset-10;
-        public static Ship _currentShip { get; set; }
-        private GameObject playerShipContainer;
+        public static Ship CurrentShip { get; set; }
+        private GameObject _playerShipContainer;
+        private PlayerShipController _playerShipController;
         
-        public List<Ship> _npcShips = new List<Ship>();
+        public List<Ship> npcShips = new List<Ship>();
 
         private static IStation _currentStation;
-        private Vector3 playerPosition;
+        private Vector3 _playerPosition;
 
         private static ShipCreator _shipCreator;
         
@@ -36,7 +37,7 @@ namespace Code._GameControllers {
             gameObject.AddComponent<EventSystem>();
             gameObject.AddComponent<StandaloneInputModule>();
             _prefabHandler = gameObject.AddComponent<PrefabHandler>();
-            playerShipContainer = new GameObject("Player Ship Container");
+            _playerShipContainer = new GameObject("Player Ship Container");
             SetupGameGUIController();
             _shipCreator = gameObject.AddComponent<ShipCreator>();
         }
@@ -44,27 +45,34 @@ namespace Code._GameControllers {
         private void SetShipPosition() {
             if (_currentStation != null) {
                 Vector3 stationPos = _galaxyController.GetSolarSystemController(_currentSolarSystem).GetBodyGameObject((Body)_currentStation).transform.position;
-                _currentShip.ShipObject.transform.position = new Vector3(stationPos.x, stationPos.y, ShipZ);
+                CurrentShip.ShipObject.transform.position = new Vector3(stationPos.x, stationPos.y, ShipZ);
             }
         }
 
         private void SetupDefaultShip() {
-            _currentShip = _shipCreator.CreateDefaultShip(playerShipContainer);
-            _currentShip.ShipObject.transform.SetParent(playerShipContainer.transform);
+            CurrentShip = _shipCreator.CreateDefaultShip(_playerShipContainer);
+            CurrentShip.ShipObject.transform.SetParent(_playerShipContainer.transform);
+            SetPlayerShipController();
+            _playerShipController.Setup(CurrentShip);
             SetShipPosition();
             SetupShipCamera();
         }
 
+        private void SetPlayerShipController() {
+            _playerShipController = CurrentShip.ShipObject.AddComponent<PlayerShipController>();
+        }
+
         public void RefreshPlayerShip() {
-            if (playerShipContainer.transform.childCount > 0) {
-                for (int i = playerShipContainer.transform.childCount - 1; i >= 0; i--) {
-                    Destroy(playerShipContainer.transform.GetChild(i).gameObject);
+            if (_playerShipContainer.transform.childCount > 0) {
+                for (int i = _playerShipContainer.transform.childCount - 1; i >= 0; i--) {
+                    Destroy(_playerShipContainer.transform.GetChild(i).gameObject);
                 }
             }
             
-            _shipCreator._shipObjectHandler.ManagedShip = _currentShip;
-            _shipCreator._shipObjectHandler.CreateShip(playerShipContainer.transform);
-            
+            _shipCreator._shipObjectHandler.ManagedShip = CurrentShip;
+            _shipCreator._shipObjectHandler.CreateShip(_playerShipContainer.transform);
+            SetPlayerShipController();
+            _playerShipController.Setup(CurrentShip);
             SetShipPosition();
             SetupShipCamera();
         }
@@ -79,7 +87,7 @@ namespace Code._GameControllers {
 
 
         private void SetupShipCamera() {
-            ShipCameraController shipCameraController = _currentShip.ShipObject.AddComponent<ShipCameraController>();
+            ShipCameraController shipCameraController = CurrentShip.ShipObject.AddComponent<ShipCameraController>();
             shipCameraController.TakeCameraControl();
         }
 
@@ -97,7 +105,7 @@ namespace Code._GameControllers {
             _currentSolarSystem = GetStartingSystem();
             _currentStation = GetStartingStation(_currentSolarSystem);
 
-            ShipCreatorTest();
+            // ShipCreatorTest();
         }
 
         private void SetupGameGUIController() {
@@ -115,11 +123,11 @@ namespace Code._GameControllers {
                 Ship newShip = _shipCreator.CreateFactionShip(ShipCreator.ShipClass.Fighter, ShipComponentTier.T5, .5f, faction, npcShipContainer);
                 newShip.ShipObject.transform.SetParent(npcShipContainer.transform);
                 newShip.ShipObject.transform.position = new Vector3(offset, 20, ShipZ);
-                _npcShips.Add(newShip);
+                npcShips.Add(newShip);
                 newShip = _shipCreator.CreateFactionShip(ShipCreator.ShipClass.Transport, ShipComponentTier.T5, .5f, faction, npcShipContainer);
                 newShip.ShipObject.transform.SetParent(npcShipContainer.transform);
                 newShip.ShipObject.transform.position = new Vector3(offset, 40, ShipZ);
-                _npcShips.Add(newShip);
+                npcShips.Add(newShip);
                 offset += offsetChange;
             }
         }

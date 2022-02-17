@@ -4,21 +4,20 @@ using UnityEngine;
 
 namespace Code._Galaxy._SolarSystem {
     public class SolarSystemController : MonoBehaviour {
-        public SolarSystem solarSystem;
+        public SolarSystem _solarSystem;
         private GameObject _solarSystemHolder;
         private List<(Body body, GameObject bodyObject)> bodyObjectMap = new List<(Body body, GameObject bodyObject)>();
         public const int ZOffset = 0;
         public bool Active { get; set; }
-        private Vector3 position;
 
         public void DisplaySolarSystem() {
             SetupSolarSystemHolder();
-            DisplaySolarSystem(solarSystem);
+            DisplaySolarSystem(_solarSystem);
         }
 
         //update the rotation of planets
         public void AssignSystem(SolarSystem solarSystem) {
-            this.solarSystem = solarSystem;
+            this._solarSystem = solarSystem;
         }
 
         private void SetupSolarSystemHolder() {

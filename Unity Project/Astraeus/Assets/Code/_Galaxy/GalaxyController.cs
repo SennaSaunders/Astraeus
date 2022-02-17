@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Code._Galaxy {
     public class GalaxyController : MonoBehaviour {
-        public const int zOffset = 2500; 
+        public const int ZOffset = 2500; 
         private Galaxy _galaxy;
         private GameObject _galaxyHolder;
         private SolarSystemController _activeSystemController;
@@ -35,7 +35,7 @@ namespace Code._Galaxy {
                 Destroy(_galaxyHolder);
             }
             _galaxyHolder = new GameObject(holderName);
-            _galaxyHolder.transform.position = new Vector3(0, 0, zOffset);
+            _galaxyHolder.transform.position = new Vector3(0, 0, ZOffset);
         }
         
         private void DisplaySolarSystemPrimary(SolarSystem solarSystem, int num) {
@@ -56,7 +56,7 @@ namespace Code._Galaxy {
         }
 
         public SolarSystemController GetSolarSystemController(SolarSystem solarSystem) {
-            return _solarSystemControllers.Find(ssc => ssc.solarSystem == solarSystem);
+            return _solarSystemControllers.Find(ssc => ssc._solarSystem == solarSystem);
         }
 
         public void DisplayGalaxy() {

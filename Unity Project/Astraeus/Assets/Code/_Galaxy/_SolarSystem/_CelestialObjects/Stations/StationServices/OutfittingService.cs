@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Code._Ships;
-using Code._Ships.Hulls;
+using System.Linq;
 using Code._Ships.ShipComponents;
+using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters.Types;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons.Types;
 using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
@@ -14,21 +14,18 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
             serviceName = "Outfitting";
             guiString = "GUIPrefabs/Station/Services/Outfitting/OutfittingGUI";
         }
-        public Ship Ship { get; private set; }
 
-        // public void AddShips() {
-        //     Ships = new List<Ship>();
-        //     Ship newShip = gameObject.AddComponent<Ship>();
-        //     newShip.ShipHull = gameObject.AddComponent<MedCargoHull>();
-        //     Ships.Add(newShip);
-        //     
-        //     newShip = gameObject.AddComponent<Ship>();
-        //     newShip.ShipHull = gameObject.AddComponent<SmallFighterHull>();
-        //     Ships.Add(newShip);
-        // }
+        private List<ShipComponent> AvailableComponents { get; } = new List<ShipComponent>();
 
-        public List<ShipComponent> AvailableComponents { get; } = new List<ShipComponent>();
+
+        public void AddAvailableComponents(List<ShipComponent> components) {
+            AvailableComponents.AddRange(components);
+        }
         
+        public List<T> GetComponentsOfType<T>() {
+            return AvailableComponents.Where(c => c.GetType().IsSubclassOf(typeof(T)) || c.GetType() == typeof(T)).Cast<T>().ToList();
+        }
+
         //generate a list of all components for ship combat test
         public void SetAllAvailableComponents() {
             AddAllPowerPlants();
@@ -72,6 +69,7 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
             AddAllPrimitiveThrusters();
             AddAllTechThrusters();
             AddAllIndustrialThrusters();
+            AddAllManoeuvringThrusters();
         }
 
         private void AddAllPrimitiveThrusters() {
@@ -129,12 +127,20 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
             AvailableComponents.Add(new BallisticCannon(ShipComponentTier.T5));
         }
 
-        private void AddAllCargoBays() {
+        public void AddAllCargoBays() {
             AvailableComponents.Add(new CargoBay(ShipComponentTier.T1));
             AvailableComponents.Add(new CargoBay(ShipComponentTier.T2));
             AvailableComponents.Add(new CargoBay(ShipComponentTier.T3));
             AvailableComponents.Add(new CargoBay(ShipComponentTier.T4));
             AvailableComponents.Add(new CargoBay(ShipComponentTier.T5));
+        }
+
+        public void AddAllManoeuvringThrusters() {
+            AvailableComponents.Add(new ManoeuvringThruster(ShipComponentTier.T1));
+            AvailableComponents.Add(new ManoeuvringThruster(ShipComponentTier.T2));
+            AvailableComponents.Add(new ManoeuvringThruster(ShipComponentTier.T3));
+            AvailableComponents.Add(new ManoeuvringThruster(ShipComponentTier.T4));
+            AvailableComponents.Add(new ManoeuvringThruster(ShipComponentTier.T5));
         }
     }
 }

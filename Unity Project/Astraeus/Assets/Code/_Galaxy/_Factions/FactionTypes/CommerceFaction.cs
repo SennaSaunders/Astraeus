@@ -9,6 +9,7 @@ using Code._Ships.ShipComponents.ExternalComponents.Thrusters.Types;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons.Types;
 using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
+using Code._Ships.ShipComponents.InternalComponents.Shields;
 
 namespace Code._Galaxy._Factions.FactionTypes {
     public class CommerceFaction : Faction {
@@ -43,6 +44,8 @@ namespace Code._Galaxy._Factions.FactionTypes {
             return powerPlants;
         }
 
-        
+        public override List<(Shield shield, int spawnWeighting)> GetAllowedShields(ShipComponentTier tier) {
+            return new List<(Shield shield, int spawnWeighting)>() { (new ShieldBalanced(tier), 10) };
+        }
     }
 }
