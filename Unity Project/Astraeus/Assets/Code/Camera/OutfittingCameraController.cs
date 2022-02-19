@@ -7,6 +7,7 @@ namespace Code.Camera {
 
         public void SetCameraPos() {
             transform.position = new Vector3(0, 0, ZOffset);
+            transform.rotation = Quaternion.Euler(0,0,0);
         }
     }
 }

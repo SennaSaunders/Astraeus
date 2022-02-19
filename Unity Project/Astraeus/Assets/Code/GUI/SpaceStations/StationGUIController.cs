@@ -22,7 +22,7 @@ namespace Code.GUI.SpaceStations {
             LoadGUI();
         }
 
-        private void LoadGUI() {
+        public void LoadGUI() {
             stationGUI = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(_stationGUIBasePath+_stationGUIPathSpecifier));
             SetupButtons();
         }

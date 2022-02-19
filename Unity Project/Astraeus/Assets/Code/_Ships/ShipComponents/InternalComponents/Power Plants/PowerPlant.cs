@@ -6,7 +6,8 @@
         public float CurrentEnergy;
         public float RechargeRate;
         
-        public static float DepletionRecoveryTime;
+        public float DepletionRecoveryTime;
+        public float CurrentDepletionTime;
         public bool Depleted = false;
         
         public PowerPlant(string name, ShipComponentTier componentSize, float baseEnergyCapacity, float baseRechargeRate) : base(name + " Power Plant", componentSize, baseMass) {
@@ -14,25 +15,6 @@
             CurrentEnergy = EnergyCapacity;
             RechargeRate = GetTierMultipliedValue(baseRechargeRate, componentSize);
         }
-        
-        public float DrainPower(float powerRequested) {
-            float outputEffectiveness = 0; //modifies the effectiveness of the ship component requesting power
-
-            if (!Depleted) { //if not depleted
-                if (CurrentEnergy - powerRequested > 0) { //if there is enough power 
-                    CurrentEnergy -= powerRequested;
-                    outputEffectiveness = 1;
-                }
-                else { // get the relative power capacity left to  drain the capacity to 0, set Depleted to true
-                    outputEffectiveness = EnergyCapacity / powerRequested;
-                    CurrentEnergy = 0;
-                    Depleted = true;
-                }
-            }
-            return outputEffectiveness;
-        }
-
-        
     }
 
     public class PowerPlantHighRecharge : PowerPlant {

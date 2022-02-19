@@ -5,6 +5,7 @@ using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
 using Code._Ships;
+using Code._Ships.Controllers;
 using Code._Ships.ShipComponents;
 using Code._Utility;
 using Code.Camera;
