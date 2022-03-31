@@ -17,7 +17,7 @@ namespace Code._Galaxy._SolarSystem {
 
         //update the rotation of planets
         public void AssignSystem(SolarSystem solarSystem) {
-            this._solarSystem = solarSystem;
+            _solarSystem = solarSystem;
         }
 
         private void SetupSolarSystemHolder() {

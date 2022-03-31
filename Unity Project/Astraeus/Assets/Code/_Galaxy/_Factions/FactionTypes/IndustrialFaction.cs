@@ -29,31 +29,31 @@ namespace Code._Galaxy._Factions.FactionTypes {
             return GetCelestialBodyDesireValue(desiredTypes,celestialBody);
         }
 
-        public override List<(Weapon weapon, int spawnWeighting)> GetAllowedWeapons(ShipComponentTier tier) {
-            List<(Weapon weapon, int spawnWeighting)> weapons = new List<(Weapon weapon, int spawnWeighting)>();
-            weapons.Add((new BallisticCannon(tier), 1));
-            weapons.Add((new LaserCannon(tier), 1));
+        public override List<(Type weaponType, int spawnWeighting)> GetAllowedWeapons() {
+            List<(Type weaponType, int spawnWeighting)> weapons = new List<(Type weaponType, int spawnWeighting)>();
+            weapons.Add((typeof(BallisticCannon), 1));
+            weapons.Add((typeof(LaserCannon), 1));
 
             return weapons;
         }
 
-        public override List<(MainThruster mainThruster, int spawnWeighting)> GetAllowedMainThrusters(ShipComponentTier tier) {
-            List<(MainThruster mainThruster, int spawnWeighting)> thrusters = new List<(MainThruster mainThruster, int spawnWeighting)>();
-            thrusters.Add((new PrimitiveThruster(tier), 1));
-            thrusters.Add((new IndustrialThruster(tier), 10));
+        public override List<(Type mainThrusterType, int spawnWeighting)> GetAllowedMainThrusters() {
+            List<(Type mainThrusterType, int spawnWeighting)> thrusters = new List<(Type mainThrusterType, int spawnWeighting)>();
+            thrusters.Add((typeof(PrimitiveThruster), 1));
+            thrusters.Add((typeof(IndustrialThruster), 10));
 
             return thrusters;
         }
 
-        public override List<(PowerPlant powerPlant, int spawnWeighting)> GetAllowedPowerPlants(ShipComponentTier tier) {
-            List<(PowerPlant powerPlant, int spawnWeighting)> powerPlants = new List<(PowerPlant powerPlant, int spawnWeighting)>();
-            powerPlants.Add((new PowerPlantHighCapacity(tier), 3));
-            powerPlants.Add((new PowerPlantBalanced(tier), 1));
+        public override List<(Type powerPlantType, int spawnWeighting)> GetAllowedPowerPlants() {
+            List<(Type powerPlantType, int spawnWeighting)> powerPlants = new List<(Type powerPlantType, int spawnWeighting)>();
+            powerPlants.Add((typeof(PowerPlantHighCapacity), 3));
+            powerPlants.Add((typeof(PowerPlantBalanced), 1));
             
             return powerPlants;
         }
-        public override List<(Shield shield, int spawnWeighting)> GetAllowedShields(ShipComponentTier tier) {
-            return new List<(Shield shield, int spawnWeighting)>() { (new ShieldBalanced(tier), 5), (new ShieldHighCapacity(tier), 2) };
+        public override List<(Type shieldType, int spawnWeighting)> GetAllowedShields() {
+            return new List<(Type shieldType, int spawnWeighting)>() { (typeof( ShieldBalanced), 5), (typeof( ShieldHighCapacity), 2) };
         }
         
     }

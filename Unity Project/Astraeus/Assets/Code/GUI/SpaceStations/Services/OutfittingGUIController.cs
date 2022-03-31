@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
 using Code._GameControllers;
 using Code._Ships;
@@ -53,6 +52,8 @@ namespace Code.GUI.SpaceStations.Services {
         
         public void StartOutfitting(OutfittingService outfittingService, StationGUIController stationGUIController, GameController gameController) {
             _outfittingService = outfittingService;
+            // _outfittingService = new OutfittingService();
+            // _outfittingService.SetAllAvailableComponents();
             _stationGUIController = stationGUIController;
             _gameController = gameController;
             _stationGUIController.stationGUI.SetActive(false);
@@ -87,10 +88,7 @@ namespace Code.GUI.SpaceStations.Services {
 
         private void DisplayShip() {
             _shipObjectHandler.ManagedShip = GameController.CurrentShip; //needs to be changed to the player's current ship
-            
-            _shipObjectHandler.CreateShip(GameObject.Find("ShipPanel").transform);
-
-            GameObject shipObject = _shipObjectHandler.ManagedShip.ShipObject;
+            GameObject shipObject = _shipObjectHandler.CreateShip(GameObject.Find("ShipPanel").transform);
             shipObject.transform.position = _shipObjectHandler.ManagedShip.ShipHull.OutfittingPosition;
             shipObject.transform.rotation = _shipObjectHandler.ManagedShip.ShipHull.OutfittingRotation;
             AddDraggableToShip();
@@ -175,6 +173,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
         
         private void ManoeuvringThrusterBtnClick() {
+            // Manoeuvring thrusters have a different slot variable so this method can't use sub cat click 
             ClearScrollView();
             DisplayManoeuvringThrusterComponents();
             var manoeuvringThrusterComponents = _shipObjectHandler.ManoeuvringThrusterComponents;
@@ -210,11 +209,12 @@ namespace Code.GUI.SpaceStations.Services {
             displayFunction.Invoke();
             CreateSelectionMarkers(slots);
         }
-        
+
         //display methods
-        private void DisplayComponents<T>(Action<T> displayFunc) {
-            List<T> components = _outfittingService.GetComponentsOfType<T>();
-            foreach (T component in components) {
+        private void DisplayComponents<T> (Action<(Type type, ShipComponentTier)> displayFunc) {
+            var components = _outfittingService.GetComponentsOfType(typeof(T));
+            //add tier in here
+            foreach (var component in components) {
                 displayFunc(component);
             }
         }
@@ -231,11 +231,11 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void DisplayManoeuvringThrusterComponents() {
-            DisplayComponents<ManoeuvringThruster>(DisplayThruster);
+            DisplayComponents<ManoeuvringThruster>(DisplayThrusterCard);
         }
 
         private void DisplayMainThrusterComponents() {
-            DisplayComponents<MainThruster>(DisplayThruster);
+            DisplayComponents<MainThruster>(DisplayThrusterCard);
         }
         
         private void DisplayShieldsComponents() {
@@ -249,90 +249,74 @@ namespace Code.GUI.SpaceStations.Services {
             DisplayComponents<PowerPlant>(DisplayPowerPlant);
         }
 
-        private void DisplayThruster(Thruster thruster) {
-            GameObject thrusterCard = CreateComponentCard(_thrusterCardPath, thruster);
+        private (Transform, T) DisplayShipComponentCard<T> (Type componentType, ShipComponentTier tier, string cardPath) {
+            T shipComponent = (T)Activator.CreateInstance(componentType, tier);
+            GameObject cardObject = CreateComponentCard(cardPath, componentType, tier);
+            Transform cardComponents = cardObject.transform.Find("Details");
+            return (cardComponents, shipComponent);
+        }
 
-            Transform cardComponents = thrusterCard.transform.Find("Details");
+        private void DisplayThrusterCard((Type thrusterType, ShipComponentTier tier)thruster) {
+            (Transform cardComponents, Thruster thrusterInstance) = DisplayShipComponentCard<Thruster>(thruster.thrusterType, thruster.tier, _thrusterCardPath);
 
             TextMeshProUGUI title = cardComponents.Find("ComponentName").GetComponent<TextMeshProUGUI>();
-            title.text = thruster.ComponentName + " - " + thruster.ComponentSize;
-
+            title.text = thrusterInstance.ComponentName + " - " + thrusterInstance.ComponentSize;
             TextMeshProUGUI force = cardComponents.Find("Force").GetComponent<TextMeshProUGUI>();
-            force.text = thruster.Force + " N";
-
+            force.text = thrusterInstance.Force + " N";
             TextMeshProUGUI powerDraw = cardComponents.Find("PowerDraw").GetComponent<TextMeshProUGUI>();
-            powerDraw.text = thruster.PowerDraw + " GW/s";
-
+            powerDraw.text = thrusterInstance.PowerDraw + " GW/s";
             TextMeshProUGUI mass = cardComponents.Find("Mass").GetComponent<TextMeshProUGUI>();
-            mass.text = (thruster.ComponentMass / 1000) + " T";
+            mass.text = (thrusterInstance.ComponentMass / 1000) + " T";
         }
 
-        private void DisplayWeaponCard(Weapon externalComponent) {
-            GameObject weaponCard = CreateComponentCard(_weaponCardPath, externalComponent);
-
-            Transform cardComponents = weaponCard.transform.Find("Details");
-
+        private void DisplayWeaponCard((Type weaponType, ShipComponentTier tier) weapon) {
+            (Transform cardComponents, Weapon weaponInstance) = DisplayShipComponentCard<Weapon>(weapon.weaponType, weapon.tier, _weaponCardPath);
+            
             TextMeshProUGUI title = cardComponents.Find("ComponentName").GetComponent<TextMeshProUGUI>();
-            title.text = externalComponent.ComponentName + " - " + externalComponent.ComponentSize;
-
+            title.text = weaponInstance.ComponentName + " - " + weaponInstance.ComponentSize;
             TextMeshProUGUI damage = cardComponents.Find("Damage").GetComponent<TextMeshProUGUI>();
-            damage.text = externalComponent.Damage + " DMG";
-
+            damage.text = weaponInstance.Damage + " DMG";
             TextMeshProUGUI rateOfFire = cardComponents.Find("RoF").GetComponent<TextMeshProUGUI>();
-            rateOfFire.text = externalComponent.FireRate * 60 + " RPM";
-
+            rateOfFire.text = weaponInstance.FireRate * 60 + " RPM";
             TextMeshProUGUI mass = cardComponents.Find("Mass").GetComponent<TextMeshProUGUI>();
-            mass.text = (externalComponent.ComponentMass / 1000) + " T";
+            mass.text = (weaponInstance.ComponentMass / 1000) + " T";
         }
 
-        private void DisplayPowerPlant(PowerPlant powerPlant) {
-            GameObject powerPlantCard = CreateComponentCard(_powerPlantCardPath, powerPlant);
-
-            Transform cardComponents = powerPlantCard.transform.Find("Details");
-
+        private void DisplayPowerPlant((Type powerPlantType, ShipComponentTier tier)powerPlant) {
+            (Transform cardComponents,PowerPlant powerPlantInstance) = DisplayShipComponentCard<PowerPlant>(powerPlant.powerPlantType, powerPlant.tier, _powerPlantCardPath);
+            
             TextMeshProUGUI title = cardComponents.Find("ComponentName").GetComponent<TextMeshProUGUI>();
-            title.text = powerPlant.ComponentName + " - " + powerPlant.ComponentSize;
-
+            title.text = powerPlantInstance.ComponentName + " - " + powerPlantInstance.ComponentSize;
             TextMeshProUGUI capacity = cardComponents.Find("Capacity").GetComponent<TextMeshProUGUI>();
-            capacity.text = powerPlant.EnergyCapacity + " GW";
-
+            capacity.text = powerPlantInstance.EnergyCapacity + " GW";
             TextMeshProUGUI rechargeRate = cardComponents.Find("Recharge").GetComponent<TextMeshProUGUI>();
-            rechargeRate.text = powerPlant.RechargeRate * 60 + " GW/s";
-
+            rechargeRate.text = powerPlantInstance.RechargeRate * 60 + " GW/s";
             TextMeshProUGUI mass = cardComponents.Find("Mass").GetComponent<TextMeshProUGUI>();
-            mass.text = (powerPlant.ComponentMass / 1000) + " T";
+            mass.text = (powerPlantInstance.ComponentMass / 1000) + " T";
         }
 
-        private void DisplayCargoBay(CargoBay cargoBay) {
-            GameObject cargoBayCard = CreateComponentCard(_cargoBayCardPath, cargoBay);
-
-            Transform cardComponents = cargoBayCard.transform.Find("Details");
-
+        private void DisplayCargoBay((Type cargoBayType, ShipComponentTier tier) cargoBay) {
+            (Transform cardComponents, CargoBay cargoBayInstance) = DisplayShipComponentCard<CargoBay>(cargoBay.cargoBayType, cargoBay.tier, _cargoBayCardPath);
+            
             TextMeshProUGUI title = cardComponents.Find("ComponentName").GetComponent<TextMeshProUGUI>();
-            title.text = cargoBay.ComponentName + " - " + cargoBay.ComponentSize;
-
+            title.text = cargoBayInstance.ComponentName + " - " + cargoBayInstance.ComponentSize;
             TextMeshProUGUI capacity = cardComponents.Find("Capacity").GetComponent<TextMeshProUGUI>();
-            capacity.text = cargoBay.CargoVolume + " Units";
+            capacity.text = cargoBayInstance.CargoVolume + " Units";
         }
 
-        private void DisplayShieldCard(Shield shield) {
-            GameObject shieldCard = CreateComponentCard(_shieldCardPath, shield);
-            Transform cardComponents = shieldCard.transform.Find("Details");
+        private void DisplayShieldCard((Type shieldType, ShipComponentTier tier) shield) {
+            (Transform cardComponents, Shield shieldInstance) = DisplayShipComponentCard<Shield>(shield.shieldType, shield.tier, _shieldCardPath);
             
             TextMeshProUGUI title = cardComponents.Find("ComponentName").GetComponent<TextMeshProUGUI>();
-            title.text = shield.ComponentName + " - " + shield.ComponentSize;
-            
+            title.text = shieldInstance.ComponentName + " - " + shieldInstance.ComponentSize;
             TextMeshProUGUI strength = cardComponents.Find("Strength").GetComponent<TextMeshProUGUI>();
-            strength.text = shield.StrengthCapacity + "GW";
-            
+            strength.text = shieldInstance.StrengthCapacity + "GW";
             TextMeshProUGUI recharge = cardComponents.Find("Recharge").GetComponent<TextMeshProUGUI>();
-            recharge.text = shield.RechargeRate + "GW/s";
-            
+            recharge.text = shieldInstance.RechargeRate + "GW/s";
             TextMeshProUGUI damageDelay = cardComponents.Find("DamageDelay").GetComponent<TextMeshProUGUI>();
-            damageDelay.text = shield.DamageRecoveryTime + "s";
-            
+            damageDelay.text = shieldInstance.DamageRecoveryTime + "s";
             TextMeshProUGUI depletionDelay = cardComponents.Find("DepletionDelay").GetComponent<TextMeshProUGUI>();
-            depletionDelay.text = shield.DepletionRecoveryTime + "s";
+            depletionDelay.text = shieldInstance.DepletionRecoveryTime + "s";
         }
         
         private void CreateSelectionMarkers(List<(Transform, Transform, string)> shipComponents) {
@@ -364,12 +348,12 @@ namespace Code.GUI.SpaceStations.Services {
             }
         }
 
-        private GameObject CreateComponentCard(string cardSpecifier, ShipComponent shipComponent) {
+        private GameObject CreateComponentCard(string cardSpecifier, Type componentType, ShipComponentTier tier) {
             GameObject componentCard = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(_outfittingPath + cardSpecifier), GetScrollViewContentContainer().transform);
 
             CardShipComponentModifier componentModifier = componentCard.AddComponent<CardShipComponentModifier>();
 
-            componentModifier.Setup(shipComponent, this);
+            componentModifier.Setup(componentType, tier, this);
             return componentCard;
         }
 
@@ -423,26 +407,29 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         class CardShipComponentModifier : MonoBehaviour, IPointerClickHandler {
-            private ShipComponent _shipComponent;
+            private Type _componentType;
+            private ShipComponentTier _tier;
             private OutfittingGUIController _outfittingGUIController;
 
-            public void Setup(ShipComponent shipComponent, OutfittingGUIController outfittingGUIController) {
-                _shipComponent = shipComponent;
+            public void Setup(Type componentType, ShipComponentTier tier, OutfittingGUIController outfittingGUIController) {
+                _componentType = componentType;
+                _tier = tier;
                 _outfittingGUIController = outfittingGUIController;
             }
 
             public void OnPointerClick(PointerEventData eventData) {
-                Debug.Log("Trying to assign: " + _shipComponent.ComponentName + " - " + _shipComponent.ComponentSize);
-                if (_shipComponent.GetType().IsSubclassOf(typeof(Weapon))) {
-                    _outfittingGUIController.ChangeSelectedShipWeapon((Weapon)_shipComponent);
+                ShipComponent shipComponent = (ShipComponent)Activator.CreateInstance(_componentType, _tier);
+                Debug.Log("Trying to assign: " + shipComponent.ComponentName + " - " + shipComponent.ComponentSize);
+                if (shipComponent.GetType().IsSubclassOf(typeof(Weapon))) {
+                    _outfittingGUIController.ChangeSelectedShipWeapon((Weapon)shipComponent);
                 }
-                else if (_shipComponent.GetType().IsSubclassOf(typeof(MainThruster))) {
-                    _outfittingGUIController.ChangeSelectedShipMainThruster((MainThruster)_shipComponent);
-                } else if (_shipComponent.GetType() == typeof(ManoeuvringThruster)) {
-                    _outfittingGUIController.ChangeSelectedShipManoeuvringThruster((ManoeuvringThruster)_shipComponent);
+                else if (shipComponent.GetType().IsSubclassOf(typeof(MainThruster))) {
+                    _outfittingGUIController.ChangeSelectedShipMainThruster((MainThruster)shipComponent);
+                } else if (shipComponent.GetType() == typeof(ManoeuvringThruster)) {
+                    _outfittingGUIController.ChangeSelectedShipManoeuvringThruster((ManoeuvringThruster)shipComponent);
                 }
-                else if (_shipComponent.GetType().IsSubclassOf(typeof(InternalComponent))) {
-                    _outfittingGUIController.ChangeSelectedInternal((InternalComponent)_shipComponent);
+                else if (shipComponent.GetType().IsSubclassOf(typeof(InternalComponent))) {
+                    _outfittingGUIController.ChangeSelectedInternal((InternalComponent)shipComponent);
                 }
             }
         }

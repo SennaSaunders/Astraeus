@@ -11,29 +11,29 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Thrusters {
             _mainThrustForce = GetMainThrustForce(_mainThrusters);
 
             _manoeuvringThrusters = manoeuvringThrusters;
-            _manoeuvreThrustForce = GetManoeuvreThrustForce(manoeuvringThrusters.thruster, manoeuvringThrusters.centerOffsets.Count);
-            _angularAcceleration = GetAngularAcceleration(_manoeuvringThrusters.thruster, _manoeuvringThrusters.centerOffsets);
+            _manoeuvreThrustForce = SetManoeuvreThrustForce(manoeuvringThrusters.thruster, manoeuvringThrusters.centerOffsets.Count);
+            AngularAcceleration = SetAngularAcceleration(_manoeuvringThrusters.thruster, _manoeuvringThrusters.centerOffsets);
         }
 
         private float _shipMass;
 
         private List<MainThruster> _mainThrusters;
         private float _mainThrustForce;
-        public Vector2 velocity = new Vector2(0, 0);
+        public Vector2 Velocity = new Vector2(0, 0);
 
         private (ManoeuvringThruster thruster, List<float> centerOffsets) _manoeuvringThrusters;
         private float _manoeuvreThrustForce;
         private float _turnScale = 20;
-        private float _angularAcceleration;
-        public float angularVelocity = 0;
+        public float AngularAcceleration { get; private set; }
+        public float AngularVelocity = 0;
         private float maxAngularVelocity = 360;
-
-
         public const float MaxSpeed = 500;
-        public const float MaxRotationSpeed = 90;
 
-
-        public float GetMainThrustForce(List<MainThruster> thrusters) {
+        public float GetMainThrusterAcceleration() {
+            return _mainThrustForce / _shipMass;
+        }
+        
+        private float GetMainThrustForce(List<MainThruster> thrusters) {
             float force = 0;
 
             foreach (var thruster in thrusters) {
@@ -43,11 +43,11 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Thrusters {
             return force;
         }
 
-        public float GetManoeuvreThrustForce(ManoeuvringThruster thruster, int thrusterCount) {
+        private float SetManoeuvreThrustForce(ManoeuvringThruster thruster, int thrusterCount) {
             return thruster.Force * thrusterCount / 2;
         }
 
-        public float GetAngularAcceleration(ManoeuvringThruster thruster, List<float> centerOffsets) {
+        private float SetAngularAcceleration(ManoeuvringThruster thruster, List<float> centerOffsets) {
             //moments
             //get total force and then half it
 
@@ -87,9 +87,9 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Thrusters {
             shipFacingQuaternion.Normalize();
             Vector2 shipRotatedThrustVector = shipFacingQuaternion * shipThrustVector;
             
-            float thrustVelocityDifferenceAngle = Vector2.Angle(velocity, shipRotatedThrustVector);
+            float thrustVelocityDifferenceAngle = Vector2.Angle(Velocity, shipRotatedThrustVector);
 
-            float v = velocity.magnitude;
+            float v = Velocity.magnitude;
             double lorentzFactor = 1 / Math.Sqrt(1 - (v * v) / (MaxSpeed * MaxSpeed));
             float adjustedMass = _shipMass * (float)lorentzFactor;
 
@@ -101,11 +101,11 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Thrusters {
                 a = shipRotatedThrustVector / _shipMass;
             }
 
-            velocity += a * deltaTime;
-            float scale = velocity.magnitude / MaxSpeed;
+            Velocity += a * deltaTime;
+            float scale = Velocity.magnitude / MaxSpeed;
 
             if (scale > 1) {
-                velocity /= scale;
+                Velocity /= scale;
             }
         }
         
@@ -115,27 +115,27 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Thrusters {
 
         //turn
         public void TurnShip(float deltaTime, float lR) {
-            angularVelocity += deltaTime * _angularAcceleration * lR;
-            if (angularVelocity > maxAngularVelocity) {
-                angularVelocity = maxAngularVelocity;
+            AngularVelocity += deltaTime * AngularAcceleration * lR;
+            if (AngularVelocity > maxAngularVelocity) {
+                AngularVelocity = maxAngularVelocity;
             }
 
-            if (angularVelocity < -maxAngularVelocity) {
-                angularVelocity = -maxAngularVelocity;
+            if (AngularVelocity < -maxAngularVelocity) {
+                AngularVelocity = -maxAngularVelocity;
             }
-            Debug.Log("Turn Rate: " + angularVelocity);
+            // Debug.Log("Turn Rate: " + angularVelocity);
         }
 
         public void StopTurn(float deltaTime) {
-            if (angularVelocity > 0) {
-                angularVelocity -= deltaTime * _angularAcceleration;
-                if (angularVelocity < 0) {
-                    angularVelocity = 0;
+            if (AngularVelocity > 0) {
+                AngularVelocity -= deltaTime * AngularAcceleration;
+                if (AngularVelocity < 0) {
+                    AngularVelocity = 0;
                 }
-            } else if (angularVelocity < 0) {
-                angularVelocity += deltaTime * _angularAcceleration;
-                if (angularVelocity > 0) {
-                    angularVelocity = 0;
+            } else if (AngularVelocity < 0) {
+                AngularVelocity += deltaTime * AngularAcceleration;
+                if (AngularVelocity > 0) {
+                    AngularVelocity = 0;
                 }
             }
         }

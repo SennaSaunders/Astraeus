@@ -100,13 +100,13 @@ namespace Code._Galaxy {
 
                     OutfittingService outfittingService = new OutfittingService();
 
-                    //add faction specific components to outfitting
-                    for (int i = 0; i < Enum.GetValues(typeof(ShipComponentTier)).Length; i++) {
-                        outfittingService.AddAvailableComponents(faction.GetAllowedWeapons((ShipComponentTier)i).Select(aw => aw.weapon).Cast<ShipComponent>().ToList());
-                        outfittingService.AddAvailableComponents(faction.GetAllowedMainThrusters((ShipComponentTier)i).Select(mt => mt.mainThruster).Cast<ShipComponent>().ToList());
-                        outfittingService.AddAvailableComponents(faction.GetAllowedPowerPlants((ShipComponentTier)i).Select(pp => pp.powerPlant).Cast<ShipComponent>().ToList());
-                        outfittingService.AddAvailableComponents(faction.GetAllowedShields((ShipComponentTier)i).Select(s=> s.shield).Cast<ShipComponent>().ToList());
-                    }
+                    // add faction specific components to outfitting
+                     for (int i = 0; i < Enum.GetValues(typeof(ShipComponentTier)).Length; i++) {
+                         outfittingService.AddAvailableComponents(faction.GetAllowedWeapons().Select(aw => aw.weaponType).ToList(), (ShipComponentTier)i);
+                         outfittingService.AddAvailableComponents(faction.GetAllowedMainThrusters().Select(mt => mt.mainThrusterType).ToList(),(ShipComponentTier)i);
+                         outfittingService.AddAvailableComponents(faction.GetAllowedPowerPlants().Select(pp => pp.powerPlantType).ToList(),(ShipComponentTier)i);
+                         outfittingService.AddAvailableComponents(faction.GetAllowedShields().Select(s=> s.shieldType).ToList(),(ShipComponentTier)i);
+                     }
                     
                     outfittingService.AddAllManoeuvringThrusters();
                     outfittingService.AddAllCargoBays();
@@ -241,7 +241,7 @@ namespace Code._Galaxy {
             int earthChance = 30;
 
             PlanetGen planetGen;
-            int size = 512;
+            int size = tier.TextureSize();
             int planetTextureSeed = Rng.Next();
             if (IsRareRoll(notRockyChance)) {
                 if (IsRareRoll(earthChance)) { //earth-like

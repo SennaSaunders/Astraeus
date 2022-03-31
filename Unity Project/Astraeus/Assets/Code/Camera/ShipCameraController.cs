@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 
 namespace Code.Camera {
     public class ShipCameraController : CameraController {
@@ -22,6 +23,7 @@ namespace Code.Camera {
             _maxZ = _shipZ + _maxZOffset;
 
             _currentZ = _minZ;
+            
         }
 
         //attached to ship and follows it
@@ -37,9 +39,8 @@ namespace Code.Camera {
             cameraTransform.position = new Vector3(shipPos.x, shipPos.y, _currentZ);
             
             Quaternion shipRotation = shipTransform.rotation;
-            Quaternion camRotation = Quaternion.Euler(shipRotation.eulerAngles.x, shipRotation.eulerAngles.y, shipRotation.eulerAngles.z-90);
+            Quaternion camRotation = Quaternion.Euler(shipRotation.eulerAngles.x, shipRotation.eulerAngles.y, shipRotation.eulerAngles.z);
             cameraTransform.rotation = camRotation;
-
         }
 
         private void ControlZoom() {

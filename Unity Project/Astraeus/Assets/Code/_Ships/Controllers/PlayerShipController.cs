@@ -1,11 +1,31 @@
-﻿using UnityEngine;
+﻿using System;
+using Code._Galaxy._SolarSystem;
+using UnityEngine;
 
 namespace Code._Ships.Controllers {
     public class PlayerShipController : ShipController {
         //takes user input and maps it to thrust/turn
+        private Vector3 targetVector;
+        private float targetRotation;
+        private BoxCollider mouseCollider;
+        private UnityEngine.Camera _camera;
 
-        public override void AimWeapon(Vector2 target) {
-            throw new System.NotImplementedException();
+        private void Awake() {
+            _camera = UnityEngine.Camera.main;
+            mouseCollider = gameObject.AddComponent<BoxCollider>();
+            mouseCollider.size = new Vector2(1000, 1000);
+        }
+
+        public override void AimWeapons() {
+            Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
+            
+            
+            if (Physics.Raycast(ray, out RaycastHit hit)) {
+                if (hit.collider != null) {
+                    Vector2 target = hit.point;
+                    AimWeapons(target);
+                }
+            }
         }
 
         public override Vector2 GetThrustVector() {

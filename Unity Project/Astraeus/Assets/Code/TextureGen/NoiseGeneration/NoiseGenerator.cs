@@ -1,48 +1,31 @@
-﻿using System;
+﻿namespace Code.TextureGen.NoiseGeneration {
+    public static class NoiseGenerator {
+        private static FastNoise GetFastNoise() {
+            FastNoise simplexNoise = new FastNoise("OpenSimplex2");
+            FastNoise fractal = new FastNoise("FractalFBm");
+            fractal.Set("Source", simplexNoise);
+            fractal.Set("Gain", .6f);
+            fractal.Set("WeightedStrength", .3f);
+            fractal.Set("Octaves", 4);
+            fractal.Set("Lacunarity", 2f);
+            return fractal;
+        }
 
-namespace Code.TextureGen.NoiseGeneration {
-    public class NoiseGenerator {
-        public static float[] GetNoise(int size, int seed) {
-            float[] noiseData = new float[size * size];
-            FastNoise fastNoiseTree = FastNoise.FromEncodedNodeTree("JgANAAQAAAAAAABACQAAmpkZPwCamZk+AAAAAAA=");
+        public static float[] GetNoise3D(int size, int seed) {
+            FastNoise fastNoise = GetFastNoise();
+            float[] noise = new float[size*size*size];
+            float freq = 0.01f;
+            FastNoise.OutputMinMax minMax = fastNoise.GenUniformGrid3D(noise, 0, 0, 0, size, size, size, freq, seed);
+            noise = NormaliseNoise(noise, minMax);
+            return noise;
+        }
 
-            int x1 = 0;
-            int y1 = 0;
-            int x2 = 1;
-            int y2 = 1;
-
-            float min = float.MaxValue;
-            float max = float.MinValue;
-            for (int x = 0; x < size; x++) {
-                for (int y = 0; y < size; y++) {
-                    float s = (float)x / size;
-                    float t = (float)y / size;
-                    float dx = x2 - x1;
-                    float dy = y2 - y1;
-
-                    float nx = (float)(x1 + Math.Cos(s * 2 * Math.PI) * dx / (2 * Math.PI));
-                    float ny = (float)(y1 + Math.Cos(t * 2 * Math.PI) * dy / (2 * Math.PI));
-                    float nz = (float)(x1 + Math.Sin(s * 2 * Math.PI) * dx / (2 * Math.PI));
-                    float nw = (float)(y1 + Math.Sin(t * 2 * Math.PI) * dy / (2 * Math.PI));
-                    
-                    float value =  fastNoiseTree.GenSingle4D(nx, ny, nz, nw, seed);
-                    // float value =  fastNoiseTree.GenSingle2D(x, y, seed);
-                    //float value =  fastNoiseTree.GenSingle2D(x, y, seed);
-                    min = value < min ? value : min;
-                    max = value > max ? value : max;
-                    
-                    noiseData[x * size + y] = value;
-                }
+        private static float[] NormaliseNoise(float[] noise, FastNoise.OutputMinMax minMax) {
+            for (int i = 0; i < noise.Length;i++) {
+                float value = noise[i]; 
+                noise[i] = (value - minMax.min) / (minMax.max - minMax.min);
             }
-
-            for (int x = 0; x < size; x++) {//scales values from 0 - 1 
-                for (int y = 0; y < size; y++) {
-                    float value = noiseData[x * size + y];
-                    noiseData[x * size + y] = (value - min) / (max - min);
-                }
-            }
-
-            return noiseData;
+            return noise;
         }
     }
 }

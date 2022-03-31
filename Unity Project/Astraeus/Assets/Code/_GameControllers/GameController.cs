@@ -86,6 +86,13 @@ namespace Code._GameControllers {
             SetupDefaultShip();
         }
 
+        public List<Faction> GetFactions() {
+            return _galaxyController.GetFactions();
+        }
+
+        public SolarSystem GetCurrentSolarSystem() {
+            return _currentSolarSystem;
+        }
 
         private void SetupShipCamera() {
             ShipCameraController shipCameraController = CurrentShip.ShipObject.AddComponent<ShipCameraController>();
@@ -105,8 +112,6 @@ namespace Code._GameControllers {
             _galaxyController.SetGalaxy(galaxy);
             _currentSolarSystem = GetStartingSystem();
             _currentStation = GetStartingStation(_currentSolarSystem);
-
-            // ShipCreatorTest();
         }
 
         private void SetupGameGUIController() {
@@ -114,23 +119,19 @@ namespace Code._GameControllers {
             _guiController.SetupGameController(this);
         }
 
-        public void ShipCreatorTest() {
-            List<Faction> factions = _galaxyController.GetFactions();
-
-            int offset = 0;
-            int offsetChange = 20;
-            GameObject npcShipContainer = new GameObject("NPC Ships");
-            foreach (Faction faction in factions) {
-                Ship newShip = _shipCreator.CreateFactionShip(ShipCreator.ShipClass.Fighter, ShipComponentTier.T5, .5f, faction, npcShipContainer);
-                newShip.ShipObject.transform.SetParent(npcShipContainer.transform);
-                newShip.ShipObject.transform.position = new Vector3(offset, 20, ShipZ);
-                npcShips.Add(newShip);
-                newShip = _shipCreator.CreateFactionShip(ShipCreator.ShipClass.Transport, ShipComponentTier.T5, .5f, faction, npcShipContainer);
-                newShip.ShipObject.transform.SetParent(npcShipContainer.transform);
-                newShip.ShipObject.transform.position = new Vector3(offset, 40, ShipZ);
-                npcShips.Add(newShip);
-                offset += offsetChange;
+        public void CreateNPC(Faction faction, ShipCreator.ShipClass shipClass, ShipComponentTier maxTier, float loadoutEfficiency, Vector2 spawnLocation) {
+            string npcShipContainerName = "NPC Ships";
+            GameObject npcShipContainer = GameObject.Find(npcShipContainerName);
+            if (npcShipContainer == null) {
+                npcShipContainer = new GameObject(npcShipContainerName);
             }
+
+            Ship ship = _shipCreator.CreateFactionShip(shipClass, maxTier, loadoutEfficiency, faction, npcShipContainer);
+            ship.ShipObject.transform.position = new Vector3(spawnLocation.x, spawnLocation.y, ShipZ);
+            NPCShipController shipController = ship.ShipObject.AddComponent<NPCShipController>();
+            shipController.Setup(ship, ship.ShipObject.transform.position);
+            npcShips.Add(ship);
+            ship.Active = true;
         }
 
         private SolarSystem GetStartingSystem() {

@@ -14,7 +14,7 @@ using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
 using Code._Ships.ShipComponents.InternalComponents.Shields;
 
 namespace Code._Galaxy._Factions {
-    public abstract class Faction : IFactionShipComponentSpecifier {
+    public abstract class Faction{
         public enum FactionType {
             Agriculture,
             Commerce,
@@ -267,10 +267,10 @@ namespace Code._Galaxy._Factions {
             return false;
         }
 
-        public abstract List<(Weapon weapon, int spawnWeighting)> GetAllowedWeapons(ShipComponentTier tier);
-        public abstract List<(MainThruster mainThruster, int spawnWeighting)> GetAllowedMainThrusters(ShipComponentTier tier);
-        public abstract List<(PowerPlant powerPlant, int spawnWeighting)> GetAllowedPowerPlants(ShipComponentTier tier);
-        public abstract List<(Shield shield, int spawnWeighting)> GetAllowedShields(ShipComponentTier tier);
+        public abstract List<(Type weaponType, int spawnWeighting)> GetAllowedWeapons();
+        public abstract List<(Type mainThrusterType, int spawnWeighting)> GetAllowedMainThrusters();
+        public abstract List<(Type powerPlantType, int spawnWeighting)> GetAllowedPowerPlants();
+        public abstract List<(Type shieldType, int spawnWeighting)> GetAllowedShields();
     }
 
     public static class FactionTypeExtension {

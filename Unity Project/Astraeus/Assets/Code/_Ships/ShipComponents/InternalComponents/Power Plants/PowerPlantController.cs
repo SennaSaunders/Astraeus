@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Code._Products.ProductTypes.Ships.Common;
-using UnityEngine;
 
 namespace Code._Ships.ShipComponents.InternalComponents.Power_Plants {
     public class PowerPlantController {

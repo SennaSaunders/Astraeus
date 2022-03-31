@@ -21,10 +21,5 @@
         public override string GetFullPath() {
             return base.GetFullPath() + ComponentTypePath;
         }
-        
-        //fire
-        public void Fire() {
-            
-        }
     }
 }

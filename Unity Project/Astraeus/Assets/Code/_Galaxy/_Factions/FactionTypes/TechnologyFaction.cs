@@ -30,20 +30,20 @@ namespace Code._Galaxy._Factions.FactionTypes {
             return GetCelestialBodyDesireValue(desiredTypes,celestialBody);
         }
 
-        public override List<(Weapon weapon, int spawnWeighting)> GetAllowedWeapons(ShipComponentTier tier) {
-            return new List<(Weapon weapon, int spawnWeighting)> { (new Railgun(tier), 1), (new LaserCannon(tier), 5) };
+        public override List<(Type weaponType, int spawnWeighting)> GetAllowedWeapons() {
+            return new List<(Type weaponType, int spawnWeighting)> { (typeof(Railgun), 1), (typeof(LaserCannon), 5) };
         }
 
-        public override List<(MainThruster mainThruster, int spawnWeighting)> GetAllowedMainThrusters(ShipComponentTier tier) {
-            return new List<(MainThruster mainThruster, int spawnWeighting)> { (new TechThruster(tier), 1) };
+        public override List<(Type mainThrusterType, int spawnWeighting)> GetAllowedMainThrusters() {
+            return new List<(Type mainThrusterType, int spawnWeighting)> { (typeof(TechThruster), 1) };
         }
 
-        public override List<(PowerPlant powerPlant, int spawnWeighting)> GetAllowedPowerPlants(ShipComponentTier tier) {
-            return new List<(PowerPlant powerPlant, int spawnWeighting)> { (new PowerPlantHighCapacity(tier), 1), (new PowerPlantHighRecharge(tier), 3) };
+        public override List<(Type powerPlantType, int spawnWeighting)> GetAllowedPowerPlants() {
+            return new List<(Type powerPlantType, int spawnWeighting)> { (typeof(PowerPlantHighCapacity), 1), (typeof(PowerPlantHighRecharge), 3) };
         }
 
-        public override List<(Shield shield, int spawnWeighting)> GetAllowedShields(ShipComponentTier tier) {
-            return new List<(Shield shield, int spawnWeighting)>() { (new ShieldHighRecharge(tier), 1), (new ShieldHighCapacity(tier), 1) };
+        public override List<(Type shieldType, int spawnWeighting)> GetAllowedShields() {
+            return new List<(Type shieldType, int spawnWeighting)>() { (typeof(ShieldHighRecharge), 1), (typeof(ShieldHighCapacity), 1) };
         }
     }
 }

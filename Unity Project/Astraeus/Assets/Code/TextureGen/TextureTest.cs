@@ -1,4 +1,5 @@
-using Code.TextureGen.NoiseGeneration;
+using Code._Galaxy._SolarSystem._CelestialObjects;
+using Code._Galaxy._SolarSystem._CelestialObjects.Planet;
 using UnityEngine;
 
 namespace Code.TextureGen {
@@ -6,12 +7,18 @@ namespace Code.TextureGen {
         MeshRenderer _meshRenderer;
 
         public int seed = 1337;
+        public Body.BodyTier tier = Body.BodyTier.T2; 
 
-        public int size = 1024;
+        
         // Start is called before the first frame update
         public void Start() {
+            GenPlanetTexture();
+        }
+
+        public void GenPlanetTexture() {
             _meshRenderer = GetComponent<MeshRenderer>();
-            _meshRenderer.sharedMaterial.mainTexture = PlanetGen.GenNoiseTex(NoiseGenerator.GetNoise(size, seed), size);
+            Planet planet = new Planet(null, tier, new EarthWorldGen(seed, tier.TextureSize())); 
+            _meshRenderer.sharedMaterial.mainTexture = planet.PlanetGen.GenTexture();
         }
     }
 }

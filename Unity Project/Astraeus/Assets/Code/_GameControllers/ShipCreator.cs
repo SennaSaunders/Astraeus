@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Code._Galaxy._Factions;
 using Code._Ships;
@@ -26,7 +27,7 @@ namespace Code._GameControllers {
 
         public Ship CreateDefaultShip(GameObject objectContainer) {
             Ship ship = objectContainer.AddComponent<Ship>();
-            ship.ShipHull = new SmallCargoHull();
+            ship.ShipHull = new SmallFighterHull();
             ship.ShipHull.ManoeuvringThrusterComponents.concreteComponent = new ManoeuvringThruster(ShipComponentTier.T1);
             MainThruster mainThruster = new PrimitiveThruster(ShipComponentTier.T1);
             for (int i = 0; i< ship.ShipHull.MainThrusterComponents.Count; i++) {
@@ -68,14 +69,13 @@ namespace Code._GameControllers {
             mainThrusterSlots = mainThrusterSlots.OrderBy(t => r.Next()).ToList(); //randomize the slots so that different configurations will be chosen on each ship with multiple thrusters
 
             int slotsUsed = RollForSlotsUsed(loadoutEfficiency, mainThrusterSlots.Count, r);
-            
-            
+
             //thrusters
 
-            List<int> assignedThrusterSlots = new List<int>();
+            List<int> assignedMainThrusterSlots = new List<int>();
             int slotIdx = 0;
-            while (assignedThrusterSlots.Count < slotsUsed) {//while there are more slots ot choose
-                while (assignedThrusterSlots.Contains(slotIdx)) {//while the current slot has already been chosen
+            while (assignedMainThrusterSlots.Count < slotsUsed) {//while there are more slots ot choose
+                while (assignedMainThrusterSlots.Contains(slotIdx)) {//while the current slot has already been chosen
                     slotIdx++;
                 }
                 
@@ -99,15 +99,21 @@ namespace Code._GameControllers {
                     foreach (var thruster in currentTiedThrusters) {
                         slotName = thruster.parentTransformName;
                         _shipObjectHandler.SetMainThrusterComponent(slotName, chosenThruster);
-                        assignedThrusterSlots.Add(mainThrusterSlots.IndexOf(thruster));
+                        assignedMainThrusterSlots.Add(mainThrusterSlots.IndexOf(thruster));
                     }
                 }
                 else {
                     _shipObjectHandler.SetMainThrusterComponent(slotName, chosenThruster);
-                    assignedThrusterSlots.Add(slotIdx);
+                    assignedMainThrusterSlots.Add(slotIdx);
                 }
             }
 
+            var manoeuvringThrusterSlot = _shipObjectHandler.ManagedShip.ShipHull.ManoeuvringThrusterComponents;
+            ShipComponentTier manoeuvringThrusterTier = RollForSlotTier(loadoutEfficiency, maxComponentTier, r);
+            var maxSize = manoeuvringThrusterSlot.maxSize;
+            manoeuvringThrusterTier = manoeuvringThrusterTier <= maxSize ? manoeuvringThrusterTier : maxSize; 
+            ManoeuvringThruster manoeuvringThruster = new ManoeuvringThruster(manoeuvringThrusterTier);
+            _shipObjectHandler.SetManoeuvringThrusterComponent(manoeuvringThruster);
 
             int currentAssignedSlots = 0;
             //weapons
@@ -137,20 +143,22 @@ namespace Code._GameControllers {
 
         private MainThruster RollForMainThruster(float slotEfficiency, ShipComponentTier slotAdjustedMaxTier, Faction faction, Random r) {
             ShipComponentTier chosenTier = RollForSlotTier(slotEfficiency, slotAdjustedMaxTier, r);
-            List<(MainThruster mainThruster, int spawnWeighting)> thrusters = faction.GetAllowedMainThrusters(chosenTier);
+            List<(Type mainThrusterType, int spawnWeighting)> thrusters = faction.GetAllowedMainThrusters();
 
             int chosenThrusterIndex = RollForSpawnWeightedIndex(thrusters.Select(t => t.spawnWeighting).ToList(), r);
-            MainThruster chosenThruster = thrusters[chosenThrusterIndex].mainThruster;
+            Type chosenType = thrusters[chosenThrusterIndex].mainThrusterType;
+            MainThruster chosenThruster = (MainThruster)Activator.CreateInstance(chosenType, chosenTier);
 
             return chosenThruster;
         }
 
         private Weapon RollForWeapon(float slotEfficiency, ShipComponentTier slotAdjustedMaxTier, Faction faction, Random r) {
             ShipComponentTier chosenTier = RollForSlotTier(slotEfficiency, slotAdjustedMaxTier, r);
-            List<(Weapon weapon, int spawnWeighting)> weapons = faction.GetAllowedWeapons(chosenTier);
+            List<(Type weaponType, int spawnWeighting)> weapons = faction.GetAllowedWeapons();
 
             int chosenWeaponIndex = RollForSpawnWeightedIndex(weapons.Select(t => t.spawnWeighting).ToList(), r);
-            Weapon chosenWeapon = weapons[chosenWeaponIndex].weapon;
+            Type chosenType = weapons[chosenWeaponIndex].weaponType;
+            Weapon chosenWeapon = (Weapon)Activator.CreateInstance(chosenType, chosenTier);
 
             return chosenWeapon;
         }

@@ -9,8 +9,9 @@ using UnityEngine;
 namespace Code._Ships.Controllers {
     public abstract class ShipController : MonoBehaviour {
         private Ship _ship;
-        protected ThrusterController ThrusterController;
+        public ThrusterController ThrusterController;
         private List<WeaponController> _weaponControllers;
+        private List<Ship> hostiles;
 
         public void Setup(Ship ship) {
             _ship = ship;
@@ -19,12 +20,26 @@ namespace Code._Ships.Controllers {
             ManoeuvringThruster manoeuvringThrusters = _ship.ShipHull.ManoeuvringThrusterComponents.concreteComponent;
             List<float> centerOffsets = _ship.ShipHull.ManoeuvringThrusterComponents.thrusters.Select(t => t.centerOffset).ToList();
             ThrusterController = new ThrusterController(mainThrusters, (manoeuvringThrusters, centerOffsets), GetShipMass());
+
+            _weaponControllers = new List<WeaponController>();
+            foreach (var weaponComponent in ship.ShipHull.WeaponComponents) {
+                Weapon weapon = weaponComponent.concreteComponent;
+                if (weaponComponent.concreteComponent != null) {
+                    var weaponGameObject = weapon.InstantiatedGameObject;
+                    GameObject spindle = weaponGameObject.transform.Find("TurretBase/TurretSpindle").gameObject;
+
+                    var weaponController = spindle.gameObject.AddComponent<WeaponController>();
+                    weaponController.Setup(weapon);
+                    _weaponControllers.Add(weaponController);
+                }
+            }
         }
 
         private void Update() {
             if (_ship.Active) {
                 Thrust();
                 Turn();
+                AimWeapons();
             }
         }
 
@@ -61,11 +76,7 @@ namespace Code._Ships.Controllers {
                 ThrusterController.FireThrusters(thrustVector, Time.deltaTime, gameObject.transform.localRotation.eulerAngles.z);
             }
 
-            Vector3 velocity = ThrusterController.velocity;
-            Vector3 mappedVelocity = new Vector3(velocity.y, -velocity.x, velocity.z);
-            
-            gameObject.transform.Translate( mappedVelocity* Time.deltaTime, Space.World);
-            
+            gameObject.transform.Translate( ThrusterController.Velocity* Time.deltaTime, Space.World);
         }
 
         public void Turn() {
@@ -74,18 +85,23 @@ namespace Code._Ships.Controllers {
             if (turnDir != 0) {
                 ThrusterController.TurnShip(Time.deltaTime, turnDir);
             }
-            else if(ThrusterController.angularVelocity!=0){
+            else if(ThrusterController.AngularVelocity!=0){
                 ThrusterController.StopTurn(Time.deltaTime);
             }
 
-            var angularVelocity = ThrusterController.angularVelocity;
+            var angularVelocity = ThrusterController.AngularVelocity;
             if (angularVelocity != 0) {
-                Vector3 rotationVector = new Vector3(0, 0, ThrusterController.angularVelocity);
+                Vector3 rotationVector = new Vector3(0, 0, ThrusterController.AngularVelocity);
                 gameObject.transform.Rotate(rotationVector * Time.deltaTime, Space.World);
             }
         }
 
-        public abstract void AimWeapon(Vector2 target);
+        public void AimWeapons(Vector2 target) {
+            foreach (WeaponController weaponController in _weaponControllers) {
+                weaponController.TurnWeapon(target, transform.rotation);
+            }
+        }
+        public abstract void AimWeapons();
 
         public abstract Vector2 GetThrustVector();
 

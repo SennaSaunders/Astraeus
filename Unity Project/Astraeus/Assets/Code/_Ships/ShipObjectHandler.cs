@@ -69,7 +69,7 @@ namespace Code._Ships {
         }
 
         private void SetDefaultShipRotation() {
-            ManagedShip.ShipObject.transform.localRotation = Quaternion.Euler(0,0,225);
+            ManagedShip.ShipObject.transform.localRotation = Quaternion.Euler(0,0,0);
         }
 
         
@@ -86,6 +86,7 @@ namespace Code._Ships {
 
             GameObject newComponentObject = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(path), parent);
             newComponentObject.transform.localScale = new Vector3(scale, scale, scale);
+            component.InstantiatedGameObject = newComponentObject;
         }
 
         private Transform MapPrefabTransformStringToTransformObject(string parentTransformNames) {

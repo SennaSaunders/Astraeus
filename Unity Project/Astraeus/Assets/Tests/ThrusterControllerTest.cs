@@ -31,15 +31,15 @@ namespace Tests {
            
             float facingAngle = 30;
             
-            _thrusterController.velocity = up;
+            _thrusterController.Velocity = up;
             _thrusterController.FireThrusters(up, 1, facingAngle);
-            _thrusterController.velocity = up*1400;
+            _thrusterController.Velocity = up*1400;
             _thrusterController.FireThrusters(up, 1, facingAngle);
             
             
-            _thrusterController.velocity = down;
+            _thrusterController.Velocity = down;
             _thrusterController.FireThrusters(up, 1, facingAngle);
-            _thrusterController.velocity = down *1400;
+            _thrusterController.Velocity = down *1400;
             _thrusterController.FireThrusters(up, 1, facingAngle);
         }
         

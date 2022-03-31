@@ -21,20 +21,20 @@ namespace Code._Galaxy._Factions.FactionTypes {
             return GetCelestialBodyDesireValue(desiredTypes,celestialBody);
         }
 
-        public override List<(Weapon weapon, int spawnWeighting)> GetAllowedWeapons(ShipComponentTier tier) {
-            return new List<(Weapon weapon, int spawnWeighting)> { (new Railgun(tier), 1), (new BallisticCannon(tier), 10), (new LaserCannon(tier), 5) };
+        public override List<(Type weaponType, int spawnWeighting)> GetAllowedWeapons() {
+            return new List<(Type weaponType, int spawnWeighting)> { (typeof(Railgun), 1), (typeof(BallisticCannon), 10), (typeof(LaserCannon), 5) };
         }
 
-        public override List<(MainThruster mainThruster, int spawnWeighting)> GetAllowedMainThrusters(ShipComponentTier tier) {
-            return new List<(MainThruster mainThruster, int spawnWeighting)> { (new PrimitiveThruster(tier), 1) };
+        public override List<(Type mainThrusterType, int spawnWeighting)> GetAllowedMainThrusters() {
+            return new List<(Type mainThruster, int spawnWeighting)> { (typeof(PrimitiveThruster), 1) };
         }
 
-        public override List<(PowerPlant powerPlant, int spawnWeighting)> GetAllowedPowerPlants(ShipComponentTier tier) {
-            return new List<(PowerPlant powerPlant, int spawnWeighting)> { (new PowerPlantBalanced(tier), 10), (new PowerPlantHighRecharge(tier), 1) };
+        public override List<(Type powerPlantType, int spawnWeighting)> GetAllowedPowerPlants() {
+            return new List<(Type powerPlant, int spawnWeighting)> { (typeof(PowerPlantBalanced), 10), (typeof(PowerPlantHighRecharge), 1) };
         }
 
-        public override List<(Shield shield, int spawnWeighting)> GetAllowedShields(ShipComponentTier tier) {
-            return new List<(Shield shield, int spawnWeighting)>() { (new ShieldBalanced(tier), 15), (new ShieldHighRecharge(tier), 1) };
+        public override List<(Type shieldType, int spawnWeighting)> GetAllowedShields() {
+            return new List<(Type shield, int spawnWeighting)>() { (typeof(ShieldBalanced), 15), (typeof(ShieldHighRecharge), 1) };
         }
     }
 }
