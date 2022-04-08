@@ -28,6 +28,12 @@ namespace Code._Ships.Controllers {
             }
         }
 
+        public override void FireCheck() {
+            if (Input.GetMouseButton(0)) {
+                FireWeapons();
+            }
+        }
+
         public override Vector2 GetThrustVector() {
             Vector2 forwards = Input.GetKey(KeyCode.W) ? Vector2.up : new Vector2();
             Vector2 backwards = Input.GetKey(KeyCode.S) ? Vector2.down : new Vector2();

@@ -19,7 +19,7 @@ namespace Tests {
             List<ManoeuvringThruster> manoeuvringThrusters=new List<ManoeuvringThruster>();
             ManoeuvringThruster manoeuvringThruster = new ManoeuvringThruster(ShipComponentTier.T1);
             List<float> centerOffsets = new List<float>(){-5,-5,5,5};
-            _thrusterController = new ThrusterController(mainThrusters, (manoeuvringThruster, centerOffsets), shipMass);
+            // _thrusterController = new ThrusterController(mainThrusters, (manoeuvringThruster, centerOffsets), shipMass);
         }
 
         [Test]

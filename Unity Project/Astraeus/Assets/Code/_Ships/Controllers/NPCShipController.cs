@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Code._Ships.Controllers {
@@ -32,6 +31,10 @@ namespace Code._Ships.Controllers {
         public override void AimWeapons() {
             Vector2 target = new Vector2();
             AimWeapons(target);
+        }
+
+        public override void FireCheck() {
+            throw new NotImplementedException();
         }
 
         public override Vector2 GetThrustVector() {
@@ -181,12 +184,5 @@ namespace Code._Ships.Controllers {
             // return Vector2.SignedAngle(forwardVec, (destination+correctionVector) - (Vector2)transform.position);
             return Vector2.SignedAngle(forwardVec, _correctionVector);
         }
-    }
-
-    class Destination {
-        //ship, body or vector2
-        private GameObject ship; //used if attacking a ship
-        private GameObject station; //used if trading
-        private Vector2 targetVector; //used for manoeuvring, e.g. collision avoidance
     }
 }

@@ -134,8 +134,8 @@ namespace Code._GameControllers {
             }
 
             List<(ShipComponentType componentType, ShipComponentTier maxSize, InternalComponent concreteComponent, string parentTransformName)> internalSlots = _shipObjectHandler.ManagedShip.ShipHull.InternalComponents;
-
             //choose a power plant
+            
             //choose a shield
 
             return _shipObjectHandler.ManagedShip;

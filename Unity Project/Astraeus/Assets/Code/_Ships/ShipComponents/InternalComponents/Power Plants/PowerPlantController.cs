@@ -10,37 +10,41 @@ namespace Code._Ships.ShipComponents.InternalComponents.Power_Plants {
         public List<PowerPlant> _powerPlants;
 
         public float DrainPower(float powerRequested) {
-            float outputEffectiveness = 0; //modifies the effectiveness of the ship component requesting power
-            //load balancing split the load equally between all power plants relative to their current total power
-            float totalCurrentEnergyCapacity = 0;
+            if (powerRequested > 0) {
+                float outputEffectiveness = 0; //modifies the effectiveness of the ship component requesting power
+                //load balancing split the load equally between all power plants relative to their current total power
+                float totalCurrentEnergyCapacity = 0;
 
-            foreach (PowerPlant powerPlant in _powerPlants) {
-                totalCurrentEnergyCapacity += powerPlant.CurrentEnergy;
-            }
+                foreach (PowerPlant powerPlant in _powerPlants) {
+                    totalCurrentEnergyCapacity += powerPlant.CurrentEnergy;
+                }
 
-            List<(float energyRequested, PowerPlant powerPlant)> powerDrainedPerPowerPlant = new List<(float energyRequested, PowerPlant powerPlant)>();
+                List<(float energyRequested, PowerPlant powerPlant)> powerDrainedPerPowerPlant = new List<(float energyRequested, PowerPlant powerPlant)>();
 
-            foreach (PowerPlant powerPlant in _powerPlants) {
-                float energy = powerRequested * (powerPlant.CurrentEnergy / totalCurrentEnergyCapacity); //sets the amount of power each power plant will need
-                powerDrainedPerPowerPlant.Add((energy, powerPlant));
-            }
+                foreach (PowerPlant powerPlant in _powerPlants) {
+                    float energy = powerRequested * (powerPlant.CurrentEnergy / totalCurrentEnergyCapacity); //sets the amount of power each power plant will need
+                    powerDrainedPerPowerPlant.Add((energy, powerPlant));
+                }
 
-            float powerProvided = 0;
-            foreach ((float energyRequested, PowerPlant powerPlant) powerPlant in powerDrainedPerPowerPlant) {
-                if (!powerPlant.powerPlant.Depleted) { //if not depleted
-                    if (powerPlant.powerPlant.CurrentEnergy - powerPlant.energyRequested > 0) {
-                        powerPlant.powerPlant.CurrentEnergy -= powerPlant.energyRequested;
-                        powerProvided += powerPlant.energyRequested;
-                    }
-                    else {
-                        powerProvided += powerPlant.powerPlant.CurrentEnergy;
-                        powerPlant.powerPlant.CurrentEnergy = 0;
-                        powerPlant.powerPlant.Depleted = true;
+                float powerProvided = 0;
+                foreach ((float energyRequested, PowerPlant powerPlant) powerPlant in powerDrainedPerPowerPlant) {
+                    if (!powerPlant.powerPlant.Depleted) { //if not depleted
+                        if (powerPlant.powerPlant.CurrentEnergy - powerPlant.energyRequested > 0) {
+                            powerPlant.powerPlant.CurrentEnergy -= powerPlant.energyRequested;
+                            powerProvided += powerPlant.energyRequested;
+                        }
+                        else {
+                            powerProvided += powerPlant.powerPlant.CurrentEnergy;
+                            powerPlant.powerPlant.CurrentEnergy = 0;
+                            powerPlant.powerPlant.Depleted = true;
+                        }
                     }
                 }
+
+                return powerProvided / powerRequested;
             }
 
-            return powerProvided / powerRequested;
+            return 0;
         }
 
         public void ChargePowerPlant(float deltaTime, List<Fuel> fuel) {

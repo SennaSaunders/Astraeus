@@ -233,7 +233,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93a93afbc7ee2fe4e83e04a068cf8910, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 14
+  seed: 521
   tier: 6
 --- !u!1 &355607928
 GameObject:
@@ -400,15 +400,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6ae277a216fd16b4bb53659aff14389b, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.62932026
+      value: -0.42720026
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6ae277a216fd16b4bb53659aff14389b, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6ae277a216fd16b4bb53659aff14389b, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.77714604
+      value: -0.9041571
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6ae277a216fd16b4bb53659aff14389b, type: 3}
       propertyPath: m_LocalRotation.z
@@ -420,7 +420,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6ae277a216fd16b4bb53659aff14389b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -618
+      value: -950.58
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6ae277a216fd16b4bb53659aff14389b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z

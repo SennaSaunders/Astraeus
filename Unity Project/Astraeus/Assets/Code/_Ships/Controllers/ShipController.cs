@@ -3,7 +3,9 @@ using System.Linq;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.InternalComponents;
+using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
 using Code._Ships.ShipComponents.InternalComponents.Storage;
+using Code._Utility;
 using UnityEngine;
 
 namespace Code._Ships.Controllers {
@@ -11,25 +13,36 @@ namespace Code._Ships.Controllers {
         private Ship _ship;
         public ThrusterController ThrusterController;
         private List<WeaponController> _weaponControllers;
+        private PowerPlantController _powerPlantController;
         private List<Ship> hostiles;
 
         public void Setup(Ship ship) {
             _ship = ship;
-
+            List<PowerPlant> powerPlants = new List<PowerPlant>();
+            foreach (var internalSlot in _ship.ShipHull.InternalComponents) {
+                if (internalSlot.concreteComponent != null) {
+                    InternalComponent component = internalSlot.concreteComponent;
+                    if (component.GetType().IsSubclassOf(typeof(PowerPlant))) {
+                        powerPlants.Add((PowerPlant)component);
+                    }
+                }
+            }
+            _powerPlantController = new PowerPlantController(powerPlants);
+            
             List<MainThruster> mainThrusters = _ship.ShipHull.MainThrusterComponents.Select(tc => tc.concreteComponent).Where(tc => tc != null).ToList();
             ManoeuvringThruster manoeuvringThrusters = _ship.ShipHull.ManoeuvringThrusterComponents.concreteComponent;
             List<float> centerOffsets = _ship.ShipHull.ManoeuvringThrusterComponents.thrusters.Select(t => t.centerOffset).ToList();
-            ThrusterController = new ThrusterController(mainThrusters, (manoeuvringThrusters, centerOffsets), GetShipMass());
 
+            ThrusterController = new ThrusterController(mainThrusters, (manoeuvringThrusters, centerOffsets), GetShipMass(), _powerPlantController);
             _weaponControllers = new List<WeaponController>();
             foreach (var weaponComponent in ship.ShipHull.WeaponComponents) {
                 Weapon weapon = weaponComponent.concreteComponent;
                 if (weaponComponent.concreteComponent != null) {
                     var weaponGameObject = weapon.InstantiatedGameObject;
-                    GameObject spindle = weaponGameObject.transform.Find("TurretBase/TurretSpindle").gameObject;
+                    GameObject spindle = FindChildGameObject.FindChild(weaponGameObject,"TurretSpindle");
 
                     var weaponController = spindle.gameObject.AddComponent<WeaponController>();
-                    weaponController.Setup(weapon);
+                    weaponController.Setup(weapon, _powerPlantController);
                     _weaponControllers.Add(weaponController);
                 }
             }
@@ -40,6 +53,7 @@ namespace Code._Ships.Controllers {
                 Thrust();
                 Turn();
                 AimWeapons();
+                FireCheck();
             }
         }
 
@@ -102,7 +116,13 @@ namespace Code._Ships.Controllers {
             }
         }
         public abstract void AimWeapons();
+        public abstract void FireCheck();
 
+        public void FireWeapons() {
+            foreach (WeaponController weaponController in _weaponControllers) {
+                weaponController.Fire(ThrusterController.Velocity);
+            }
+        }
         public abstract Vector2 GetThrustVector();
 
         public abstract float GetTurnDirection();

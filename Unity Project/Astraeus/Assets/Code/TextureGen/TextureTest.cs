@@ -17,7 +17,7 @@ namespace Code.TextureGen {
 
         public void GenPlanetTexture() {
             _meshRenderer = GetComponent<MeshRenderer>();
-            Planet planet = new Planet(null, tier, new EarthWorldGen(seed, tier.TextureSize())); 
+            Planet planet = new Planet(null, tier, new RockyWorldGen(seed, tier.TextureSize())); 
             _meshRenderer.sharedMaterial.mainTexture = planet.PlanetGen.GenTexture();
         }
     }

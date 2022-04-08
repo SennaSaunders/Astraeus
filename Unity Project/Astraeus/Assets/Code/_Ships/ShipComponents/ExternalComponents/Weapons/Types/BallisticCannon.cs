@@ -7,12 +7,18 @@
         private static float projectileSpeed = 30;
         private static float travelTime = 5;
         private static int baseMass = 100;
+        private static float minTierRotationSpeed = 10;
+        private static float maxTierRotationSpeed = 3;
 
-        public BallisticCannon(ShipComponentTier componentSize) : base("Ballistic Cannon", componentSize, minTierFireRate, maxTierFireRate, baseDamage, projectileSpeed, travelTime, basePowerDraw, baseMass) {
+        public BallisticCannon(ShipComponentTier componentSize) : base("Ballistic Cannon", componentSize, minTierFireRate, maxTierFireRate, baseDamage, projectileSpeed, travelTime, basePowerDraw, minTierRotationSpeed, maxTierRotationSpeed,baseMass) {
         }
 
         public override string GetFullPath() {
             return base.GetFullPath() + "BallisticCannon";
+        }
+
+        public override string GetProjectilePath() {
+            return base.GetProjectilePath() + "PhysicalProjectile";
         }
     }
 }
