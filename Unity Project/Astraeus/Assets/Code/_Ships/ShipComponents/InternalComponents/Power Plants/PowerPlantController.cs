@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using Code._Products.ProductTypes.Ships.Common;
+using Code._Cargo.ProductTypes.Ships;
+using UnityEngine;
 
 namespace Code._Ships.ShipComponents.InternalComponents.Power_Plants {
     public class PowerPlantController {
@@ -11,13 +12,13 @@ namespace Code._Ships.ShipComponents.InternalComponents.Power_Plants {
 
         public float DrainPower(float powerRequested) {
             if (powerRequested > 0) {
-                float outputEffectiveness = 0; //modifies the effectiveness of the ship component requesting power
                 //load balancing split the load equally between all power plants relative to their current total power
                 float totalCurrentEnergyCapacity = 0;
 
                 foreach (PowerPlant powerPlant in _powerPlants) {
                     totalCurrentEnergyCapacity += powerPlant.CurrentEnergy;
                 }
+                // Debug.Log("Power level: " + totalCurrentEnergyCapacity + "Power Requested: "+powerRequested);
 
                 List<(float energyRequested, PowerPlant powerPlant)> powerDrainedPerPowerPlant = new List<(float energyRequested, PowerPlant powerPlant)>();
 
@@ -40,7 +41,7 @@ namespace Code._Ships.ShipComponents.InternalComponents.Power_Plants {
                         }
                     }
                 }
-
+                
                 return powerProvided / powerRequested;
             }
 

@@ -11,7 +11,6 @@ namespace Tests {
 
         [SetUp]
         public static void SetupTest() {
-            float shipMass = 10000;
             List<MainThruster> mainThrusters = new List<MainThruster>();
             MainThruster thruster1 = new PrimitiveThruster(ShipComponentTier.T1);
             mainThrusters.Add(thruster1);

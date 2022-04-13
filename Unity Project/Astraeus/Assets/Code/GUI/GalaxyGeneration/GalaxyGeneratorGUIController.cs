@@ -12,7 +12,13 @@ namespace Code.GUI.GalaxyGeneration {
         private GameObject _guiGameObject;
         private GameObject _loadingScreen;
         private Galaxy _galaxy;
-        private Thread _generationThread;
+        private GameController _gameController;
+        private Thread _galaxyGenerationThread;
+        private Thread _textureGenerationThread;
+        
+        private bool _startedGalaxyGen;
+        private bool _finishedgalaxyGen = false;
+        private bool _startedTextureGen = false;
         public void Start() {
             SetGUIGameObject();
             _generator = gameObject.AddComponent<GalaxyGenerator>();
@@ -126,42 +132,82 @@ namespace Code.GUI.GalaxyGeneration {
         }
         
         private void GenerateGalaxy() {
+            StartLoadingScreen();
+            _galaxyGenerationThread = new Thread(() => {
+                _galaxy = _generator.GenGalaxy();
+            });
+            _galaxyGenerationThread.Start();
+        }
+
+        private void StartLoadingScreen() {
             _loadingScreen = (GameObject)Resources.Load("GUIPrefabs/LoadingGUI");
             _loadingScreen = Instantiate(_loadingScreen);
             LoadingScreenController.SetLoadingText("Generating Galaxy");
-            
-            _generationThread = new Thread(() => {
-                _galaxy = _generator.GenGalaxy();
-            });
-            _generationThread.Start();
-            Destroy(GameObject.Find("GUIHolder"));//removes visual elements of the GUI so that it doesn't cover the loading screen - may be better to pass the Thread to the loading screen and destroy itself?
+            Destroy(GameObject.Find("GUIHolder"));//removes visual elements of the GUI so that it doesn't cover the loading screen
         }
 
-        private void Loaded() {
+        private void DestroyLoadingScreen() {
             Destroy(_loadingScreen);
-            //start game controller. pass galaxy through
-            string gameControllerObjName = "GameController";
-            GameObject gameControllerObj = new GameObject(gameControllerObjName);
-            GameController gameController = gameControllerObj.AddComponent<GameController>();
-            gameController.SetupGalaxyController(_galaxy);
-            gameController.StartGame();
             Destroy(_guiGameObject);
         }
 
-        private bool _startedMsg;
+        private void GenerateStartingSystemColours() {
+            _textureGenerationThread = GameController._galaxyController.GenerateSolarSystemColours(GameController._currentSolarSystem);
+        }
+
+        private void GenerateStartingSystemTextures() {
+            GameController._galaxyController.GenerateSolarSystemTextures(GameController._currentSolarSystem);
+        }
+
+        private void InitialiseGameController() {
+            Destroy(GameObject.Find("EventSystem"));
+            string gameControllerObjName = "GameController";
+            GameObject gameControllerObj = new GameObject(gameControllerObjName);
+            _gameController = gameControllerObj.AddComponent<GameController>();
+            _gameController.SetupGalaxyController(_galaxy);
+        }
+
+        private void Loaded() {
+            //start game controller. pass galaxy through
+            
+            _gameController.StartGame();
+            DestroyLoadingScreen();
+            
+        }
+
         public void Update() {
-            if (_generationThread != null) {
-                if (_generationThread.IsAlive) {
-                    if (!_startedMsg) {
+            if (_galaxyGenerationThread != null) {
+                if (_galaxyGenerationThread.IsAlive) {
+                    if (!_startedGalaxyGen) {
                         Debug.Log("Running Generation in separate thread..");
-                        _startedMsg = !_startedMsg;
+                        _startedGalaxyGen = !_startedGalaxyGen;
                     }
                 }
-                else {
-                    Debug.Log("Stopped");
-                    Loaded();
+                else if(!_finishedgalaxyGen){
+                    Debug.Log("Finished Generating Galaxy");
+                    _finishedgalaxyGen = true;
+                }
+            }
+
+            if (_finishedgalaxyGen) {
+                if (!_startedTextureGen) {
+                    Debug.Log("Initialising Game Controller");
+                    InitialiseGameController();
+                    Debug.Log("Generating planet textures");
+                    LoadingScreenController.SetLoadingText("Generating Planet Textures");
+                    _startedTextureGen = true;
+                    GenerateStartingSystemColours();
                     
                 }
+                else {
+                    if (_textureGenerationThread != null) {
+                        if (!_textureGenerationThread.IsAlive) {
+                            GenerateStartingSystemTextures();
+                            Loaded();
+                        }
+                    }
+                }
+                
             }
         }
     }

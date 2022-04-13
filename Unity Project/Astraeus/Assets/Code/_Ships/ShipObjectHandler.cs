@@ -6,6 +6,7 @@ using Code._Ships.ShipComponents.ExternalComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.InternalComponents;
+using Code._Utility;
 using UnityEngine;
 
 namespace Code._Ships {
@@ -32,7 +33,11 @@ namespace Code._Ships {
         
         
         private void CreateHull() {
-            ManagedShip.ShipObject = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(ManagedShip.ShipHull.GetHullFullPath()));
+            ManagedShip.ShipObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(ManagedShip.ShipHull.GetHullFullPath()));
+            Rigidbody hullRigidbody = ManagedShip.ShipObject.AddComponent<Rigidbody>();
+            hullRigidbody.isKinematic = false;
+            hullRigidbody.useGravity = false;
+            hullRigidbody.constraints = RigidbodyConstraints.FreezeAll;
         }
         
         private void CreateWeaponComponents() {
@@ -84,16 +89,13 @@ namespace Code._Ships {
 
             string path = component.GetFullPath();
 
-            GameObject newComponentObject = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(path), parent);
+            GameObject newComponentObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(path), parent);
             newComponentObject.transform.localScale = new Vector3(scale, scale, scale);
             component.InstantiatedGameObject = newComponentObject;
         }
 
         private Transform MapPrefabTransformStringToTransformObject(string parentTransformNames) {
-            List<Transform> allShipTransforms = ManagedShip.ShipObject.GetComponentsInChildren<Transform>().ToList();
-            Transform parentTransform = allShipTransforms.Find(t => t.name == parentTransformNames);
-
-            return parentTransform;
+            return FindChildGameObject.FindChild(ManagedShip.ShipObject, parentTransformNames).transform;
         }
         
         private Transform GetSelectionTransform(Transform parent) {
@@ -143,7 +145,7 @@ namespace Code._Ships {
                             }
                         }
                         
-                        GameObject bracket = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab("Ships/Thrusters/ThrusterBracket"), holderTransform);
+                        GameObject bracket = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab("Ships/Thrusters/ThrusterBracket"), holderTransform);
                         float scale = ShipComponent.GetTierMultipliedValue(1, slot.concreteComponent.ComponentSize);
                         bracket.transform.localScale = new Vector3(scale,scale,scale);
                         Transform bracketMountTransform = bracket.transform.Find("ThrusterBracket").transform.Find("ThrusterMount").transform;
@@ -211,10 +213,9 @@ namespace Code._Ships {
             //get object transform
             Transform slotTransform = MapPrefabTransformStringToTransformObject(parentName);
             Transform selectionTransform = GetSelectionTransform(slotTransform);
-            if (WeaponComponents.Select(wc => wc.mountTransform).Contains(slotTransform)) {
-                WeaponComponents.Remove(WeaponComponents.Find(wc => wc.mountTransform == slotTransform));
+            if (!WeaponComponents.Select(wc => wc.mountTransform).Contains(slotTransform)) {
+                WeaponComponents.Add((slotTransform,selectionTransform, "Weapon - " + slot.maxSize));
             }
-            WeaponComponents.Add((slotTransform,selectionTransform, "Weapon - " + slot.maxSize));
 
             if (slotTransform != null&&weapon!=null) {
                 if (weapon.ComponentType == slot.componentType && weapon.ComponentSize <= slot.maxSize) {
@@ -245,12 +246,13 @@ namespace Code._Ships {
 
             //get object transform
             Transform selectionTransform = MapPrefabTransformStringToTransformObject(parentName);
-            
-            if (InternalComponents.Select(ic => ic.mountTransform).Contains(selectionTransform)) {
-                InternalComponents.Remove(WeaponComponents.Find(wc => wc.mountTransform == selectionTransform));
+
+            if (!InternalComponents.Select(ic => ic.mountTransform).Contains(selectionTransform)) {
+                InternalComponents.Add((selectionTransform,selectionTransform, "Internal - " + slot.maxSize));
+                // InternalComponents.Remove(WeaponComponents.Find(wc => wc.mountTransform == selectionTransform));
             }
             
-            InternalComponents.Add((selectionTransform,selectionTransform, "Internal - " + slot.maxSize));
+            
 
             if (selectionTransform != null&&internalComponent!=null) {
                 if (internalComponent.ComponentType == slot.componentType && internalComponent.ComponentSize <= slot.maxSize) {

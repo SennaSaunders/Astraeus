@@ -1,9 +1,10 @@
 ﻿using Code._Galaxy;
-using Code.ObserverPattern;
+using Code.GUI.ObserverPattern;
 using UnityEngine.UI;
 
+
 namespace Code.GUI.GalaxyGeneration {
-    public class GalaxyGenSliderController : GalaxyGenInputModifier, IIntObserver{
+    public class GalaxyGenSliderController : GalaxyGenInputModifier, IItemObserver<int> {
         private Slider _slider;
 
         public void Awake() {

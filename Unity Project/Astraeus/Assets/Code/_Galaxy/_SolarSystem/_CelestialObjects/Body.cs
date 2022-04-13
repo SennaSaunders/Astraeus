@@ -99,5 +99,18 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects {
             if (tier == Body.BodyTier.T1) return 100;
             else return 1;
         }
+
+        public static int InteractDistance(this Body.BodyTier tier) {
+            if (tier == Body.BodyTier.T9) return 1500;
+            if (tier == Body.BodyTier.T8) return 1100;
+            if (tier == Body.BodyTier.T7) return 700;
+            if (tier == Body.BodyTier.T6) return 350;
+            if (tier == Body.BodyTier.T5) return 300;
+            if (tier == Body.BodyTier.T4) return 250;
+            if (tier == Body.BodyTier.T3) return 200;
+            if (tier == Body.BodyTier.T2) return 150;
+            if (tier == Body.BodyTier.T1) return 100;
+            else return 80;
+        }
     }
 }

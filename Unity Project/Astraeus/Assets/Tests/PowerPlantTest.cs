@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Code._Products.ProductTypes.Ships.Common;
+using Code._Cargo.ProductTypes.Ships;
 using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
 using NUnit.Framework;

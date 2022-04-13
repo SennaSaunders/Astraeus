@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
@@ -10,7 +11,8 @@ using Code._Galaxy._SolarSystem._CelestialObjects.Star;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
 using Code._Galaxy.GalaxyComponents;
-using Code._Ships.ShipComponents;
+using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
+using Code._Ships.ShipComponents.InternalComponents.Storage;
 using Code.TextureGen;
 using UnityEngine;
 using Random = System.Random;
@@ -101,15 +103,22 @@ namespace Code._Galaxy {
                     OutfittingService outfittingService = new OutfittingService();
 
                     // add faction specific components to outfitting
-                     for (int i = 0; i < Enum.GetValues(typeof(ShipComponentTier)).Length; i++) {
-                         outfittingService.AddAvailableComponents(faction.GetAllowedWeapons().Select(aw => aw.weaponType).ToList(), (ShipComponentTier)i);
-                         outfittingService.AddAvailableComponents(faction.GetAllowedMainThrusters().Select(mt => mt.mainThrusterType).ToList(),(ShipComponentTier)i);
-                         outfittingService.AddAvailableComponents(faction.GetAllowedPowerPlants().Select(pp => pp.powerPlantType).ToList(),(ShipComponentTier)i);
-                         outfittingService.AddAvailableComponents(faction.GetAllowedShields().Select(s=> s.shieldType).ToList(),(ShipComponentTier)i);
-                     }
+                    List<Type> componentTypes = new List<Type>();
+                    componentTypes.AddRange(faction.GetAllowedWeapons().Select(aw => aw.weaponType).ToList());
+                    componentTypes.AddRange(faction.GetAllowedMainThrusters().Select(mt => mt.mainThrusterType).ToList());
+                    componentTypes.AddRange(faction.GetAllowedPowerPlants().Select(pp => pp.powerPlantType).ToList());
+                    componentTypes.AddRange(faction.GetAllowedShields().Select(s => s.shieldType).ToList());
+
+                    foreach (Type componentType in componentTypes) {
+                        Type t = typeof(OutfittingService);
+                        MethodInfo addAvailableComponentsMethod = t.GetMethod("AddAvailableComponents");
+                        MethodInfo genericMethod = addAvailableComponentsMethod.MakeGenericMethod(componentType);
+                        genericMethod.Invoke(outfittingService, null);
+                    }
                     
-                    outfittingService.AddAllManoeuvringThrusters();
-                    outfittingService.AddAllCargoBays();
+                    outfittingService.AddAvailableComponents<ManoeuvringThruster>();
+                    outfittingService.AddAvailableComponents<CargoBay>();
+                    
 
                     spaceStation.StationServices = new List<StationService>() { new RefuelService(), new RepairService(), new ShipyardService(), outfittingService };
                     solarSystem.Bodies.Add(spaceStation);
@@ -272,7 +281,7 @@ namespace Code._Galaxy {
                 CelestialBody newBody;
                 //stars - extraStarChance % chance
                 if (currentPrimary.Primary == null && IsRareRoll(extraStarChance)) {
-                    newBody = currentPrimary.GetType() == typeof(Star) ? new Star(currentPrimary, PickRandomStarType(((Star)currentPrimary).Type)) : new Star(currentPrimary, PickRandomStarType());
+                    newBody = currentPrimary.GetType() == typeof(Star) ? new Star(currentPrimary, PickRandomStarType(((Star)currentPrimary).StarClass)) : new Star(currentPrimary, PickRandomStarType());
                     stats.starCount += 1;
                 }
                 //planets
@@ -309,7 +318,7 @@ namespace Code._Galaxy {
 
                 samePrimaryBodiesLists.Add(samePrimaryBodies);
             }
-            
+
             for (int i = samePrimaryBodiesLists.Count - 1; i >= 0; i--) {
                 for (int j = 0; j < samePrimaryBodiesLists[i].Count; j++) {
                     Body currentBody = samePrimaryBodiesLists[i][j];

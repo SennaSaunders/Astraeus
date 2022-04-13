@@ -15,27 +15,20 @@ using UnityEngine.EventSystems;
 namespace Code._GameControllers {
     public class GameController : MonoBehaviour {
         public static PrefabHandler _prefabHandler;
-        private static GalaxyController _galaxyController;
-        private static GameGUIController _guiController;
-        private static SolarSystem _currentSolarSystem;
-        public const int ShipZ = SolarSystemController.ZOffset-10;
+        public static GalaxyController _galaxyController;
+        public static GameGUIController _guiController;
+        public static SolarSystem _currentSolarSystem;
+        public const int ShipZ = SolarSystemController.ZOffset - 100;
         public static Ship CurrentShip { get; set; }
         private GameObject _playerShipContainer;
         private PlayerShipController _playerShipController;
         
         public List<Ship> npcShips = new List<Ship>();
-
         private static IStation _currentStation;
-        private Vector3 _playerPosition;
-
         private static ShipCreator _shipCreator;
-        
-        private UnityEngine.Camera _camera;
 
 
         private void Awake() {
-            _camera = UnityEngine.Camera.main;
-            gameObject.AddComponent<EventSystem>();
             gameObject.AddComponent<StandaloneInputModule>();
             _prefabHandler = gameObject.AddComponent<PrefabHandler>();
             _playerShipContainer = new GameObject("Player Ship Container");
@@ -61,6 +54,7 @@ namespace Code._GameControllers {
 
         private void SetPlayerShipController() {
             _playerShipController = CurrentShip.ShipObject.AddComponent<PlayerShipController>();
+            _playerShipController.gameObject.tag = "Player";
         }
 
         public void RefreshPlayerShip() {
@@ -70,8 +64,8 @@ namespace Code._GameControllers {
                 }
             }
             
-            _shipCreator._shipObjectHandler.ManagedShip = CurrentShip;
-            _shipCreator._shipObjectHandler.CreateShip(_playerShipContainer.transform);
+            _shipCreator.shipObjectHandler.ManagedShip = CurrentShip;
+            _shipCreator.shipObjectHandler.CreateShip(_playerShipContainer.transform);
             SetPlayerShipController();
             _playerShipController.Setup(CurrentShip);
             SetShipPosition();
@@ -79,11 +73,12 @@ namespace Code._GameControllers {
         }
 
         public void StartGame() {
-            _guiController.SetupStationGUI(_currentStation);
             _galaxyController.DisplayGalaxy();
             SolarSystemController solarSystemController = _galaxyController.GetSolarSystemController(_currentSolarSystem);
             solarSystemController.DisplaySolarSystem();
             SetupDefaultShip();
+            _guiController.SetupStationGUI(_currentStation);
+            
         }
 
         public List<Faction> GetFactions() {

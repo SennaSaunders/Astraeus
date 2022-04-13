@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Code._Galaxy._SolarSystem._CelestialObjects;
+using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
+using Code._GameControllers;
 using UnityEngine;
 
 namespace Code._Galaxy._SolarSystem {
@@ -8,6 +10,7 @@ namespace Code._Galaxy._SolarSystem {
         private GameObject _solarSystemHolder;
         private List<(Body body, GameObject bodyObject)> bodyObjectMap = new List<(Body body, GameObject bodyObject)>();
         public const int ZOffset = 0;
+        public const int SpaceStationZ = -80;
         public bool Active { get; set; }
 
         public void DisplaySolarSystem() {
@@ -47,10 +50,20 @@ namespace Code._Galaxy._SolarSystem {
                 Body body = solarSystem.Bodies[i];
                 GameObject bodyObject = body.GetSystemObject();
                 bodyObjectMap.Add((body, bodyObject));
-                bodyObject.transform.localPosition = new Vector3(0, 0, body.Tier.SystemScale() / 2); //sets the forwards most part of all bodies so that they are on the same Z level
+                bodyObject.transform.localPosition = new Vector3(0, 0, body.Tier.SystemScale()); //sets the forwards most part of all bodies so that they are on the same Z level
                 bodyObject.name = "Body: " + i + " Tier: " + body.Tier;
                 GameObject bodyHolder = new GameObject("Holder - " + body.Tier + " Body");
                 bodyObject.transform.SetParent(bodyHolder.transform);
+                // if (body.GetType() == typeof(Planet)) {
+                //     bodyObject.GetComponent<MeshRenderer>().material.mainTexture = ((Planet)body).SurfaceTexture;
+                // }
+                if (body.GetType() == typeof(SpaceStation)) {
+                    bodyObject.transform.localPosition = new Vector3(0, 0, SpaceStationZ);
+                    Debug.Log("SpaceStation");
+                    PlayerBodyProximity playerBodyProximity = bodyObject.AddComponent<PlayerBodyProximity>();
+                    playerBodyProximity.SetCollisionFunction<SpaceStation>(GameController._guiController.SetupStationGUI, (SpaceStation)body);
+
+                }
                 bodyHolders.Add(bodyHolder);
             }
 

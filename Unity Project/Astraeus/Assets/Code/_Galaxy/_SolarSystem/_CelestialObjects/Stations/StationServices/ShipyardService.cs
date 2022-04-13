@@ -6,7 +6,8 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
         private List<Hull> hulls;
 
         protected override void SetGUIStrings() {
-            serviceName = "Shipyard";
+            ServiceName = "Shipyard";
+            GUIPath = "GUIPrefabs/Station/Services/Shipyard/ShipyardGUI";
         }
         void SetShipHulls() {
             hulls = new List<Hull>();

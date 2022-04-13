@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Code.ObserverPattern;
+using Code.GUI.ObserverPattern;
 
 namespace Code._Galaxy {
     [Serializable]
-    public class GalaxyGeneratorInput : ISubject{
+    public class GalaxyGeneratorInput : ISubject<IItemObserver<int>>{
         public int MinValue { get; private set; }
         public int MaxValue{ get; private set; }
 
@@ -22,8 +22,6 @@ namespace Code._Galaxy {
             SetValue(value);
         }
 
-        
-        
         public void SetValue(int newValue) {
             Value = newValue <= MaxValue ? newValue >= MinValue ? newValue : MinValue : MaxValue;
             NotifyObservers();
@@ -33,14 +31,14 @@ namespace Code._Galaxy {
             return Value;
         }
 
-        private List<IIntObserver> _observers = new List<IIntObserver>();
+        private List<IItemObserver<int>> _observers = new List<IItemObserver<int>>();
 
-        public void AddObserver(IIntObserver intObserver) {
-            _observers.Add(intObserver);
+        public void AddObserver(IItemObserver<int> observer) {
+            _observers.Add(observer);
         }
 
-        public void RemoveObserver(IIntObserver intObserver) {
-            _observers.Remove(intObserver);
+        public void RemoveObserver(IItemObserver<int> observer) {
+            _observers.Remove(observer);
         }
 
         public void NotifyObservers() {

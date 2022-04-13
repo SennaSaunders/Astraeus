@@ -5,8 +5,8 @@
         }
 
         //need a link to the GUI for the service
-        public string guiString;
-        public string serviceName;
+        public string GUIPath { get; protected set; }
+        public string ServiceName { get; protected set;}
 
         protected abstract void SetGUIStrings();
 

@@ -12,22 +12,27 @@ namespace Code._Ships.Controllers {
     public abstract class ShipController : MonoBehaviour {
         private Ship _ship;
         public ThrusterController ThrusterController;
-        private List<WeaponController> _weaponControllers;
+        protected List<WeaponController> _weaponControllers;
         private PowerPlantController _powerPlantController;
+        public CargoController CargoController;
         private List<Ship> hostiles;
 
         public void Setup(Ship ship) {
             _ship = ship;
             List<PowerPlant> powerPlants = new List<PowerPlant>();
+            List<CargoBay> cargoBays = new List<CargoBay>();
             foreach (var internalSlot in _ship.ShipHull.InternalComponents) {
                 if (internalSlot.concreteComponent != null) {
                     InternalComponent component = internalSlot.concreteComponent;
                     if (component.GetType().IsSubclassOf(typeof(PowerPlant))) {
                         powerPlants.Add((PowerPlant)component);
+                    } else if (component.GetType() == typeof(CargoBay)) {
+                        cargoBays.Add((CargoBay)component);
                     }
                 }
             }
             _powerPlantController = new PowerPlantController(powerPlants);
+            CargoController = new CargoController(cargoBays);
             
             List<MainThruster> mainThrusters = _ship.ShipHull.MainThrusterComponents.Select(tc => tc.concreteComponent).Where(tc => tc != null).ToList();
             ManoeuvringThruster manoeuvringThrusters = _ship.ShipHull.ManoeuvringThrusterComponents.concreteComponent;
@@ -46,6 +51,10 @@ namespace Code._Ships.Controllers {
                     _weaponControllers.Add(weaponController);
                 }
             }
+
+            
+
+            
         }
 
         private void Update() {
@@ -110,11 +119,7 @@ namespace Code._Ships.Controllers {
             }
         }
 
-        public void AimWeapons(Vector2 target) {
-            foreach (WeaponController weaponController in _weaponControllers) {
-                weaponController.TurnWeapon(target, transform.rotation);
-            }
-        }
+        
         public abstract void AimWeapons();
         public abstract void FireCheck();
 

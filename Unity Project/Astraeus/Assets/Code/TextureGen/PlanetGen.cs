@@ -15,6 +15,7 @@ namespace Code.TextureGen {
         internal float SeaLevel;
         private Color _lowSeaColour;
         private Color _highSeaColour;
+        Color[] colors;
         protected Random rng;
 
         protected PlanetGen(int seed, int size) {
@@ -175,7 +176,7 @@ namespace Code.TextureGen {
                 }
             }
 
-            Debug.Log("Sea: " + seaCount + "\nLand: " + landCount);
+            // Debug.Log("Sea: " + seaCount + "\nLand: " + landCount);
             return colors;
         }
 
@@ -191,10 +192,9 @@ namespace Code.TextureGen {
             return colors;
         }
 
-        public Texture2D GenTexture() {
+        public void GenColors() {
             float[] noise = Get3DNoiseTo2D();
             Setup(noise);
-            Color[] colors;
             if (SeaLevel == 0) { //no sea
                 colors = GenLandOnly(noise);
             }
@@ -204,7 +204,9 @@ namespace Code.TextureGen {
             else { //land & sea
                 colors = GenLandAndSea(noise);
             }
-            
+        }
+
+        public Texture2D GenTexture() {
             Texture2D texture = new Texture2D(width, height);
             texture.filterMode = FilterMode.Point;
             texture.SetPixels(colors);

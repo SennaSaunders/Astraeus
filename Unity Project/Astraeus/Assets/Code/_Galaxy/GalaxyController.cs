@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
@@ -21,6 +22,18 @@ namespace Code._Galaxy {
         //     SolarSystemRaycast();
         // }
 
+        public Thread GenerateSolarSystemColours(SolarSystem solarSystem) {
+            Thread generationThread = new Thread(() => {
+                solarSystem.GenerateSolarSystemColours();
+            });
+            generationThread.Start();
+            return generationThread;
+        }
+
+        public void GenerateSolarSystemTextures(SolarSystem solarSystem) {
+            solarSystem.GenerateSolarSystemTextures();
+        }
+        
         public void SetGalaxy(Galaxy galaxy) {
             _galaxy = galaxy;
         }

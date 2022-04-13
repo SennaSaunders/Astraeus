@@ -1,9 +1,12 @@
-﻿using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
+﻿using System;
+using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
 using Code._GameControllers;
 using Code.GUI.SpaceStations.Services;
+using ICSharpCode.NRefactory.Ast;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Code.GUI.SpaceStations {
@@ -23,7 +26,8 @@ namespace Code.GUI.SpaceStations {
         }
 
         public void LoadGUI() {
-            stationGUI = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(_stationGUIBasePath+_stationGUIPathSpecifier));
+            stationGUI = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_stationGUIBasePath+_stationGUIPathSpecifier));
+            GameController.CurrentShip.Active = false;
             SetupButtons();
         }
 
@@ -51,23 +55,65 @@ namespace Code.GUI.SpaceStations {
         private void CreateServiceButtons() {
             foreach (StationService stationService in _station.StationServices) {
                 //instantiate button
-                GameObject buttonPrefab = GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(_stationGUIBasePath + _serviceButtonPathSpecifier), GetScrollContainer());
-                
+                GameObject buttonPrefab = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_stationGUIBasePath + _serviceButtonPathSpecifier), GetScrollContainer());
+
+                UnityAction buttonMethod = null;
                 if(stationService.GetType()==typeof(OutfittingService)) {
-                    Button btn = buttonPrefab.GetComponent<Button>(); 
-                    btn.onClick.AddListener(OutfittingBtnClick);
+                    buttonMethod = OutfittingBtnClick;
+                } else if (stationService.GetType() == typeof(RefuelService)) {
+                    buttonMethod = RefuelBtnClick;
+                }else if (stationService.GetType() == typeof(RepairService)) {
+                    buttonMethod = RepairBtnClick;
+                }else if (stationService.GetType() == typeof(ShipyardService)) {
+                    buttonMethod = ShipyardBtnClick;
+                }else if (stationService.GetType() == typeof(TradeService)) {
+                    buttonMethod = TradeBtnClick;
                 }
+                Button btn = buttonPrefab.GetComponent<Button>(); 
+                btn.onClick.AddListener(buttonMethod);
 
                 TextMeshProUGUI text = buttonPrefab.transform.Find("Text").GetComponent<TextMeshProUGUI>();
-                text.text = stationService.serviceName;
+                text.text = stationService.ServiceName;
             }
         }
 
+        private StationService FindStationService<T>() {
+            return _station.StationServices.Find(s => s.GetType() == typeof(T));
+        }
+        
         private void OutfittingBtnClick() {
             Debug.Log("Outfitting Button Clicked");
             OutfittingGUIController outfittingGUIController = gameObject.AddComponent<OutfittingGUIController>();
-            OutfittingService outfittingService = (OutfittingService)_station.StationServices.Find(s => s.GetType() == typeof(OutfittingService));
+            OutfittingService outfittingService = (OutfittingService)FindStationService<OutfittingService>();
             outfittingGUIController.StartOutfitting(outfittingService, this, _gameController);
+        }
+
+        private void RefuelBtnClick() {
+            Debug.Log("Refuel Button Clicked");
+            RefuelGUIController refuelGUIController = gameObject.AddComponent<RefuelGUIController>();
+            RefuelService refuelService = (RefuelService)FindStationService<RefuelService>();
+            refuelGUIController.StartRefuelGUI(refuelService, this);
+        }
+
+        private void RepairBtnClick() {
+            Debug.Log("Refuel Button Clicked");
+            RepairGUIController repairGUIController = gameObject.AddComponent<RepairGUIController>();
+            RepairService repairService = (RepairService)FindStationService<RepairService>();
+            repairGUIController.StartRepairGUI(repairService, this);
+        }
+
+        private void ShipyardBtnClick() {
+            Debug.Log("Shipyard Button Clicked");
+            ShipyardGUIController shipyardGUIController = gameObject.AddComponent<ShipyardGUIController>();
+            ShipyardService shipyardService = (ShipyardService)FindStationService<ShipyardService>();
+            shipyardGUIController.StartShipyardGUI(shipyardService, this);
+        }
+
+        private void TradeBtnClick() {
+            Debug.Log("Trade Button Clicked");
+            TradeGUIController tradeGUIController = gameObject.AddComponent<TradeGUIController>();
+            TradeService tradeService = (TradeService)FindStationService<TradeService>();
+            tradeGUIController.StartTradeGUI(tradeService, this);
         }
     }
 }

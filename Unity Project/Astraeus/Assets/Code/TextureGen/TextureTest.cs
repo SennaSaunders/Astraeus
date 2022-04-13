@@ -7,9 +7,15 @@ namespace Code.TextureGen {
         MeshRenderer _meshRenderer;
 
         public int seed = 1337;
-        public Body.BodyTier tier = Body.BodyTier.T2; 
+        public Body.BodyTier tier = Body.BodyTier.T2;
+        public PlanetGenType planetGenType;
 
-        
+        public enum PlanetGenType {
+            Earth,
+            Water,
+            Rocky
+        }
+
         // Start is called before the first frame update
         public void Start() {
             GenPlanetTexture();
@@ -17,8 +23,17 @@ namespace Code.TextureGen {
 
         public void GenPlanetTexture() {
             _meshRenderer = GetComponent<MeshRenderer>();
-            Planet planet = new Planet(null, tier, new RockyWorldGen(seed, tier.TextureSize())); 
-            _meshRenderer.sharedMaterial.mainTexture = planet.PlanetGen.GenTexture();
+            Planet planet;
+            if (planetGenType == PlanetGenType.Earth) {
+                planet = new Planet(null, tier, new EarthWorldGen(seed, tier.TextureSize()));
+            } else if (planetGenType == PlanetGenType.Water) {
+                planet = new Planet(null, tier, new WaterWorldGen(seed, tier.TextureSize()));
+            }
+            else {
+                planet = new Planet(null, tier, new RockyWorldGen(seed, tier.TextureSize()));
+            }
+            planet.PlanetGen.GenColors();
+            _meshRenderer.material.mainTexture = planet.PlanetGen.GenTexture();
         }
     }
 }

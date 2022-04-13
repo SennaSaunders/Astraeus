@@ -9,15 +9,18 @@ using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters.Types;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.InternalComponents;
+using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
+using Code._Ships.ShipComponents.InternalComponents.Shields;
+using Code._Ships.ShipComponents.InternalComponents.Storage;
 using UnityEngine;
 using Random = System.Random;
 
 namespace Code._GameControllers {
     public class ShipCreator : MonoBehaviour {
-        public ShipObjectHandler _shipObjectHandler;
+        public ShipObjectHandler shipObjectHandler;
 
         private void Awake() {
-            _shipObjectHandler = gameObject.AddComponent<ShipObjectHandler>();
+            shipObjectHandler = gameObject.AddComponent<ShipObjectHandler>();
         }
 
         public enum ShipClass {
@@ -28,16 +31,64 @@ namespace Code._GameControllers {
         public Ship CreateDefaultShip(GameObject objectContainer) {
             Ship ship = objectContainer.AddComponent<Ship>();
             ship.ShipHull = new SmallFighterHull();
-            ship.ShipHull.ManoeuvringThrusterComponents.concreteComponent = new ManoeuvringThruster(ShipComponentTier.T1);
-            MainThruster mainThruster = new PrimitiveThruster(ShipComponentTier.T1);
-            for (int i = 0; i< ship.ShipHull.MainThrusterComponents.Count; i++) {
+            shipObjectHandler.ManagedShip = ship;
+            shipObjectHandler.CreateShip(objectContainer.transform);
+            //manoeuvring thrusters
+            shipObjectHandler.SetManoeuvringThrusterComponent(new ManoeuvringThruster(ShipComponentTier.T1));
+            //main thrusters
+            for (int i = 0; i< ship.ShipHull.MainThrusterComponents.Count; i++) {//DO NOT convert to foreach - causes enumerator error as loop is changing the list
                 var thrusterComponent = ship.ShipHull.MainThrusterComponents[i]; 
-                thrusterComponent.concreteComponent = mainThruster;
-                ship.ShipHull.MainThrusterComponents[i] = thrusterComponent;
+                shipObjectHandler.SetMainThrusterComponent(thrusterComponent.parentTransformName, new PrimitiveThruster(ShipComponentTier.T1));
             }
-            _shipObjectHandler.ManagedShip = ship;
-            ship.ShipObject = _shipObjectHandler.CreateShip(objectContainer.transform);
-            return ship;
+            
+            SetupBasicLoadout(shipObjectHandler.ManagedShip);
+            return shipObjectHandler.ManagedShip;
+        }
+
+        private void SetupBasicLoadout(Ship ship) {
+            //shield
+            int slotIndex = GetBestEmptyInternalSlotIndex(ship);
+            if (slotIndex >= 0) {
+                var slot = ship.ShipHull.InternalComponents[slotIndex];
+                shipObjectHandler.SetInternalComponent(slot.parentTransformName, new ShieldBalanced(slot.maxSize));
+            }
+            
+            //power plant
+            slotIndex = GetBestEmptyInternalSlotIndex(ship);
+            if (slotIndex >= 0) {
+                var slot = ship.ShipHull.InternalComponents[slotIndex];
+                shipObjectHandler.SetInternalComponent(slot.parentTransformName, new PowerPlantBalanced(slot.maxSize));
+            }
+            //cargo
+            do {
+                slotIndex = GetBestEmptyInternalSlotIndex(ship);
+                if (slotIndex >= 0) {
+                    var slot = ship.ShipHull.InternalComponents[slotIndex]; 
+                    shipObjectHandler.SetInternalComponent(slot.parentTransformName, new CargoBay(slot.maxSize));
+                }
+            } while (slotIndex >= 0);
+        }
+
+        public int GetBestEmptyInternalSlotIndex(Ship ship) {
+            int bestIndex = -1;//if -1 is returned then there will be no empty slot
+            ShipComponentTier bestTier = ShipComponentTier.T1;//smallest slot size by default
+            for (int i = 0; i < ship.ShipHull.InternalComponents.Count; i++) {
+                var currentSlot = ship.ShipHull.InternalComponents[i];
+                if (currentSlot.concreteComponent == null) {//if slot is empty
+                    if (bestIndex < 0) {//if slot hasn't been picked
+                        bestIndex = i;
+                        bestTier = currentSlot.maxSize;
+                    }
+                    else {
+                        if (bestTier < currentSlot.maxSize) {//if slot has a higher tier than current best
+                            bestIndex = i;
+                            bestTier = currentSlot.maxSize;
+                        }
+                    }
+                    
+                }
+            }
+            return bestIndex;
         }
 
         public Ship CreateFactionShip(ShipClass shipClass, ShipComponentTier maxComponentTier, float loadoutEfficiency, Faction faction, GameObject objectContainer) { // slotEfficiency should define how likely a slot is to be fully-utilised
@@ -60,11 +111,11 @@ namespace Code._GameControllers {
 
             Ship ship = objectContainer.AddComponent<Ship>();
             ship.ShipHull = chosenHull;
-            _shipObjectHandler.ManagedShip = ship;
-            _shipObjectHandler.CreateShip(objectContainer.transform);
+            shipObjectHandler.ManagedShip = ship;
+            shipObjectHandler.CreateShip(objectContainer.transform);
 
             //choose thrusters
-            List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string parentTransformName, bool needsBracket)> mainThrusterSlots = _shipObjectHandler.ManagedShip.ShipHull.MainThrusterComponents;
+            List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string parentTransformName, bool needsBracket)> mainThrusterSlots = shipObjectHandler.ManagedShip.ShipHull.MainThrusterComponents;
 
             mainThrusterSlots = mainThrusterSlots.OrderBy(t => r.Next()).ToList(); //randomize the slots so that different configurations will be chosen on each ship with multiple thrusters
 
@@ -98,26 +149,26 @@ namespace Code._GameControllers {
                     //set all thrusters to the chosen thruster type
                     foreach (var thruster in currentTiedThrusters) {
                         slotName = thruster.parentTransformName;
-                        _shipObjectHandler.SetMainThrusterComponent(slotName, chosenThruster);
+                        shipObjectHandler.SetMainThrusterComponent(slotName, chosenThruster);
                         assignedMainThrusterSlots.Add(mainThrusterSlots.IndexOf(thruster));
                     }
                 }
                 else {
-                    _shipObjectHandler.SetMainThrusterComponent(slotName, chosenThruster);
+                    shipObjectHandler.SetMainThrusterComponent(slotName, chosenThruster);
                     assignedMainThrusterSlots.Add(slotIdx);
                 }
             }
 
-            var manoeuvringThrusterSlot = _shipObjectHandler.ManagedShip.ShipHull.ManoeuvringThrusterComponents;
+            var manoeuvringThrusterSlot = shipObjectHandler.ManagedShip.ShipHull.ManoeuvringThrusterComponents;
             ShipComponentTier manoeuvringThrusterTier = RollForSlotTier(loadoutEfficiency, maxComponentTier, r);
             var maxSize = manoeuvringThrusterSlot.maxSize;
             manoeuvringThrusterTier = manoeuvringThrusterTier <= maxSize ? manoeuvringThrusterTier : maxSize; 
             ManoeuvringThruster manoeuvringThruster = new ManoeuvringThruster(manoeuvringThrusterTier);
-            _shipObjectHandler.SetManoeuvringThrusterComponent(manoeuvringThruster);
+            shipObjectHandler.SetManoeuvringThrusterComponent(manoeuvringThruster);
 
             int currentAssignedSlots = 0;
             //weapons
-            List<(ShipComponentType componentType, ShipComponentTier maxSize, Weapon concreteComponent, string parentTransformName)> weaponSlots = _shipObjectHandler.ManagedShip.ShipHull.WeaponComponents.OrderBy(w => r.Next()).ToList();
+            List<(ShipComponentType componentType, ShipComponentTier maxSize, Weapon concreteComponent, string parentTransformName)> weaponSlots = shipObjectHandler.ManagedShip.ShipHull.WeaponComponents.OrderBy(w => r.Next()).ToList();
             slotsUsed = RollForSlotsUsed(loadoutEfficiency, weaponSlots.Count, r);
             currentAssignedSlots = 0;
 
@@ -126,19 +177,16 @@ namespace Code._GameControllers {
                 ShipComponentTier slotAdjustedMaxTier = maxComponentTier <= slotTier ? maxComponentTier : slotTier;
                 Weapon chosenWeapon = RollForWeapon(loadoutEfficiency, slotAdjustedMaxTier, faction, r);
                 string slotName = weaponSlots[i].parentTransformName;
-                _shipObjectHandler.SetWeaponComponent(slotName, chosenWeapon);
+                shipObjectHandler.SetWeaponComponent(slotName, chosenWeapon);
                 currentAssignedSlots++;
                 if (currentAssignedSlots >= slotsUsed) {
                     break;
                 }
             }
 
-            List<(ShipComponentType componentType, ShipComponentTier maxSize, InternalComponent concreteComponent, string parentTransformName)> internalSlots = _shipObjectHandler.ManagedShip.ShipHull.InternalComponents;
-            //choose a power plant
-            
-            //choose a shield
+            SetupBasicLoadout(shipObjectHandler.ManagedShip);
 
-            return _shipObjectHandler.ManagedShip;
+            return shipObjectHandler.ManagedShip;
         }
 
         private MainThruster RollForMainThruster(float slotEfficiency, ShipComponentTier slotAdjustedMaxTier, Faction faction, Random r) {

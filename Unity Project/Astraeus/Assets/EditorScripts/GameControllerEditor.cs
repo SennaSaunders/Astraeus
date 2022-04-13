@@ -8,7 +8,6 @@ using Code._Ships.Controllers;
 using Code._Ships.ShipComponents;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
 namespace EditorScripts {
     [CustomEditor(typeof(GameController))]

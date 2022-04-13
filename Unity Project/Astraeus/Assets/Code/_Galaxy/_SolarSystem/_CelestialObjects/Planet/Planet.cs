@@ -11,13 +11,26 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Planet {
         public const BodyTier MINPlanetTier = BodyTier.T1;
 
         public PlanetGen PlanetGen { get; }
-        private Texture _surfaceTexture;
+        public Texture2D SurfaceTexture;
         public override GameObject GetSystemObject() {
             GameObject sphere = base.GetSystemObject();
             //slap generated texture on the sphere
             //move noise generation to here
-            sphere.GetComponent<MeshRenderer>().material.mainTexture = _surfaceTexture;
+            
+            MeshRenderer meshRenderer = sphere.GetComponent<MeshRenderer>();
+            meshRenderer.material.mainTexture = SurfaceTexture;
+            meshRenderer.material.shader = Shader.Find("Unlit/Texture");
+            
+            Debug.Log("Setting texture");
             return sphere;
+        }
+
+        public void GeneratePlanetColours() {
+            PlanetGen.GenColors();
+        }
+
+        public void GeneratePlanetTexture() {
+            SurfaceTexture = PlanetGen.GenTexture();
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-using Code._Utility;
+using Code._GameControllers;
 using UnityEngine;
 
 namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
@@ -22,25 +22,39 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
             MaxDistanceCheck();
         }
 
-        public void Spawn(GameObject projectileObject,Vector2 shipVelocity, float projectileSpeed, float maxTravelDistance, float damage) {
-            _projectileObject = projectileObject;
-            _projectileObject.transform.position = transform.position;
-            _projectileObject.transform.rotation = transform.rotation;
+        public void Spawn(Weapon weapon, Vector2 shipVelocity, float damage) {
+            _projectileObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(weapon.GetProjectilePath()));
+            Rigidbody projectileRigidbody = _projectileObject.AddComponent<Rigidbody>();
+            projectileRigidbody.useGravity = false;
+            projectileRigidbody.isKinematic = false;
+            CapsuleCollider capsuleCollider = _projectileObject.AddComponent<CapsuleCollider>();
+            capsuleCollider.isTrigger = true;
+            
+            Transform projectileTransform = transform;
+            _projectileObject.transform.position = projectileTransform.position;
+            _projectileObject.transform.rotation = projectileTransform.rotation;
             _currentTravelTime = 0;
-            _maxTravelTime = maxTravelDistance;
+            _maxTravelTime = weapon.MaxTravelTime;
             _damage = damage;
-            SetProjectileVelocity(shipVelocity, projectileSpeed);
+            SetProjectileVelocity(shipVelocity, weapon.ProjectileSpeed);
         }
 
         private void SetProjectileVelocity(Vector2 shipVelocity, float projectileSpeed) {
             Quaternion rotVec = Quaternion.Euler(0,0,transform.rotation.eulerAngles.z);
             Vector2 up = rotVec * new Vector2(0,projectileSpeed);
             _velocity = shipVelocity + up;
-            Debug.Log(_velocity);
         }
 
         private void DealDamage() {
-            
+            //check for collisions with ships that aren't the ship that fired it
+            //set hostile status with ships that aren't currently hostile
+            //deals damage to hit ship
+            Debug.Log("Dealing damage: " + _damage);
+        }
+
+        private void OnTriggerEnter(Collider hitCollider) {
+            DealDamage();
+            Debug.Log(hitCollider.gameObject.name);
         }
 
         private void MaxDistanceCheck() {

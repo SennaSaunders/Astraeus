@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Code._GameControllers;
+using UnityEngine;
 
 namespace Code._Galaxy._SolarSystem._CelestialObjects {
     public abstract class CelestialBody : Body {
@@ -9,13 +10,13 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects {
         }
         
         public override GameObject GetSystemObject() {
-            GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            GameObject obj = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab("Sphere/WarpSphere"));
             float scale = Tier.SystemScale();
             obj.transform.localScale = new Vector3(scale, scale, scale);
             return obj;
         }
 
-        public GameObject GetMapObject() {
+        public virtual GameObject GetMapObject() {
             GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             float scale = Tier.MapScale();
             obj.transform.localScale = new Vector3(scale, scale, scale);

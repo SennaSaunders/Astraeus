@@ -1,5 +1,4 @@
-﻿using System;
-using Code._Galaxy._SolarSystem;
+﻿using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using UnityEngine;
 
 namespace Code._Ships.Controllers {
@@ -18,13 +17,19 @@ namespace Code._Ships.Controllers {
 
         public override void AimWeapons() {
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
-            
-            
+
+
             if (Physics.Raycast(ray, out RaycastHit hit)) {
                 if (hit.collider != null) {
                     Vector2 target = hit.point;
                     AimWeapons(target);
                 }
+            }
+        }
+
+        public void AimWeapons(Vector2 aimTarget) {
+            foreach (WeaponController weaponController in _weaponControllers) {
+                weaponController.TurnWeapon(aimTarget, transform.rotation);
             }
         }
 
@@ -36,16 +41,15 @@ namespace Code._Ships.Controllers {
 
         public override Vector2 GetThrustVector() {
             Vector2 forwards = Input.GetKey(KeyCode.W) ? Vector2.up : new Vector2();
-            Vector2 backwards = Input.GetKey(KeyCode.S) ? Vector2.down : new Vector2();
-            Vector2 left = Input.GetKey(KeyCode.Q) ? Vector2.left : new Vector2();
-            Vector2 right = Input.GetKey(KeyCode.E) ? Vector2.right : new Vector2();
-
-            return forwards + backwards + left + right;
+            Vector2 back = Input.GetKey(KeyCode.S) ? Vector2.down : new Vector2();
+            Vector2 left = Input.GetKey(KeyCode.A) ? Vector2.left : new Vector2();
+            Vector2 right = Input.GetKey(KeyCode.D) ? Vector2.right : new Vector2();
+            return forwards + back + left + right;
         }
 
         public override float GetTurnDirection() {
-            float left = Input.GetKey(KeyCode.A) ? 1 : 0;
-            float right = Input.GetKey(KeyCode.D) ? -1 : 0;
+            float left = Input.GetKey(KeyCode.Q) ? 1 : 0;
+            float right = Input.GetKey(KeyCode.E) ? -1 : 0;
             return left + right;
         }
     }

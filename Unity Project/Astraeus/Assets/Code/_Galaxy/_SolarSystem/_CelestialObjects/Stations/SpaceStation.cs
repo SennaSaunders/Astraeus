@@ -20,7 +20,7 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations {
 
 
         public override GameObject GetSystemObject() {
-            return GameController._prefabHandler.instantiateObject(GameController._prefabHandler.loadPrefab(spaceStationPath));
+            return GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(spaceStationPath));
         }
 
         public SpaceStation(Body primary) : base(primary, BodyTier.T0) {

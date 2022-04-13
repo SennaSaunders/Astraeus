@@ -15,8 +15,10 @@ namespace Code._GameControllers {
         }
         
         public void SetupStationGUI(IStation station) {
-            StationGUIController stationGUIController = gameObject.AddComponent<StationGUIController>();
-            stationGUIController.Setup(station, _gameController);
+            if (!gameObject.GetComponent<StationGUIController>()) {
+                StationGUIController stationGUIController = gameObject.AddComponent<StationGUIController>();
+                stationGUIController.Setup(station, _gameController);
+            }
         }
     }
 }

@@ -1,12 +1,12 @@
-﻿using Code.ObserverPattern;
+﻿using Code.GUI.ObserverPattern;
 using TMPro;
 
 namespace Code.GUI.GalaxyGeneration {
-    public class GalaxyGenInputController : GalaxyGenInputModifier, IIntObserver {
+    public class GalaxyGenInputController : GalaxyGenInputModifier, IItemObserver<int> {
         private TMP_InputField _inputField;
 
-        public void Awake() {
-            _inputField = GetComponentInParent<TMP_InputField>();
+        private void Awake() {
+            _inputField = GetComponent<TMP_InputField>();
             _inputField.onEndEdit.AddListener(delegate { ChangeGalaxyGenInputValue(); });
         }
 

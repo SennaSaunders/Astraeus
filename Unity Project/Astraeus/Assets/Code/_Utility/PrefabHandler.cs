@@ -2,15 +2,15 @@
 
 namespace Code._Utility {
     public class PrefabHandler : MonoBehaviour {
-        public GameObject loadPrefab(string prefabPath) {
+        public GameObject LoadPrefab(string prefabPath) {
             return (GameObject)Resources.Load(prefabPath);
         }
 
-        public GameObject instantiateObject(GameObject prefab) {
+        public GameObject InstantiateObject(GameObject prefab) {
             return Instantiate(prefab);
         }
 
-        public GameObject instantiateObject(GameObject prefab, Transform parent) {
+        public GameObject InstantiateObject(GameObject prefab, Transform parent) {
             return Instantiate(prefab, parent);
         }
     }
