@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Code._Cargo.ProductTypes.Commodity.Exotic;
+using Code._Cargo.ProductTypes.Commodity.Industrial;
+using Code._Cargo.ProductTypes.Commodity.Organic;
+using Code._Cargo.ProductTypes.Commodity.Tech;
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._Galaxy._SolarSystem._CelestialObjects.BlackHole;
@@ -39,6 +43,10 @@ namespace Code._Galaxy._Factions.FactionTypes {
         }
         public override List<(Type shieldType, int spawnWeighting)> GetAllowedShields() {
             return new List<(Type shieldType, int spawnWeighting)>() { (typeof(ShieldBalanced), 10) };
+        }
+
+        public override List<(Type productType, float productionMult, float priceMult)> GetProductionMultipliers() {
+            return new List<(Type productType, float productionMult, float priceMult)>() { (typeof(OrganicProduct), 3, 1), (typeof(IndustrialProduct), .7f, 1.5f), (typeof(TechProduct), 0, 2), (typeof(ExoticProduct), 1, 1) };
         }
     }
 }

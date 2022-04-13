@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 namespace Code.GUI.SpaceStations {
     public class StationGUIController : MonoBehaviour {
-        private IStation _station;
+        public IStation _station { get; private set; }
         private GameController _gameController;
 
         private string _stationGUIBasePath = "GUIPrefabs/Station/";

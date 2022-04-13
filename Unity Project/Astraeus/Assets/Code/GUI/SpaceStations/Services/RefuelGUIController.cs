@@ -16,7 +16,7 @@ namespace Code.GUI.SpaceStations.Services {
         private StationGUIController _stationGUIController;
         private GameObject _guiGameObject;
         private CargoController _cargoController;
-        private Slider slider;
+        private Slider _slider;
 
         public void StartRefuelGUI(RefuelService refuelService, StationGUIController stationGUIController) {
             _refuelService = refuelService;
@@ -45,24 +45,24 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void SetupSlider() {
-            slider = GameObject.Find("FuelSlider").GetComponent<Slider>();
-            slider.onValueChanged.AddListener(delegate { SliderChange(); });
+            _slider = GameObject.Find("FuelSlider").GetComponent<Slider>();
+            _slider.onValueChanged.AddListener(delegate { SliderChange(); });
             UpdateGUIValues();
             SliderChange();
         }
 
         private void UpdateGUIValues() {
             int currentFuelUnits = _cargoController.GetCargoOfType<Fuel>().Count;
-            slider.minValue = 0;
-            slider.value = currentFuelUnits;
-            slider.maxValue = _cargoController.GetFreeCargoSpace() + currentFuelUnits;
+            _slider.minValue = 0;
+            _slider.value = currentFuelUnits;
+            _slider.maxValue = _cargoController.GetFreeCargoSpace() + currentFuelUnits;
             TextMeshProUGUI fullTxt = GameObject.Find("FullValue").GetComponentInChildren<TextMeshProUGUI>();
-            fullTxt.text = slider.maxValue.ToString();
+            fullTxt.text = _slider.maxValue.ToString();
         }
 
         private void SliderChange() {
             int currentFuelUnits = _cargoController.GetCargoOfType<Fuel>().Count;
-            int total = (int)slider.value;
+            int total = (int)_slider.value;
             int change = total - currentFuelUnits;
             TextMeshProUGUI totalTxt = GameObject.Find("TotalValue").GetComponentInChildren<TextMeshProUGUI>();
             totalTxt.text = total.ToString();
@@ -77,7 +77,7 @@ namespace Code.GUI.SpaceStations.Services {
 
         private void PurchaseBtnClick() {
             int currentFuelUnits = _cargoController.GetCargoOfType<Fuel>().Count;
-            int fuelChange = (int)slider.value - currentFuelUnits;
+            int fuelChange = (int)_slider.value - currentFuelUnits;
             if (fuelChange > 0) {
                 List<Cargo> fuel = new List<Cargo>();
                 for (int i = 0; i < fuelChange; i++) {

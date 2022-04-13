@@ -271,6 +271,8 @@ namespace Code._Galaxy._Factions {
         public abstract List<(Type mainThrusterType, int spawnWeighting)> GetAllowedMainThrusters();
         public abstract List<(Type powerPlantType, int spawnWeighting)> GetAllowedPowerPlants();
         public abstract List<(Type shieldType, int spawnWeighting)> GetAllowedShields();
+        public abstract List<(Type productType, float productionMult, float priceMult)> GetProductionMultipliers();
+        
     }
 
     public static class FactionTypeExtension {

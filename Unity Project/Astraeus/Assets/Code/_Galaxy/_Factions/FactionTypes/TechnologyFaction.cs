@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using Code._Cargo.ProductTypes.Commodity.Exotic;
+using Code._Cargo.ProductTypes.Commodity.Industrial;
+using Code._Cargo.ProductTypes.Commodity.Organic;
+using Code._Cargo.ProductTypes.Commodity.Tech;
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._Galaxy._SolarSystem._CelestialObjects.BlackHole;
 using Code._Galaxy._SolarSystem._CelestialObjects.Star;
-using Code._Ships.ShipComponents;
-using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters.Types;
-using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons.Types;
 using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
 using Code._Ships.ShipComponents.InternalComponents.Shields;
@@ -44,6 +45,10 @@ namespace Code._Galaxy._Factions.FactionTypes {
 
         public override List<(Type shieldType, int spawnWeighting)> GetAllowedShields() {
             return new List<(Type shieldType, int spawnWeighting)>() { (typeof(ShieldHighRecharge), 1), (typeof(ShieldHighCapacity), 1) };
+        }
+
+        public override List<(Type productType, float productionMult, float priceMult)> GetProductionMultipliers() {
+            return new List<(Type productType, float productionMult, float priceMult)>() { (typeof(OrganicProduct), .2f, 3), (typeof(IndustrialProduct), 1, 4), (typeof(TechProduct), 5, 1), (typeof(ExoticProduct), 1, 1) };
         }
     }
 }

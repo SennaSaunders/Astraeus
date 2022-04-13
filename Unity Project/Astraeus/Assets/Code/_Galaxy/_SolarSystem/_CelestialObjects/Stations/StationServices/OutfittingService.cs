@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using Code._Galaxy._Factions;
 using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters.Types;
@@ -11,7 +13,26 @@ using Code._Ships.ShipComponents.InternalComponents.Storage;
 namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
     public class OutfittingService : StationService {
         private List<(Type componentType,ShipComponentTier tier)> AvailableComponents { get; } = new List<(Type, ShipComponentTier)>();
-        
+
+        public OutfittingService(Faction faction) {
+            // add faction specific components to outfitting
+            List<Type> componentTypes = new List<Type>();
+            componentTypes.AddRange(faction.GetAllowedWeapons().Select(aw => aw.weaponType).ToList());
+            componentTypes.AddRange(faction.GetAllowedMainThrusters().Select(mt => mt.mainThrusterType).ToList());
+            componentTypes.AddRange(faction.GetAllowedPowerPlants().Select(pp => pp.powerPlantType).ToList());
+            componentTypes.AddRange(faction.GetAllowedShields().Select(s => s.shieldType).ToList());
+
+            foreach (Type componentType in componentTypes) {
+                Type t = typeof(OutfittingService);
+                MethodInfo addAvailableComponentsMethod = t.GetMethod("AddAvailableComponents");
+                MethodInfo genericMethod = addAvailableComponentsMethod.MakeGenericMethod(componentType);
+                genericMethod.Invoke(this, null);
+            }
+                    
+            AddAvailableComponents<ManoeuvringThruster>();
+            AddAvailableComponents<CargoBay>();
+        }
+
         protected override void SetGUIStrings() {
             ServiceName = "Outfitting";
             GUIPath = "GUIPrefabs/Station/Services/Outfitting/OutfittingGUI";

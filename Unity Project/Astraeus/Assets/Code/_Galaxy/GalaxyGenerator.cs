@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
@@ -11,8 +10,6 @@ using Code._Galaxy._SolarSystem._CelestialObjects.Star;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
 using Code._Galaxy.GalaxyComponents;
-using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
-using Code._Ships.ShipComponents.InternalComponents.Storage;
 using Code.TextureGen;
 using UnityEngine;
 using Random = System.Random;
@@ -100,27 +97,7 @@ namespace Code._Galaxy {
                     //only refuel and repair should be everywhere
                     //for the moment just instantiate the outfitter with the faction specific parts
 
-                    OutfittingService outfittingService = new OutfittingService();
-
-                    // add faction specific components to outfitting
-                    List<Type> componentTypes = new List<Type>();
-                    componentTypes.AddRange(faction.GetAllowedWeapons().Select(aw => aw.weaponType).ToList());
-                    componentTypes.AddRange(faction.GetAllowedMainThrusters().Select(mt => mt.mainThrusterType).ToList());
-                    componentTypes.AddRange(faction.GetAllowedPowerPlants().Select(pp => pp.powerPlantType).ToList());
-                    componentTypes.AddRange(faction.GetAllowedShields().Select(s => s.shieldType).ToList());
-
-                    foreach (Type componentType in componentTypes) {
-                        Type t = typeof(OutfittingService);
-                        MethodInfo addAvailableComponentsMethod = t.GetMethod("AddAvailableComponents");
-                        MethodInfo genericMethod = addAvailableComponentsMethod.MakeGenericMethod(componentType);
-                        genericMethod.Invoke(outfittingService, null);
-                    }
-                    
-                    outfittingService.AddAvailableComponents<ManoeuvringThruster>();
-                    outfittingService.AddAvailableComponents<CargoBay>();
-                    
-
-                    spaceStation.StationServices = new List<StationService>() { new RefuelService(), new RepairService(), new ShipyardService(), outfittingService };
+                    spaceStation.StationServices = new List<StationService>() { new RefuelService(), new RepairService(), new ShipyardService(), new OutfittingService(faction), new TradeService(faction, solarSystem) };
                     solarSystem.Bodies.Add(spaceStation);
                 }
             }
