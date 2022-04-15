@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Code._Cargo;
 
@@ -10,7 +11,20 @@ namespace Code._Ships.ShipComponents.InternalComponents.Storage {
             _cargoBays = cargoBays;
         }
 
-        public bool AddCargo(List<Cargo> newCargo) {
+        public List<Type> GetCargoTypes() {
+            List<Type> cargoTypes = new List<Type>();
+            foreach (CargoBay cargoBay in _cargoBays) {
+                foreach (Cargo cargo in cargoBay.StoredCargo) {
+                    if (!cargoTypes.Contains(cargo.GetType())) {
+                        cargoTypes.Add(cargo.GetType());
+                    }
+                }
+            }
+
+            return cargoTypes;
+        }
+
+        public void AddCargo(List<Cargo> newCargo) {
             if (newCargo.Count <= GetFreeCargoSpace()) {
                 for (int i = 0; i < _cargoBays.Count; i++) {
                     for (int j = _cargoBays[i].StoredCargo.Count; j < _cargoBays[i].CargoVolume; j++) {
@@ -24,9 +38,7 @@ namespace Code._Ships.ShipComponents.InternalComponents.Storage {
                         }
                     }
                 }
-                return true;
             }
-            return false;
         }
 
         public void RemoveCargo(List<Cargo> cargoToRemove) {
@@ -64,20 +76,18 @@ namespace Code._Ships.ShipComponents.InternalComponents.Storage {
             return GetMaxCargoSpace() - GetUsedCargoSpace();
         }
 
-        public List<T> GetCargoOfType<T>() where T : Cargo {
-            List<T> cargo = new List<T>();
-            foreach (CargoBay cargoBay in _cargoBays) {
-                cargo.AddRange(cargoBay.StoredCargo.Where(c => c.GetType() == typeof(T)).Cast<T>().ToList());
+        public List<Cargo> GetCargoOfType(Type cargoType) {
+            List<Cargo> cargo = new List<Cargo>();
+            foreach (CargoBay cargoBay in _cargoBays){
+                cargo.AddRange(cargoBay.StoredCargo.Where(c=> c.GetType()==cargoType));
             }
 
             return cargo;
         }
-
-        public List<T> GetCargoOfType<T>(int amount) where T : Cargo {
-            List<T> cargo = GetCargoOfType<T>();
+        public List<Cargo> GetCargoOfType(Type cargoType, int amount)  {
+            List<Cargo> cargo = GetCargoOfType(cargoType);
             cargo.RemoveRange(0, cargo.Count-amount);
             return cargo;
         }
-
     }
 }

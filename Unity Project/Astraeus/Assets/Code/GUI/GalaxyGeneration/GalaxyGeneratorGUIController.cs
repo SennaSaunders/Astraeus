@@ -17,8 +17,8 @@ namespace Code.GUI.GalaxyGeneration {
         private Thread _textureGenerationThread;
         
         private bool _startedGalaxyGen;
-        private bool _finishedgalaxyGen = false;
-        private bool _startedTextureGen = false;
+        private bool _finishedGalaxyGen;
+        private bool _startedTextureGen;
         public void Start() {
             SetGUIGameObject();
             _generator = gameObject.AddComponent<GalaxyGenerator>();
@@ -133,6 +133,7 @@ namespace Code.GUI.GalaxyGeneration {
         
         private void GenerateGalaxy() {
             StartLoadingScreen();
+            _generator.SetPotentialSystemNames();
             _galaxyGenerationThread = new Thread(() => {
                 _galaxy = _generator.GenGalaxy();
             });
@@ -183,13 +184,13 @@ namespace Code.GUI.GalaxyGeneration {
                         _startedGalaxyGen = !_startedGalaxyGen;
                     }
                 }
-                else if(!_finishedgalaxyGen){
+                else if(!_finishedGalaxyGen){
                     Debug.Log("Finished Generating Galaxy");
-                    _finishedgalaxyGen = true;
+                    _finishedGalaxyGen = true;
                 }
             }
 
-            if (_finishedgalaxyGen) {
+            if (_finishedGalaxyGen) {
                 if (!_startedTextureGen) {
                     Debug.Log("Initialising Game Controller");
                     InitialiseGameController();

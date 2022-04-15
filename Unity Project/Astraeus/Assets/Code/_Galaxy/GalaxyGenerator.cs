@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem;
@@ -26,13 +27,29 @@ namespace Code._Galaxy {
         public GalaxyGeneratorInput width = new GalaxyGeneratorInput(50, 2000, 1000);
         public GalaxyGeneratorInput height = new GalaxyGeneratorInput(50, 2000, 1000);
         public GalaxyGeneratorInput systemExclusionDistance = new GalaxyGeneratorInput(5, 20, 5);
+        private List<string> potentialSystemNames;
 
         public GalaxyStats stats;
+        
 
         private bool IsRareRoll(int rarePercentageChance) {
             int maxRoll = 100;
             int rareRoll = maxRoll - rarePercentageChance;
             return Rng.Next(maxRoll) > rareRoll;
+        }
+
+        //has to be called before galaxy generation as getting Application.dataPath has to be on the main thread
+        public void SetPotentialSystemNames() { 
+            Debug.Log(Application.dataPath);
+            string path = Application.dataPath + "/Resources/SystemNames/System Names.txt";
+            string[] lines = File.ReadAllLines(path);
+            
+            potentialSystemNames = new List<string>();
+            foreach (string line in lines) {
+                if (!line.StartsWith("*")) {
+                    potentialSystemNames.Add(line);
+                }
+            }
         }
 
         //Generates a galaxy
@@ -279,8 +296,11 @@ namespace Code._Galaxy {
             if (systemSize < stats.smallestSystem) {
                 stats.smallestSystem = systemSize;
             }
+            
+            string systemName = potentialSystemNames[Rng.Next(potentialSystemNames.Count)];
+            potentialSystemNames.Remove(systemName);
 
-            return new SolarSystem(systemCoordinate, primary, celestialBodies);
+            return new SolarSystem(systemCoordinate, primary, celestialBodies, systemName);
         }
 
         private List<Body> SetupPositions(List<Body> bodies) {

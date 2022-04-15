@@ -29,7 +29,7 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
                 float powerDrawEffectiveness = _powerPlantController.DrainPower(ControlledWeapon.PowerDraw);
                 if (powerDrawEffectiveness > 0) { //only fires if there is power to expend
                     float damage = ControlledWeapon.Damage * powerDrawEffectiveness;
-                    GameObject projectileSpawnPoint = FindChildGameObject.FindChild(ControlledWeapon.InstantiatedGameObject, "ProjectileSpawn");
+                    GameObject projectileSpawnPoint = GameObjectHelper.FindChild(ControlledWeapon.InstantiatedGameObject, "ProjectileSpawn");
                     Projectile projectile = projectileSpawnPoint.AddComponent<Projectile>();
                     projectile.transform.position = projectileSpawnPoint.transform.position;
                     Quaternion turretRotation = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z);

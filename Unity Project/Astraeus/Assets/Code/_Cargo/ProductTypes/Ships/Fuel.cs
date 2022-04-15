@@ -6,9 +6,10 @@
             MaxEnergy = maxEnergy;
             Capacity = 1;
         }
-
+        
         public float MaxEnergy { get; private set; }
         public float Capacity { get; set; } // defines how full this unit of fuel is from 0 - 1
+        public static int fuelPrice = 5;
         public override float GetMass() {
             return mass * Capacity;
         }

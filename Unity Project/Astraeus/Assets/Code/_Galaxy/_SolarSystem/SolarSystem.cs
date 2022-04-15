@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem._CelestialObjects;
+using Code._Galaxy._SolarSystem._CelestialObjects.BlackHole;
 using Code._Galaxy._SolarSystem._CelestialObjects.Planet;
+using Code._Galaxy._SolarSystem._CelestialObjects.Star;
 using Code._Galaxy.GalaxyComponents;
+using Code.TextureGen;
 using UnityEngine;
 
 namespace Code._Galaxy._SolarSystem {
@@ -12,14 +15,21 @@ namespace Code._Galaxy._SolarSystem {
         public List<Body> Bodies { get; set; }
         public Body Primary { get; }
 
+        public string SystemName;
+
         public Faction OwnerFaction { get; set; }
+
+        public SolarSystemStats SystemStats;
         
-        public SolarSystem(Vector2 coordinate, Body primary, List<Body> bodies) {
+        public SolarSystem(Vector2 coordinate, Body primary, List<Body> bodies, string systemName) {
             Coordinate = coordinate;
             Bodies = bodies;
             Primary = primary;
-
+            SetSystemStats(Bodies);
+            SystemName = systemName;
         }
+
+        
 
         public void GenerateSolarSystemColours() {
             for (int i =0;i<Bodies.Count; i++) {
@@ -37,6 +47,33 @@ namespace Code._Galaxy._SolarSystem {
                     ((Planet)currentBody).GeneratePlanetTexture();
                 }
             }
+        }
+        
+        private void SetSystemStats(List<Body> bodies) {
+            SolarSystemStats systemStats = new SolarSystemStats();
+            foreach (Body body in bodies) {
+                if (body.GetType().IsSubclassOf(typeof(CelestialBody))) {
+                    if (body.GetType() == typeof(BlackHole)) {
+                        systemStats.blackHoleCount++;
+                    }else if (body.GetType() == typeof(Star)) {
+                        systemStats.starCount++;
+                    }else if (body.GetType() == typeof(Planet)) {
+                        systemStats.planetCount++;
+                        if (((Planet)body).PlanetGen.GetType() == typeof(EarthWorldGen)) {
+                            systemStats.earthWorldCount++;
+                        } else if (((Planet)body).PlanetGen.GetType() == typeof(WaterWorldGen)) {
+                            systemStats.waterWorldCount++;
+                        }
+                        else if (((Planet)body).PlanetGen.GetType() == typeof(RockyWorldGen)) {
+                            systemStats.rockyWorldCount++;
+                        }
+                    }
+
+                    systemStats.celestialBodyCount++;
+                }
+            }
+
+            SystemStats = systemStats;
         }
 
         // public static float GetFurthestDistance(List<Body> bodies) {

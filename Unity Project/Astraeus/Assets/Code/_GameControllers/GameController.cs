@@ -4,6 +4,7 @@ using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
+using Code._PlayerProfile;
 using Code._Ships;
 using Code._Ships.Controllers;
 using Code._Ships.ShipComponents;
@@ -19,6 +20,8 @@ namespace Code._GameControllers {
         public static GameGUIController _guiController;
         public static SolarSystem _currentSolarSystem;
         public const int ShipZ = SolarSystemController.ZOffset - 100;
+
+        public static PlayerProfile PlayerProfile = new PlayerProfile();
         public static Ship CurrentShip { get; set; }
         private GameObject _playerShipContainer;
         private PlayerShipController _playerShipController;

@@ -2,6 +2,7 @@
 using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters.Types;
+using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -18,7 +19,8 @@ namespace Tests {
             List<ManoeuvringThruster> manoeuvringThrusters=new List<ManoeuvringThruster>();
             ManoeuvringThruster manoeuvringThruster = new ManoeuvringThruster(ShipComponentTier.T1);
             List<float> centerOffsets = new List<float>(){-5,-5,5,5};
-            // _thrusterController = new ThrusterController(mainThrusters, (manoeuvringThruster, centerOffsets), shipMass);
+            int shipMass = 1000;
+            _thrusterController = new ThrusterController(mainThrusters, (manoeuvringThruster, centerOffsets), shipMass, new PowerPlantController(new List<PowerPlant>()));
         }
 
         [Test]

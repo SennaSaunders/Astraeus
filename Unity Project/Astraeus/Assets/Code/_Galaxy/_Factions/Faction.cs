@@ -14,7 +14,7 @@ using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
 using Code._Ships.ShipComponents.InternalComponents.Shields;
 
 namespace Code._Galaxy._Factions {
-    public abstract class Faction{
+    public abstract class Faction {
         public enum FactionType {
             Agriculture,
             Commerce,
@@ -23,6 +23,7 @@ namespace Code._Galaxy._Factions {
             Pirate,
             Technology
         }
+
         protected Faction(SolarSystem homeSystem, FactionType factionType) {
             HomeSystem = homeSystem;
             Systems = new List<SolarSystem>();
@@ -31,13 +32,18 @@ namespace Code._Galaxy._Factions {
 
             GroupName = factionType.GetFactionGroupNameList()[GalaxyGenerator.Rng.Next(this.factionType.GetFactionGroupNameList().Count)];
         }
-        
+
         public FactionType factionType { get; }
         public SolarSystem HomeSystem { get; }
         public List<SolarSystem> Systems { get; }
         public List<Sector> Sectors { get; } = new List<Sector>();
-        public string GroupName { get; }
-        
+        private string GroupName;
+
+        public string GetFactionName() {
+            return HomeSystem.SystemName + " " + GroupName;
+        }
+
+
         public void AddSector(Sector sector) {
             if (!Sectors.Contains(sector)) {
                 Sectors.Add(sector);
@@ -58,21 +64,21 @@ namespace Code._Galaxy._Factions {
                 Planet planet = (Planet)body;
                 foreach ((Type type, Body.BodyTier tier, int desire) typeDesire in desireValues) {
                     if (planet.PlanetGen.GetType() == typeDesire.type) {
-                        return typeDesire.desire*(int)body.Tier;
+                        return typeDesire.desire * (int)body.Tier;
                     }
                 }
             }
             else if (body.GetType() == typeof(Star) && desireValues.Select(dv => dv.tier).Contains(body.Tier)) {
                 foreach ((Type type, Body.BodyTier tier, int desire) typeDesire in desireValues) {
                     if (body.Tier == typeDesire.tier && body.GetType() == typeDesire.type) {
-                        return typeDesire.desire*(int)body.Tier;
+                        return typeDesire.desire * (int)body.Tier;
                     }
                 }
             }
             else {
                 foreach ((Type type, Body.BodyTier tier, int desire) typeDesire in desireValues) {
                     if (body.GetType() == typeDesire.type) {
-                        return typeDesire.desire*(int)body.Tier;
+                        return typeDesire.desire * (int)body.Tier;
                     }
                 }
             }
@@ -164,9 +170,9 @@ namespace Code._Galaxy._Factions {
                         potentialNewSystems.Add((factionType.GetPreCalcSystemDesire(solarSystem), solarSystem));
                     }
                 }
-                
+
                 // Need to modify the desire by the distance to the nearest system/sector
-                
+
                 List<(float closestDistance, int desire, SolarSystem solarSystem)> newSystems = new List<(float closestDistance, int desire, SolarSystem solarSystem)>();
 
                 foreach ((int desire, SolarSystem newSystem) potentialNewSystem in potentialNewSystems) {
@@ -191,9 +197,10 @@ namespace Code._Galaxy._Factions {
                         float distance = ownedSectorTile.GetDistanceToTile(newSectorTile);
                         distanceToClosestSector = distanceToClosestSector > distance ? distance : distanceToClosestSector;
                     }
+
                     newSectors.Add((distanceToClosestSector, potentialNewSector.desire, potentialNewSector.sector));
                 }
-                
+
                 List<(float weightedDesire, Sector sector)> weightedNewSectors = new List<(float weightedDesire, Sector sector)>();
                 foreach ((float closestDistance, int desire, Sector sector) newSector in newSectors) {
                     float weightedDesire;
@@ -209,6 +216,7 @@ namespace Code._Galaxy._Factions {
                     else {
                         weightedDesire = newSector.desire / newSector.closestDistance;
                     }
+
                     weightedNewSectors.Add((weightedDesire, newSector.sector));
                 }
 
@@ -227,9 +235,10 @@ namespace Code._Galaxy._Factions {
                     else {
                         weightedDesire = newSystem.desire / newSystem.closestDistance;
                     }
+
                     weightedNewSystems.Add((weightedDesire, newSystem.solarSystem));
                 }
-                
+
                 //choose the most desirable system or sector
                 weightedNewSectors = weightedNewSectors.OrderByDescending(s => s.weightedDesire).ToList();
                 weightedNewSystems = weightedNewSystems.OrderByDescending(s => s.weightedDesire).ToList();
@@ -254,6 +263,7 @@ namespace Code._Galaxy._Factions {
                         AddSolarSystem(bestInSector);
                         return true;
                     }
+
                     AddSolarSystem(bestSystem.solarSystem);
                     return true;
                 }
@@ -272,7 +282,6 @@ namespace Code._Galaxy._Factions {
         public abstract List<(Type powerPlantType, int spawnWeighting)> GetAllowedPowerPlants();
         public abstract List<(Type shieldType, int spawnWeighting)> GetAllowedShields();
         public abstract List<(Type productType, float productionMult, float priceMult)> GetProductionMultipliers();
-        
     }
 
     public static class FactionTypeExtension {
@@ -471,6 +480,7 @@ namespace Code._Galaxy._Factions {
             foreach (Body body in solarSystem.Bodies) {
                 desireSum += factionType.CelestialBodyDesire((CelestialBody)body);
             }
+
             return desireSum; //if generic factions are desired this can be altered to allow for them
         }
 

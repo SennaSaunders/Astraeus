@@ -58,7 +58,7 @@ namespace Tests {
                 t3WaterPlanet,
                 t5WaterPlanet
             };
-            solarSystem = new SolarSystem(vector2, null, bodies);
+            solarSystem = new SolarSystem(vector2, null, bodies, "");
 
             agricultureBodyValues = new List<int>() { 7,8,9,-900,1,2,3,200,250,300,50,150,250};
             commerceBodyValues = new List<int>() {7,8,9,-900,1,2,3,4,5,6,1,3,5 };

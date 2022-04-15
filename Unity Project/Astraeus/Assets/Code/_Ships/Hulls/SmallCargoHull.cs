@@ -51,6 +51,12 @@ namespace Code._Ships.Hulls {
             InternalComponents = internalComponents;
         }
 
-        
+        public override void SetColourChannelObjectMap() {
+            ColourChannelObjectMap = new List<(List<string> objectName, Color colour)>() {
+                (new List<string>() { "Hull" }, new Color(.2f, 0, .6f)),
+                (new List<string>() { "Cockpit" }, new Color(.1f, .1f, .1f)),
+                (new List<string>() { "RearDoor" }, new Color(.3f, .3f, .2f))
+            };
+        }
     }
 }

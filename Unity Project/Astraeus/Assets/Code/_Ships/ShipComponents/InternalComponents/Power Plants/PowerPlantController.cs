@@ -48,7 +48,8 @@ namespace Code._Ships.ShipComponents.InternalComponents.Power_Plants {
             return 0;
         }
 
-        public void ChargePowerPlant(float deltaTime, List<Fuel> fuel) {
+        public List<Fuel> ChargePowerPlant(float deltaTime, List<Fuel> fuel) {
+            List<Fuel> depletedFuel = new List<Fuel>();
             foreach (PowerPlant powerPlant in _powerPlants) {
                 if (powerPlant.Depleted) {
                     powerPlant.CurrentDepletionTime += deltaTime; // add time to depletion timer
@@ -71,6 +72,7 @@ namespace Code._Ships.ShipComponents.InternalComponents.Power_Plants {
                     if (usedFuelEnergy + currentFuelEnergy <= maxEnergyCharged) {
                         usedFuelEnergy += currentFuelEnergy;
                         fuel.Remove(currentFuel);
+                        depletedFuel.Add(currentFuel);
                     }
                     else {
                         float epsilon = 0.0001f;
@@ -88,6 +90,8 @@ namespace Code._Ships.ShipComponents.InternalComponents.Power_Plants {
 
                 powerPlant.CurrentEnergy += usedFuelEnergy;
             }
+
+            return depletedFuel;
         }
     }
 }

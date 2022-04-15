@@ -1,4 +1,7 @@
-﻿namespace Code._Ships.ShipComponents.ExternalComponents.Weapons.Types {
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+namespace Code._Ships.ShipComponents.ExternalComponents.Weapons.Types {
     public class BallisticCannon : Weapon {
         private static float minTierFireDelay = .75f;
         private static float maxTierFireDelay = 1.5f;
@@ -19,6 +22,15 @@
 
         public override string GetProjectilePath() {
             return base.GetProjectilePath() + "PhysicalProjectile";
+        }
+
+        public override void SetColourChannelObjectMap() {
+            ColourChannelObjectMap = new List<(List<string> objectName, Color colour)>() {
+                (new List<string>() { "TurretBase" }, Color.black),
+                (new List<string>() { "GunBarrel", "RecoilCompensator" }, new Color(.2f,.2f,.2f)),
+                (new List<string>() { "TurretSpindle", "GunBase" }, new Color(.2f,.2f,.5f)),
+                (new List<string>() { "GunBack" }, new Color(.2f,.2f,.5f))
+            };
         }
     }
 }

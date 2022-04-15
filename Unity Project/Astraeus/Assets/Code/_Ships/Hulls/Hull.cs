@@ -22,6 +22,9 @@ namespace Code._Ships.Hulls {
         public (ShipComponentType componentType, ShipComponentTier maxSize, ManoeuvringThruster concreteComponent, string selectionTransformName, List<(string parentTransformName, float centerOffset)> thrusters) ManoeuvringThrusterComponents;
         public List<List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string parentTransformName,bool needsBracket)>> TiedThrustersSets = new List<List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string parentTransformName,bool needsBracket)>>();  
         public float HullMass;
+        public List<GameObject> MeshObjects;
+        public List<(List<string> objectName, Color colour)> ColourChannelObjectMap;
+        
         public Vector3 OutfittingPosition { get; set; }
         public Quaternion OutfittingRotation { get; } = Quaternion.Euler(50, 0, -30);
 
@@ -36,5 +39,6 @@ namespace Code._Ships.Hulls {
         public abstract void SetThrusterComponents();
         public abstract void SetWeaponComponents();
         public abstract void SetInternalComponents();
+        public abstract void SetColourChannelObjectMap();
     }
 }

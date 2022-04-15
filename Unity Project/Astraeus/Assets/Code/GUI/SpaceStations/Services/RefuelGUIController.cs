@@ -6,6 +6,7 @@ using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
 using Code._GameControllers;
 using Code._Ships.Controllers;
 using Code._Ships.ShipComponents.InternalComponents.Storage;
+using Code._Utility;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,19 +19,37 @@ namespace Code.GUI.SpaceStations.Services {
         private CargoController _cargoController;
         private Slider _slider;
 
+        private GameObject notEnoughCreditsMsg;
+        private float creditMsgTime = 3;
+        private float creditMsgCountdown = 0;
+
         public void StartRefuelGUI(RefuelService refuelService, StationGUIController stationGUIController) {
             _refuelService = refuelService;
             _stationGUIController = stationGUIController;
             SetupGUI();
+        }
+        
+        private void Update() {
+            if (notEnoughCreditsMsg != null) {
+                if (notEnoughCreditsMsg.activeSelf) {
+                    creditMsgCountdown -= Time.deltaTime;
+                    if (creditMsgCountdown <= 0) {
+                        notEnoughCreditsMsg.SetActive(false);
+                    }
+                }
+            }
         }
 
         private void SetupGUI() {
             _stationGUIController.stationGUI.SetActive(false);
             _guiGameObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_refuelService.GUIPath));
             _cargoController = GameController.CurrentShip.ShipObject.GetComponent<ShipController>().CargoController;
+            notEnoughCreditsMsg = GameObjectHelper.FindChild(_guiGameObject, "NotEnoughCredits");
+            notEnoughCreditsMsg.SetActive(false);
             SetupHomeBtn();
             SetupSlider();
             SetupPurchaseBtn();
+            UpdateCredits();
         }
 
         private void SetupHomeBtn() {
@@ -52,7 +71,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void UpdateGUIValues() {
-            int currentFuelUnits = _cargoController.GetCargoOfType<Fuel>().Count;
+            int currentFuelUnits = _cargoController.GetCargoOfType(typeof(Fuel)).Count;
             _slider.minValue = 0;
             _slider.value = currentFuelUnits;
             _slider.maxValue = _cargoController.GetFreeCargoSpace() + currentFuelUnits;
@@ -61,13 +80,26 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void SliderChange() {
-            int currentFuelUnits = _cargoController.GetCargoOfType<Fuel>().Count;
+            int currentFuelUnits = _cargoController.GetCargoOfType(typeof(Fuel)).Count;
             int total = (int)_slider.value;
             int change = total - currentFuelUnits;
             TextMeshProUGUI totalTxt = GameObject.Find("TotalValue").GetComponentInChildren<TextMeshProUGUI>();
             totalTxt.text = total.ToString();
             TextMeshProUGUI changeTxt = GameObject.Find("ChangeValue").GetComponentInChildren<TextMeshProUGUI>();
             changeTxt.text = change <= 0 ? change.ToString() : "+" + change;
+            UpdateCredits();
+        }
+
+        private void UpdateCredits() {
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsCurrentValue", GameController.PlayerProfile._credits.ToString());
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsChangeValue", GetChangeInFunds().ToString());
+        }
+
+        private int GetChangeInFunds() {
+            int currentFuelUnits = _cargoController.GetCargoOfType(typeof(Fuel)).Count;
+            int total = (int)_slider.value;
+            int change = total - currentFuelUnits;
+            return -change * Fuel.fuelPrice;
         }
 
         private void SetupPurchaseBtn() {
@@ -76,32 +108,36 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void PurchaseBtnClick() {
-            int currentFuelUnits = _cargoController.GetCargoOfType<Fuel>().Count;
+            int currentFuelUnits = _cargoController.GetCargoOfType(typeof(Fuel)).Count;
             int fuelChange = (int)_slider.value - currentFuelUnits;
-            if (fuelChange > 0) {
-                List<Cargo> fuel = new List<Cargo>();
-                for (int i = 0; i < fuelChange; i++) {
-                    fuel.Add(_refuelService.GetFuel());
-                }
+            if (GameController.PlayerProfile.ChangeCredits(GetChangeInFunds())) {
+                if (fuelChange > 0) {
+                    List<Cargo> fuel = new List<Cargo>();
+                    for (int i = 0; i < fuelChange; i++) {
+                        fuel.Add(_refuelService.GetFuel());
+                    }
 
-                bool addedFuel = _cargoController.AddCargo(fuel);
-                if (addedFuel) {
-                    Debug.Log("Successful purchase");
+                    _cargoController.AddCargo(fuel);
+
                     UpdateGUIValues();
                     SliderChange();
                 }
-                else {
-                    Debug.Log("Failed to refuel");
+                else if (fuelChange < 0) {
+                    Debug.Log("Removing fuel");
+                    List<Cargo> fuelToSell = new List<Cargo>();
+                    fuelToSell.AddRange(_cargoController.GetCargoOfType(typeof(Fuel), fuelChange * -1).ToList());
+                    _cargoController.RemoveCargo(fuelToSell);
+                    UpdateGUIValues();
+                    SliderChange();
                 }
             }
-            else if(fuelChange<0) {
-                Debug.Log("Removing fuel");
-                List<Cargo> fuelToSell = new List<Cargo>(); 
-                fuelToSell.AddRange(_cargoController.GetCargoOfType<Fuel>(fuelChange*-1).ToList());
-                _cargoController.RemoveCargo(fuelToSell);
-                UpdateGUIValues();
-                SliderChange();
+            else {
+                NotEnoughCredits();
             }
+        }
+        private void NotEnoughCredits() {
+            notEnoughCreditsMsg.SetActive(true);
+            creditMsgCountdown = creditMsgTime;
         }
     }
 }

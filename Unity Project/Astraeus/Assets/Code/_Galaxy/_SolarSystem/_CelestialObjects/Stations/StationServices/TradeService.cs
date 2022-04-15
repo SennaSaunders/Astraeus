@@ -27,16 +27,12 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
             GUIPath = "GUIPrefabs/Station/Services/Trade/TradeGUI";
         }
 
-        public void SetupPlayerProducts() {
-            
-        }
-
         private void SetupProducts() {
             if (Products == null) {
                 Products = new List<(Type productType, int quantity, int price)>();
                 List<(Type productType, float productionMult, float priceMult)> productModifiers = _faction.GetProductionMultipliers();
                 foreach ((Type productType, float productionMult, float priceMult) productModifier in productModifiers) {
-                    if (productModifier.productionMult > 0) {
+                    
                         if (productModifier.productType == typeof(OrganicProduct)) {
                             SetupOrganics(productModifier.productionMult, productModifier.priceMult);
                         }
@@ -46,7 +42,7 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
                         else if (productModifier.productType == typeof(TechProduct)) {
                             SetupTechProducts(productModifier.productionMult, productModifier.priceMult);
                         }
-                    }
+                    
                 }
             }
         }
@@ -68,10 +64,8 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
                     }
                 }
             }
-
-            if (quantity > 0) {
-                Products.Add((productType, quantity, price));
-            }
+            
+            Products.Add((productType, quantity, price));
         }
 
         private void SetupOrganics(float productionMult, float priceMult) {

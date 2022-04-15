@@ -12,6 +12,7 @@ using Code._Ships.ShipComponents.InternalComponents;
 using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
 using Code._Ships.ShipComponents.InternalComponents.Shields;
 using Code._Ships.ShipComponents.InternalComponents.Storage;
+using Code._Utility;
 using Code.Camera;
 using Code.GUI.Utility;
 using TMPro;
@@ -55,7 +56,7 @@ namespace Code.GUI.SpaceStations.Services {
             _stationGUIController = stationGUIController;
             _stationGUIController.stationGUI.SetActive(false);
             _gameController = gameController;
-            
+
             SetupCamera();
             SetupGUI();
             DisplayShip();
@@ -75,6 +76,17 @@ namespace Code.GUI.SpaceStations.Services {
             Button homeBtn = GameObject.Find("HomeBtn").GetComponent<Button>();
             homeBtn.onClick.AddListener(ExitOutfitting);
         }
+
+        private void SetupColourBtn() {
+            Button colourBtn = GameObject.Find("ColourBtn").GetComponent<Button>();
+            colourBtn.onClick.AddListener(ColourBtnClick);
+        }
+
+        private void ColourBtnClick() {
+            ShipColourGUIController shipColourGUIController = gameObject.AddComponent<ShipColourGUIController>();
+            shipColourGUIController.SetupGUI(this, _guiGameObject);
+        }
+
 
         private void ExitOutfitting() {
             _gameController.RefreshPlayerShip();
@@ -112,6 +124,7 @@ namespace Code.GUI.SpaceStations.Services {
         private void SetupBtns() {
             SetupComponentBtns();
             SetupHomeBtn();
+            SetupColourBtn();
         }
 
         private void SetupComponentBtns() {
@@ -210,7 +223,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         //display methods
-        private void DisplayComponents<T>(Action<(Type type, ShipComponentTier)> displayFunc) where T:ShipComponent {
+        private void DisplayComponents<T>(Action<(Type type, ShipComponentTier)> displayFunc) where T : ShipComponent {
             var components = _outfittingService.GetComponentsOfType(typeof(T));
             //add tier in here
             foreach (var component in components) {
@@ -250,7 +263,7 @@ namespace Code.GUI.SpaceStations.Services {
             DisplayComponents<PowerPlant>(DisplayPowerPlant);
         }
 
-        private (Transform, T) DisplayShipComponentCard<T>(Type componentType, ShipComponentTier tier, string cardPath) where T:ShipComponent {
+        private (Transform, T) DisplayShipComponentCard<T>(Type componentType, ShipComponentTier tier, string cardPath) where T : ShipComponent {
             T shipComponent = (T)Activator.CreateInstance(componentType, tier);
             GameObject cardObject = CreateComponentCard(cardPath, componentType, tier);
             Transform cardComponents = cardObject.transform.Find("Details");
@@ -259,65 +272,41 @@ namespace Code.GUI.SpaceStations.Services {
 
         private void DisplayThrusterCard((Type thrusterType, ShipComponentTier tier) thruster) {
             (Transform cardComponents, Thruster thrusterInstance) = DisplayShipComponentCard<Thruster>(thruster.thrusterType, thruster.tier, _thrusterCardPath);
-
-            TextMeshProUGUI title = cardComponents.Find("ComponentName").GetComponent<TextMeshProUGUI>();
-            title.text = thrusterInstance.ComponentName + " - " + thrusterInstance.ComponentSize;
-            TextMeshProUGUI force = cardComponents.Find("Force").GetComponent<TextMeshProUGUI>();
-            force.text = thrusterInstance.Force + " N";
-            TextMeshProUGUI powerDraw = cardComponents.Find("PowerDraw").GetComponent<TextMeshProUGUI>();
-            powerDraw.text = thrusterInstance.PowerDraw + " GW/s";
-            TextMeshProUGUI mass = cardComponents.Find("Mass").GetComponent<TextMeshProUGUI>();
-            mass.text = (thrusterInstance.ComponentMass / 1000) + " T";
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "ComponentName", thrusterInstance.ComponentName + " - " + thrusterInstance.ComponentSize);
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Force", thrusterInstance.Force + " N");
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "PowerDraw", thrusterInstance.PowerDraw + " GW/s");
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "PowerDraw", thrusterInstance.ComponentMass / 1000 + " T");
         }
 
         private void DisplayWeaponCard((Type weaponType, ShipComponentTier tier) weapon) {
             (Transform cardComponents, Weapon weaponInstance) = DisplayShipComponentCard<Weapon>(weapon.weaponType, weapon.tier, _weaponCardPath);
-
-            TextMeshProUGUI title = cardComponents.Find("ComponentName").GetComponent<TextMeshProUGUI>();
-            title.text = weaponInstance.ComponentName + " - " + weaponInstance.ComponentSize;
-            TextMeshProUGUI damage = cardComponents.Find("Damage").GetComponent<TextMeshProUGUI>();
-            damage.text = weaponInstance.Damage + " DMG";
-            TextMeshProUGUI rateOfFire = cardComponents.Find("RoF").GetComponent<TextMeshProUGUI>();
-            rateOfFire.text = 60/weaponInstance.FireDelay + " RPM";
-            TextMeshProUGUI mass = cardComponents.Find("Mass").GetComponent<TextMeshProUGUI>();
-            mass.text = (weaponInstance.ComponentMass / 1000) + " T";
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "ComponentName", weaponInstance.ComponentName + " - " + weaponInstance.ComponentSize);
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Damage", weaponInstance.Damage + " DMG");
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "RoF", 60 / weaponInstance.FireDelay + " RPM");
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Mass", weaponInstance.ComponentMass / 1000 + " T");
         }
 
         private void DisplayPowerPlant((Type powerPlantType, ShipComponentTier tier) powerPlant) {
             (Transform cardComponents, PowerPlant powerPlantInstance) = DisplayShipComponentCard<PowerPlant>(powerPlant.powerPlantType, powerPlant.tier, _powerPlantCardPath);
-
-            TextMeshProUGUI title = cardComponents.Find("ComponentName").GetComponent<TextMeshProUGUI>();
-            title.text = powerPlantInstance.ComponentName + " - " + powerPlantInstance.ComponentSize;
-            TextMeshProUGUI capacity = cardComponents.Find("Capacity").GetComponent<TextMeshProUGUI>();
-            capacity.text = powerPlantInstance.EnergyCapacity + " GW";
-            TextMeshProUGUI rechargeRate = cardComponents.Find("Recharge").GetComponent<TextMeshProUGUI>();
-            rechargeRate.text = powerPlantInstance.RechargeRate * 60 + " GW/s";
-            TextMeshProUGUI mass = cardComponents.Find("Mass").GetComponent<TextMeshProUGUI>();
-            mass.text = (powerPlantInstance.ComponentMass / 1000) + " T";
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "ComponentName", powerPlantInstance.ComponentName + " - " + powerPlantInstance.ComponentSize);
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Capacity", powerPlantInstance.EnergyCapacity + " GW");
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Recharge", powerPlantInstance.RechargeRate * 60 + " GW/s");
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Mass", powerPlantInstance.ComponentMass / 1000 + " T");
         }
 
         private void DisplayCargoBay((Type cargoBayType, ShipComponentTier tier) cargoBay) {
             (Transform cardComponents, CargoBay cargoBayInstance) = DisplayShipComponentCard<CargoBay>(cargoBay.cargoBayType, cargoBay.tier, _cargoBayCardPath);
-
-            TextMeshProUGUI title = cardComponents.Find("ComponentName").GetComponent<TextMeshProUGUI>();
-            title.text = cargoBayInstance.ComponentName + " - " + cargoBayInstance.ComponentSize;
-            TextMeshProUGUI capacity = cardComponents.Find("Capacity").GetComponent<TextMeshProUGUI>();
-            capacity.text = cargoBayInstance.CargoVolume + " Units";
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "ComponentName", cargoBayInstance.ComponentName + " - " + cargoBayInstance.ComponentSize);
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Capacity", cargoBayInstance.CargoVolume + " Units");
         }
 
         private void DisplayShieldCard((Type shieldType, ShipComponentTier tier) shield) {
             (Transform cardComponents, Shield shieldInstance) = DisplayShipComponentCard<Shield>(shield.shieldType, shield.tier, _shieldCardPath);
-
-            TextMeshProUGUI title = cardComponents.Find("ComponentName").GetComponent<TextMeshProUGUI>();
-            title.text = shieldInstance.ComponentName + " - " + shieldInstance.ComponentSize;
-            TextMeshProUGUI strength = cardComponents.Find("Strength").GetComponent<TextMeshProUGUI>();
-            strength.text = shieldInstance.StrengthCapacity + "GW";
-            TextMeshProUGUI recharge = cardComponents.Find("Recharge").GetComponent<TextMeshProUGUI>();
-            recharge.text = shieldInstance.RechargeRate + "GW/s";
-            TextMeshProUGUI damageDelay = cardComponents.Find("DamageDelay").GetComponent<TextMeshProUGUI>();
-            damageDelay.text = shieldInstance.DamageRecoveryTime + "s";
-            TextMeshProUGUI depletionDelay = cardComponents.Find("DepletionDelay").GetComponent<TextMeshProUGUI>();
-            depletionDelay.text = shieldInstance.DepletionRecoveryTime + "s";
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "ComponentName", shieldInstance.ComponentName + " - " + shieldInstance.ComponentSize);
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Strength", shieldInstance.StrengthCapacity + "GW");
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Recharge", shieldInstance.RechargeRate + "GW/s");
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "DamageDelay", shieldInstance.DamageRecoveryTime + "s");
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "DepletionDelay", shieldInstance.DepletionRecoveryTime + "s");
         }
 
         private void CreateSelectionMarkers(List<(Transform mountTransform, Transform selectionTransform, string slotName)> shipComponents) {
@@ -328,7 +317,7 @@ namespace Code.GUI.SpaceStations.Services {
                     SlotSelector selector = _selectionMarkers[i].GetComponent<SlotSelector>();
                     var selectionMarkerDetails = (selector.ObjectMountTransform, selector.SelectionMountTransform, SlotName: selector.SlotName);
                     sameSlots = shipComponents.Select(sc => sc.selectionTransform).ToList().Contains(selectionMarkerDetails.SelectionMountTransform);
-                    
+
                     if (!sameSlots) {
                         break;
                     }
@@ -337,7 +326,7 @@ namespace Code.GUI.SpaceStations.Services {
             else {
                 sameSlots = false;
             }
-            
+
             //if same as current not destroy and create new
             if (!sameSlots) {
                 foreach (GameObject selectionMarker in _selectionMarkers) {

@@ -21,6 +21,8 @@ namespace Code._Galaxy {
         // void Update() {
         //     SolarSystemRaycast();
         // }
+        
+        
 
         public Thread GenerateSolarSystemColours(SolarSystem solarSystem) {
             Thread generationThread = new Thread(() => {

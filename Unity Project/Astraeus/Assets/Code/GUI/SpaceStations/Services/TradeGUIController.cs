@@ -18,9 +18,17 @@ namespace Code.GUI.SpaceStations.Services {
         private StationGUIController _stationGUIController;
         private GameObject _guiGameObject;
         private GameObject _availableContainer;
-        public List<ProductCard> _productCards;
+        private GameObject _ownedContainer;
+
+        private List<(Type productType, int quantity, int price)> _availableProducts;
+
+        private List<ProductCard> _availableProductCards;
+        private List<ProductCard> _ownedProductCards;
         private CargoController _cargoController;
-        private Vector2 _indicatorBarDefaultSize; 
+        private Vector2 _indicatorBarDefaultSize;
+        private GameObject notEnoughCreditsMsg;
+        private float creditMsgTime = 3;
+        private float creditMsgCountdown = 0;
 
         public void StartTradeGUI(TradeService tradeService, StationGUIController stationGUIController) {
             _tradeService = tradeService;
@@ -28,57 +36,160 @@ namespace Code.GUI.SpaceStations.Services {
             SetupGUI();
         }
 
+        private void Update() {
+            if (notEnoughCreditsMsg != null) {
+                if (notEnoughCreditsMsg.activeSelf) {
+                    creditMsgCountdown -= Time.deltaTime;
+                    if (creditMsgCountdown <= 0) {
+                        notEnoughCreditsMsg.SetActive(false);
+                    }
+                }
+            }
+        }
+
         private void SetupGUI() {
             _stationGUIController.stationGUI.SetActive(false);
             _guiGameObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_tradeService.GUIPath));
+            _cargoController = GameController.CurrentShip.ShipObject.GetComponent<ShipController>().CargoController;
+            notEnoughCreditsMsg = GameObjectHelper.FindChild(_guiGameObject, "NotEnoughCredits");
+            notEnoughCreditsMsg.SetActive(false);
             SetupButtons();
+            SetupProducts();
+        }
+
+        private void SetupAvailableProducts() {
+            _availableProducts = new List<(Type productType, int quantity, int price)>();
+
+            foreach ((Type productType, int quantity, int price) product in _tradeService.Products) {
+                _availableProducts.Add(product);
+            }
+        }
+
+        private void SetupProducts() {
             SetupAvailableProducts();
+            SetupAvailableProductCards();
+            SetupOwnedProductCards();
             UpdateCargoHoldBar();
+            UpdateCredits();
+        }
+
+        private void UpdateCredits() {
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsCurrentValue", GameController.PlayerProfile._credits.ToString());
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsChangeValue", GetChangeInFunds().ToString());
+        }
+
+        private int GetChangeInFunds() {
+            //cost of purchases
+            int purchaseCost = 0;
+            foreach (ProductCard productCard in _availableProductCards) {
+                purchaseCost += productCard.GetCurrentValue() * productCard.Product.price;
+            }
+
+            //money made selling
+            int saleValue = 0;
+            foreach (ProductCard productCard in _ownedProductCards) {
+                saleValue += productCard.GetCurrentValue() * productCard.Product.price;
+            }
+
+            return saleValue - purchaseCost;
+        }
+
+        private void SetupAvailableProductCards() {
+            if (_availableContainer == null) {
+                _availableContainer = GameObjectHelper.FindChild(_guiGameObject, "AvailableProducts");
+            }
+
+            _availableProductCards = new List<ProductCard>();
+
+            foreach ((Type productType, int quantity, int price) product in _availableProducts) {
+                if (product.quantity > 0) {
+                    ProductCard productCard = _availableProductCards.Find(apc => product == apc.Product);
+                    if (productCard == null) {
+                        GameObject productCardObject = GetProductCardObject();
+                        productCardObject.transform.SetParent(_availableContainer.transform);
+                        productCard = productCardObject.AddComponent<ProductCard>();
+                        productCard.SetupCard(product, this, false);
+                        _availableProductCards.Add(productCard);
+                    }
+                }
+            }
+        }
+
+        private void SetupOwnedProductCards() {
+            if (_ownedContainer == null) {
+                _ownedContainer = GameObjectHelper.FindChild(_guiGameObject, "CargoProducts");
+            }
+
+            _ownedProductCards = new List<ProductCard>();
+
+            List<Type> cargoTypes = _cargoController.GetCargoTypes();
+            foreach (Type cargoType in cargoTypes) {
+                if (cargoType != typeof(Fuel)) {
+                    GameObject productCardObject = GetProductCardObject();
+                    productCardObject.transform.SetParent(_ownedContainer.transform);
+                    ProductCard productCard = productCardObject.AddComponent<ProductCard>();
+                    int quantity = _cargoController.GetCargoOfType(cargoType).Count;
+                    int price = _availableProducts.Find(product => product.productType == cargoType).price;
+                    productCard.SetupCard((cargoType, quantity, price), this, true);
+                    _ownedProductCards.Add(productCard);
+                }
+            }
+        }
+
+        private GameObject GetProductCardObject() {
+            return GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab("GUIPrefabs/Station/Services/Trade/ProductCard"));
         }
 
         private void SetupButtons() {
-            Button homeBtn = FindChildGameObject.FindChild(_guiGameObject, "HomeBtn").GetComponent<Button>();
-            homeBtn.onClick.AddListener(Exit);
-            
-            Button purchaseBtn = FindChildGameObject.FindChild(_guiGameObject, "PurchaseButton").GetComponent<Button>();
+            Button homeBtn = GameObjectHelper.FindChild(_guiGameObject, "HomeBtn").GetComponent<Button>();
+            homeBtn.onClick.AddListener(ExitBtn);
+
+            Button resetBtn = GameObjectHelper.FindChild(_guiGameObject, "ResetButton").GetComponent<Button>();
+            resetBtn.onClick.AddListener(ResetTrade);
+
+            Button purchaseBtn = GameObjectHelper.FindChild(_guiGameObject, "PurchaseButton").GetComponent<Button>();
             purchaseBtn.onClick.AddListener(PurchaseBtnClick);
         }
 
-        private void Exit() {
+        private void ResetTrade() {
+            RecreateCards();
+        }
+
+        private void ExitBtn() {
             _stationGUIController.stationGUI.SetActive(true);
             Destroy(_guiGameObject);
             Destroy(this);
         }
-        
-        private void UpdatePriceChange() {
-            
-        }
 
         private void UpdateCargoHoldBar() {
-            _cargoController = GameController.CurrentShip.ShipObject.GetComponent<ShipController>().CargoController;
-            int fuel = _cargoController.GetCargoOfType<Fuel>().Count;
-            RectTransform fuelBarTransform = FindChildGameObject.FindChild(_guiGameObject, "FuelIndicator").GetComponent<RectTransform>();
-            
-            int stored = _cargoController.GetUsedCargoSpace() - fuel;
-            RectTransform storedBarTransform = FindChildGameObject.FindChild(_guiGameObject, "StoredIndicator").GetComponent<RectTransform>();
-            int buying = GetPurchasingCargoCount();
-            RectTransform purchasingTransform = FindChildGameObject.FindChild(_guiGameObject, "PurchaseIndicator").GetComponent<RectTransform>();
-            int totalCapacity = _cargoController.GetMaxCargoSpace();
-            RectTransform freeTransform = FindChildGameObject.FindChild(_guiGameObject, "FreeIndicator").GetComponent<RectTransform>();
+            int fuel = _cargoController.GetCargoOfType(typeof(Fuel)).Count;
+            RectTransform fuelBarTransform = GameObjectHelper.FindChild(_guiGameObject, "FuelIndicator").GetComponent<RectTransform>();
 
-            if (_indicatorBarDefaultSize == new Vector2(0,0)) {
+            int stored = _cargoController.GetUsedCargoSpace() - fuel;
+            int selling = GetProductCardsCargoCount(_ownedProductCards);
+            RectTransform storedBarTransform = GameObjectHelper.FindChild(_guiGameObject, "StoredIndicator").GetComponent<RectTransform>();
+
+            int buying = GetProductCardsCargoCount(_availableProductCards);
+            RectTransform purchasingTransform = GameObjectHelper.FindChild(_guiGameObject, "PurchaseIndicator").GetComponent<RectTransform>();
+            int totalCapacity = _cargoController.GetMaxCargoSpace();
+            RectTransform freeTransform = GameObjectHelper.FindChild(_guiGameObject, "FreeIndicator").GetComponent<RectTransform>();
+
+            if (_indicatorBarDefaultSize == new Vector2(0, 0)) {
                 _indicatorBarDefaultSize = freeTransform.sizeDelta;
             }
 
-            fuelBarTransform.sizeDelta = new Vector2((float)fuel / totalCapacity* _indicatorBarDefaultSize.x, _indicatorBarDefaultSize.y);
-            storedBarTransform.sizeDelta = new Vector2((float)(fuel + stored) / totalCapacity * _indicatorBarDefaultSize.x, _indicatorBarDefaultSize.y);
-            purchasingTransform.sizeDelta = new Vector2((float)(fuel + stored + buying) / totalCapacity* _indicatorBarDefaultSize.x, _indicatorBarDefaultSize.y);
+            int barX = fuel;
+            fuelBarTransform.sizeDelta = new Vector2((float)barX / totalCapacity * _indicatorBarDefaultSize.x, _indicatorBarDefaultSize.y);
+            barX += stored - selling;
+            storedBarTransform.sizeDelta = new Vector2((float)barX / totalCapacity * _indicatorBarDefaultSize.x, _indicatorBarDefaultSize.y);
+            barX += buying;
+            purchasingTransform.sizeDelta = new Vector2((float)barX / totalCapacity * _indicatorBarDefaultSize.x, _indicatorBarDefaultSize.y);
         }
 
-        private int GetPurchasingCargoCount() {
+        private int GetProductCardsCargoCount(List<ProductCard> productCards) {
             int cargoCount = 0;
 
-            foreach (ProductCard productCard in _productCards) {
+            foreach (ProductCard productCard in productCards) {
                 cargoCount += productCard.GetCurrentValue();
             }
 
@@ -86,124 +197,136 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void PurchaseBtnClick() {
-            List<Cargo> newCargo = new List<Cargo>();
+            if (GameController.PlayerProfile.ChangeCredits(GetChangeInFunds())) {
+                List<Cargo> newCargo = new List<Cargo>();
+                List<Cargo> cargoToSell = new List<Cargo>();
 
-            foreach (ProductCard productCard in _productCards) {
-                int cargoCount = productCard.GetCurrentValue();
-                for (int i = 0; i < cargoCount; i++) {
-                    Commodity commodity = (Commodity)Activator.CreateInstance(productCard.Product.productType);
-                    newCargo.Add(commodity);
+                foreach (ProductCard productCard in _availableProductCards) {
+                    int cargoCount = productCard.GetCurrentValue();
+                    for (int i = 0; i < cargoCount; i++) {
+                        Commodity commodity = (Commodity)Activator.CreateInstance(productCard.Product.productType);
+                        newCargo.Add(commodity);
+                    }
+
+                    var product = _tradeService.Products.Find(type => type.productType == productCard.Product.productType);
+                    int indexOfProduct = _tradeService.Products.IndexOf(product);
+
+                    productCard.Product.quantity -= cargoCount;
+                    _tradeService.Products[indexOfProduct] = productCard.Product;
                 }
 
-                var product = _tradeService.Products.Find(type => type.productType == productCard.Product.productType);
-                int indexOfProduct = _tradeService.Products.IndexOf(product);
-                productCard.Product.quantity -= cargoCount;
-                _tradeService.Products[indexOfProduct] = productCard.Product;
-                productCard.ResetCard();
+
+                foreach (ProductCard productCard in _ownedProductCards) {
+                    int cargoCount = productCard.GetCurrentValue();
+                    cargoToSell.AddRange(_cargoController.GetCargoOfType(productCard.Product.productType, cargoCount));
+
+                    var productIndex = _tradeService.Products.FindIndex(product => product.productType == productCard.Product.productType);
+                    var product = _availableProducts[productIndex];
+                    product.quantity += cargoCount;
+                    _tradeService.Products[productIndex] = product;
+                }
+
+                _cargoController.RemoveCargo(cargoToSell);
+                _cargoController.AddCargo(newCargo);
+
+                RecreateCards();
             }
-
-            _cargoController.AddCargo(newCargo);
-            UpdateCargoHoldBar();
-        }
-
-        private void SetupAvailableProducts() {
-            if (_availableContainer == null) {
-                _availableContainer = FindChildGameObject.FindChild(_guiGameObject, "AvailableProducts");
-            }
-
-            if (_productCards == null) {
-                _productCards = new List<ProductCard>();
-            }
-
-            foreach ((Type productType, int quantity, int price) product in _tradeService.Products) {
-                GameObject productCardObject = GetProductCard();
-                productCardObject.transform.SetParent(_availableContainer.transform);
-                ProductCard productCard = productCardObject.AddComponent<ProductCard>();
-                productCard.SetupCard(product, this);
-                _productCards.Add(productCard);
+            else {
+                NotEnoughCredits();
             }
         }
 
-        private GameObject GetProductCard() {
-            return GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab("GUIPrefabs/Station/Services/Trade/ProductCard"));
+        private void NotEnoughCredits() {
+            notEnoughCreditsMsg.SetActive(true);
+            creditMsgCountdown = creditMsgTime;
         }
+
+        private void RecreateCards() {
+            for (int i = _availableProductCards.Count-1; i >= 0;i--) {
+                Destroy(_availableProductCards[i].gameObject);
+                Destroy(_availableProductCards[i]);
+            }
+
+            for (int i = _ownedProductCards.Count-1;i >= 0;i--) {
+                Destroy(_ownedProductCards[i].gameObject);
+            }
+
+            SetupProducts();
+        }
+        
+        
 
         public class ProductCard : MonoBehaviour {
             public (Type productType, int quantity, int price) Product;
             private TradeGUIController _tradeGUIController;
             private TMP_InputField _txtIntInput;
-            
+            private bool _isSellCard;
 
-            public void SetupCard((Type productType, int quantity, int price) product, TradeGUIController tradeGUIController) {//split into 2 classes inheriting from this for ship cargo with List of products instead of Type and quantity
+
+            public void SetupCard((Type productType, int quantity, int price) product, TradeGUIController tradeGUIController, bool isSellCard) { //split into 2 classes inheriting from this for ship cargo with List of products instead of Type and quantity
                 Product = product;
                 _tradeGUIController = tradeGUIController;
-                
+                _isSellCard = isSellCard;
                 Commodity commodity = (Commodity)Activator.CreateInstance(product.productType);
-                
-                TextMeshProUGUI nameText = FindChildGameObject.FindChild(gameObject, "ProductName").GetComponent<TextMeshProUGUI>();
-                nameText.text = commodity.Name;
-                
-                UpdateAvailable();
-                
-                TextMeshProUGUI priceText = FindChildGameObject.FindChild(gameObject, "PriceValue").GetComponent<TextMeshProUGUI>();
-                priceText.text = product.price + " Cr";
+                GameObjectHelper.SetGUITextValue(gameObject, "ProductName", commodity.Name);
+                GameObjectHelper.SetGUITextValue(gameObject, "PriceValue", product.price + " Cr");
+                UpdateAvailableValue();
 
-                _txtIntInput = FindChildGameObject.FindChild(gameObject, "PurchaseAmountInput").GetComponent<TMP_InputField>();
+                _txtIntInput = GameObjectHelper.FindChild(gameObject, "PurchaseAmountInput").GetComponent<TMP_InputField>();
                 _txtIntInput.onValueChanged.AddListener(ParseTxtInput);
                 SetupButtons();
             }
 
-            private void UpdateAvailable() {
-                TextMeshProUGUI availableText = FindChildGameObject.FindChild(gameObject, "AvailableValue").GetComponent<TextMeshProUGUI>();
-                availableText.text = Product.quantity.ToString();
+            private void UpdateAvailableValue() {
+                GameObjectHelper.SetGUITextValue(gameObject, "AvailableValue", Product.quantity.ToString());
             }
 
             private void SetupButtons() {
-                Button plusBtn = FindChildGameObject.FindChild(gameObject, "PlusBtn").GetComponent<Button>();
+                Button plusBtn = GameObjectHelper.FindChild(gameObject, "PlusBtn").GetComponent<Button>();
                 plusBtn.onClick.AddListener(delegate { PlusBtnClick(); });
 
-                Button minusBtn = FindChildGameObject.FindChild(gameObject, "MinusBtn").GetComponent<Button>();
+                Button minusBtn = GameObjectHelper.FindChild(gameObject, "MinusBtn").GetComponent<Button>();
                 minusBtn.onClick.AddListener(delegate { MinusBtnClick(); });
             }
 
             private void ParseTxtInput(string text) {
+                int qtyPurchaseProducts = _tradeGUIController.GetProductCardsCargoCount(_tradeGUIController._availableProductCards);
+                int qtySoldProducts = _tradeGUIController.GetProductCardsCargoCount(_tradeGUIController._ownedProductCards);
+                
                 //ensures value is not too large or small upon changing
                 int value = Int32.Parse(text);
-                value = value < 0 ? 0 : value > Product.quantity ? Product.quantity : value;//if less than 0 set to 0 - if larger than quantity of products available set to quantity of products
-                
-                //check if there is enough cargo space & if other purchases will also fit
+                value = value < 0 ? 0 : value > Product.quantity ? Product.quantity : value;//stops negative values && values larger than quantity of products
+
                 int freeCargoSpace = GameController.CurrentShip.ShipObject.GetComponent<ShipController>().CargoController.GetFreeCargoSpace();
-                int qtyOtherProductsPurchase = 0;
-                List<ProductCard> productCards = _tradeGUIController._productCards; 
-                for (int i = 0; i < productCards.Count; i++) {
-                    if (productCards[i] != this) {
-                        qtyOtherProductsPurchase += productCards[i].GetCurrentValue();
-                    }
+                
+                //ensures cargo won't be overfilled when buying
+                if (!_isSellCard) {
+                    // int qtyOtherPurchaseProducts = qtyPurchaseProducts-GetCurrentValue();
+                    int qtyOtherPurchaseProducts = qtyPurchaseProducts-GetCurrentValue();
+                    value = freeCargoSpace - qtyOtherPurchaseProducts - value + qtySoldProducts >= 0 ? value : freeCargoSpace - qtyOtherPurchaseProducts + qtySoldProducts;//ensures purchase fits in cargo bays
+                }
+                else {
+                    int qtyOtherSoldProducts = qtySoldProducts -GetCurrentValue();
+                    value = freeCargoSpace - qtyPurchaseProducts + qtyOtherSoldProducts + value >= 0 ? value : -(freeCargoSpace - qtyPurchaseProducts + qtyOtherSoldProducts);
                 }
 
-                value = freeCargoSpace - qtyOtherProductsPurchase - value > 0 ? value : freeCargoSpace - qtyOtherProductsPurchase;//ensures the cargo won't be overfilled
-                
                 _txtIntInput.text = value.ToString();
                 _tradeGUIController.UpdateCargoHoldBar();
+                _tradeGUIController.UpdateCredits();
             }
 
             public int GetCurrentValue() {
                 return Int32.Parse(_txtIntInput.text);
             }
 
-            public void ResetCard() {
-                UpdateAvailable();
-                _txtIntInput.text = 0.ToString();
-            }
-
-            public void PlusBtnClick() {
+            private void PlusBtnClick() {
                 //get new value
                 //shift to increase by 50 - Ctrl to add all - regular click to inc by 1
                 int newValue = Input.GetKey(KeyCode.LeftShift) ? GetCurrentValue() + 50 : Input.GetKey(KeyCode.LeftControl) ? Product.quantity : GetCurrentValue() + 1;
                 _txtIntInput.text = newValue.ToString();
             }
 
-            public void MinusBtnClick() {
+            private void MinusBtnClick() {
                 //get new value
                 //shift to decrease by 50 - Ctrl to remove all - regular click to dec by 1
                 int newValue = Input.GetKey(KeyCode.LeftShift) ? GetCurrentValue() - 50 : Input.GetKey(KeyCode.LeftControl) ? 0 : GetCurrentValue() - 1;

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Code._Cargo;
+using Code._Cargo.ProductTypes.Ships;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.InternalComponents;
@@ -44,7 +46,7 @@ namespace Code._Ships.Controllers {
                 Weapon weapon = weaponComponent.concreteComponent;
                 if (weaponComponent.concreteComponent != null) {
                     var weaponGameObject = weapon.InstantiatedGameObject;
-                    GameObject spindle = FindChildGameObject.FindChild(weaponGameObject,"TurretSpindle");
+                    GameObject spindle = GameObjectHelper.FindChild(weaponGameObject,"TurretSpindle");
 
                     var weaponController = spindle.gameObject.AddComponent<WeaponController>();
                     weaponController.Setup(weapon, _powerPlantController);
@@ -63,8 +65,15 @@ namespace Code._Ships.Controllers {
                 Turn();
                 AimWeapons();
                 FireCheck();
+                ChargePowerPlant();
             }
         }
+
+        private void ChargePowerPlant() {
+            List<Fuel> depletedFuel = _powerPlantController.ChargePowerPlant(Time.deltaTime, CargoController.GetCargoOfType(typeof(Fuel)).Cast<Fuel>().ToList());
+            CargoController.RemoveCargo(depletedFuel.Cast<Cargo>().ToList());
+        }
+
 
         private float GetShipMass() {
             float mass = _ship.ShipHull.HullMass;

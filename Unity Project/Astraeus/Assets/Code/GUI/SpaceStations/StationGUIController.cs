@@ -1,9 +1,10 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
 using Code._GameControllers;
+using Code._Utility;
 using Code.GUI.SpaceStations.Services;
-using ICSharpCode.NRefactory.Ast;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -28,8 +29,50 @@ namespace Code.GUI.SpaceStations {
         public void LoadGUI() {
             stationGUI = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_stationGUIBasePath+_stationGUIPathSpecifier));
             GameController.CurrentShip.Active = false;
+            SetupStationInfo();
             SetupButtons();
         }
+
+        private void SetupStationInfo() {
+            SolarSystem solarSystem = GameController._currentSolarSystem;
+            GameObjectHelper.SetGUITextValue(stationGUI, "StationName", solarSystem.SystemName + " Station");
+            GameObjectHelper.SetGUITextValue(stationGUI, "FactionNameValue", solarSystem.OwnerFaction.GetFactionName());
+            GameObjectHelper.SetGUITextValue(stationGUI, "FactionTypeValue", solarSystem.OwnerFaction.factionType.ToString());
+            GameObjectHelper.SetGUITextValue(stationGUI, "FactionHomeSystemValue", solarSystem.OwnerFaction.HomeSystem.SystemName);
+            GameObjectHelper.SetGUITextValue(stationGUI, "FactionStandingValue", "Implement Faction standing");
+            GameObjectHelper.SetGUITextValue(stationGUI, "SystemStatusValue", "Implement System Status");
+            GameObjectHelper.SetGUITextValue(stationGUI, "BodyCountValue", solarSystem.SystemStats.celestialBodyCount.ToString());
+            
+            string summaryText = "";
+            List<(string bodyType, int count)> bodyCountMapping = new List<(string bodyType, int count)>() {
+                ("Black Holes", solarSystem.SystemStats.blackHoleCount),
+                ("Stars", solarSystem.SystemStats.starCount),
+                ("Planets", solarSystem.SystemStats.planetCount)
+            };
+            
+            List<(string bodyType, int count)> planetCountMapping = new List<(string bodyType, int count)>() {
+                ("Earth-like", solarSystem.SystemStats.earthWorldCount),
+                ("Water Worlds", solarSystem.SystemStats.waterWorldCount),
+                ("Rocky", solarSystem.SystemStats.rockyWorldCount)
+            };
+
+            foreach ((string bodyType, int count) bodyCount in bodyCountMapping) {
+                if (bodyCount.count > 0) {
+                    summaryText += bodyCount.bodyType + ": " + bodyCount.count + "\n";
+                }
+            }
+
+            summaryText += "\nPlanet Summary\n";
+            foreach ((string bodyType, int count) bodyCount in planetCountMapping) {
+                if (bodyCount.count > 0) {
+                    summaryText += bodyCount.bodyType + ": " + bodyCount.count + "\n";
+                }
+            }
+            
+            GameObjectHelper.SetGUITextValue(stationGUI, "CelestialBodiesSummary", summaryText);
+        }
+
+        
 
         private Transform GetScrollContainer() {
             return stationGUI.transform.Find("MainContainer/Menu/Scroll View/Viewport/Content");
