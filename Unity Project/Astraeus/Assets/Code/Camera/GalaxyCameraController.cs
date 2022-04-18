@@ -1,33 +1,18 @@
 ﻿using System;
+using Code._Galaxy;
 using UnityEngine;
 
 namespace Code.Camera {
     public class GalaxyCameraController : CameraController {
         
-        private float _x;
-        private float _y;
-        private float _z;
-
-        private float _x1;
-        private float _y1;
-        private float _x2;
-        private float _y2;
-        
-        private float _minMoveSpeed;
-        private float _maxMoveSpeed;
-
-        private float _minScrollSpeed;
-        private float _maxScrollSpeed;
-
-        private float _maxZoomOutDistance;
-        private float _minZoomInDistance;
+        private float _x, _y, _z, _x1, _y1, _x2, _y2, _minMoveSpeed, _maxMoveSpeed, _minScrollSpeed, _maxScrollSpeed, _maxZoomOutDistance, _minZoomInDistance;
         private UnityEngine.Camera _camera;
 
         private void Awake() {
             _camera = UnityEngine.Camera.main;
         }
 
-        public void SetupCamera(float x1, float y1, float x2, float y2, int zoomOffset, int absoluteMaxZoomOut, int minZoomInDistance, float minScrollSpeed, float maxScrollSpeed, float minMoveSpeed, float maxMoveSpeed) {
+        private void SetupCamera(float x1, float y1, float x2, float y2, int zoomOffset, int absoluteMaxZoomOut, int minZoomInDistance, float minScrollSpeed, float maxScrollSpeed, float minMoveSpeed, float maxMoveSpeed) {
             _x1 = x1;
             _y1 = y1;
             _x2 = x2;
@@ -43,14 +28,16 @@ namespace Code.Camera {
             _maxZoomOutDistance = c1 < c2 ? c1 : c2;
             _maxZoomOutDistance += +zoomOffset;
             _maxZoomOutDistance = _maxZoomOutDistance > absoluteMaxZoomOut ? _maxZoomOutDistance : absoluteMaxZoomOut;
-            _x = (_x1 +_x2) / 2;
-            _y = (_y1 + _y2) / 2;
-            _z = _maxZoomOutDistance;
+            
             _minZoomInDistance = minZoomInDistance + zoomOffset;
             _minScrollSpeed = minScrollSpeed;
             _maxScrollSpeed = maxScrollSpeed;
             _minMoveSpeed = minMoveSpeed;
             _maxMoveSpeed = maxMoveSpeed;
+            
+            _x = (_x1 +_x2) / 2;
+            _y = (_y1 + _y2) / 2;
+            _z = _minZoomInDistance;
             SetCamera();
         }
 
@@ -59,10 +46,11 @@ namespace Code.Camera {
             SetCamera();
         }
 
-        public void SetCamera(float x, float y, float z) {
-            _x = x;
-            _y = y;
-            _z = z;
+        public void SetCamera(Vector2 pos) {
+            _x = pos.x;
+            _y = pos.y;
+            _z = _minZoomInDistance;
+            transform.rotation = new Quaternion(0, 0, 0, 0);
         }
 
         private void SetCamera() {
@@ -162,7 +150,7 @@ namespace Code.Camera {
 
         public void SetupCamera(float x2, float y2) {
             TakeCameraControl();
-            SetupCamera(0, 0, x2, y2, 0, -1900, -30, 1000, 7500, 30, 500);
+            SetupCamera(0, 0, x2, y2, 0, GalaxyController.ZOffset-400, GalaxyController.ZOffset-35, 1000, 7500, 30, 500);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Code._Ships.Controllers {
     public class PlayerShipController : ShipController {
@@ -35,7 +36,11 @@ namespace Code._Ships.Controllers {
 
         protected override void FireCheck() {
             if (Input.GetMouseButton(0)) {
-                FireWeapons();
+                BaseInputModule baseInputModule = FindObjectOfType<BaseInputModule>();
+                if (!baseInputModule.IsPointerOverGameObject(-1)) {
+                    FireWeapons();
+                }
+                
             }
         }
 

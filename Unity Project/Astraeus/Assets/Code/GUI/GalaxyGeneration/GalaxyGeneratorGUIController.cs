@@ -15,7 +15,6 @@ namespace Code.GUI.GalaxyGeneration {
         private GameController _gameController;
         private Thread _galaxyGenerationThread;
         private Thread _textureGenerationThread;
-        private int _minExclusionDistance;
         
         private bool _startedGalaxyGen;
         private bool _finishedGalaxyGen;
@@ -134,7 +133,6 @@ namespace Code.GUI.GalaxyGeneration {
         
         private void GenerateGalaxy() {
             StartLoadingScreen();
-            _minExclusionDistance = _generator.systemExclusionDistance.Value;
             _generator.SetPotentialSystemNames();
             _galaxyGenerationThread = new Thread(() => {
                 _galaxy = _generator.GenGalaxy();
@@ -167,7 +165,7 @@ namespace Code.GUI.GalaxyGeneration {
             string gameControllerObjName = "GameController";
             GameObject gameControllerObj = new GameObject(gameControllerObjName);
             _gameController = gameControllerObj.AddComponent<GameController>();
-            _gameController.Setup(_galaxy, _minExclusionDistance);
+            _gameController.Setup(_galaxy, _generator.systemExclusionDistance.Value,_generator.width.Value, _generator.height.Value );
         }
 
         private void Loaded() {

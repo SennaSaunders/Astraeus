@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Code._GameControllers;
+using UnityEngine;
 
 namespace Code.Camera {
     public class ShipCameraController : CameraController {
@@ -11,15 +12,13 @@ namespace Code.Camera {
         private float _minZ;
 
         private float _currentZ;
-        private float _shipZ;
         
         private float _scrollRate = 10;
 
         private void Awake() {
             _camera = UnityEngine.Camera.main;
-            _shipZ = transform.position.z;
-            _minZ = _shipZ + _minZOffset;
-            _maxZ = _shipZ + _maxZOffset;
+            _minZ = GameController.ShipZ + _minZOffset;
+            _maxZ = GameController.ShipZ + _maxZOffset;
 
             _currentZ = _minZ;
             

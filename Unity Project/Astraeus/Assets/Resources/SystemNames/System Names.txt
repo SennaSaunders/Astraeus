@@ -112,7 +112,7 @@ Oslofn
 Komoneta
 Asmerg
 Mallrichill
-Peniae
+Penitae
 Osiegomora
 Ōmuroi
 Solicha
@@ -347,7 +347,7 @@ Medenheim
 Appaniland
 Ottomatsuki
 Lavan
-Titis
+Tithis
 Birkhou
 Higashiro
 Monroda
@@ -832,7 +832,7 @@ Trells
 Arani
 Dreen
 Chingen
-Errimandick
+Errimandicce
 Astein
 Yotal
 Görlingerðr
@@ -1447,7 +1447,6 @@ Newyoro
 Gamer
 Moriangchen
 Lacrivia
-Shittlica
 Sideki
 Treyungen
 Owangzhonjō
@@ -1839,7 +1838,6 @@ Blank
 Neuces
 Hameriscop
 Harathofen
-Cockentitia
 Urume
 Greenrir
 Waldentum
@@ -2835,7 +2833,7 @@ Schousebo
 Wepwk
 Stochaf
 Rawaù
-Blandick
+Blandicce
 Alaciel
 Semyv
 Kaicp
@@ -3139,7 +3137,7 @@ Waldheil
 Gescà
 Werehyeō
 Rheinag
-Antitð
+Antið
 Kingù
 Torneü
 Saraú
@@ -3150,7 +3148,7 @@ Perugiaē
 Purieu
 Kōriyí
 Sameä
-Penix
+Mensa
 Auroae
 Roßweó
 Hemmic
@@ -3394,7 +3392,7 @@ Aericí
 Valenb
 Gargs
 Agathonl
-Analap
+Anaap
 Danto
 Heiligù
 Boltonnewhâ

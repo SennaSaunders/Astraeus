@@ -3,20 +3,18 @@ using System.Threading;
 using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
+using Code._GameControllers;
+using Code._Utility;
 using UnityEngine;
 
 namespace Code._Galaxy {
     public class GalaxyController : MonoBehaviour {
-        public const int ZOffset = 2500; 
+        public const int ZOffset = 2500;
         private Galaxy _galaxy;
-        private GameObject _galaxyHolder;
-        private SolarSystemController _activeSystemController;
+        public GameObject _galaxyHolder;
+        public SolarSystemController activeSystemController;
         private List<SolarSystemController> _solarSystemControllers = new List<SolarSystemController>();
-        private UnityEngine.Camera _camera;
-
-        private void Start() {
-            _camera = UnityEngine.Camera.main;
-        }
+        
         
         public Thread GenerateSolarSystemPlanetColours(SolarSystem solarSystem) {
             Thread generationThread = new Thread(() => {
@@ -56,6 +54,17 @@ namespace Code._Galaxy {
             SolarSystemController controller = primaryObject.AddComponent<SolarSystemController>();
             controller.AssignSystem(solarSystem);
             _solarSystemControllers.Add(controller);
+            GameObject systemName = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab("GUIPrefabs/Map/SystemName"));
+            if (solarSystem.OwnerFaction != null) {
+                GameObjectHelper.SetGUITextValue(systemName, "SystemNameValue", controller._solarSystem.SystemName, new Color(53 / 255f, 157 / 255f, 255 / 255f));
+            }
+            else {
+                GameObjectHelper.SetGUITextValue(systemName, "SystemNameValue", controller._solarSystem.SystemName);
+            }
+            
+            
+            systemName.transform.SetParent(primaryObject.transform);
+            systemName.transform.localPosition = new Vector3(0, -1, -1);
         }
 
         public void DisplayGalaxy(Galaxy galaxy) {
@@ -71,26 +80,6 @@ namespace Code._Galaxy {
         public void DisplayGalaxy() {
             SetupGalaxyHolder();
             DisplayGalaxy(_galaxy);
-        }
-
-        private void SolarSystemRaycast() {
-            Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out RaycastHit hit)) {
-                var bodyHit = hit.collider.gameObject.GetComponent<SolarSystemController>();
-                if (bodyHit) {
-                    Debug.Log("Hit " + hit.collider.gameObject.name);
-                    if (Input.GetMouseButtonDown(0)) {
-                        if (_activeSystemController != null) {
-                            _activeSystemController.Active = false;
-                        }
-                        _activeSystemController = bodyHit;
-                        _activeSystemController.Active = true;
-                        _activeSystemController.DisplaySolarSystem();
-                    }
-                }
-                Debug.DrawLine(hit.transform.position, _camera.transform.position);
-            }
         }
 
         public List<Faction> GetFactions() {

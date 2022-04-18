@@ -7,6 +7,7 @@ using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters.Types;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons.Types;
+using Code._Ships.ShipComponents.InternalComponents.JumpDrives;
 using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
 using Code._Ships.ShipComponents.InternalComponents.Storage;
 
@@ -31,6 +32,7 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
                     
             AddAvailableComponents<ManoeuvringThruster>();
             AddAvailableComponents<CargoBay>();
+            AddAvailableComponents<JumpDrive>();
         }
 
         protected override void SetGUIStrings() {

@@ -19,7 +19,7 @@ namespace Code._GameControllers {
         public static GalaxyController _galaxyController;
         public static GameGUIController GUIController;
         public static SolarSystem CurrentSolarSystem;
-        public static int MinExclusionDistance;
+        public static int MinExclusionDistance, GalaxyWidth,GalaxyHeight;
         public const int ShipZ = SolarSystemController.ZOffset - 100;
 
         public static PlayerProfile PlayerProfile = new PlayerProfile();
@@ -28,7 +28,7 @@ namespace Code._GameControllers {
         private PlayerShipController _playerShipController;
         
         public List<Ship> npcShips = new List<Ship>();
-        private static IStation _currentStation;
+        public static IStation _currentStation;
         private static ShipCreator _shipCreator;
         public static bool isPaused = true;
 
@@ -41,7 +41,7 @@ namespace Code._GameControllers {
             _shipCreator = gameObject.AddComponent<ShipCreator>();
         }
 
-        private void SetShipPosition() {
+        private void SetShipToStation() {
             if (_currentStation != null) {
                 Vector3 stationPos = _galaxyController.GetSolarSystemController(CurrentSolarSystem).GetBodyGameObject((Body)_currentStation).transform.position;
                 CurrentShip.ShipObject.transform.position = new Vector3(stationPos.x, stationPos.y, ShipZ);
@@ -53,7 +53,6 @@ namespace Code._GameControllers {
             CurrentShip.ShipObject.transform.SetParent(_playerShipContainer.transform);
             SetPlayerShipController();
             _playerShipController.Setup(CurrentShip);
-            SetShipPosition();
             SetupShipCamera();
         }
 
@@ -73,17 +72,18 @@ namespace Code._GameControllers {
             _shipCreator.shipObjectHandler.CreateShip(_playerShipContainer.transform);
             SetPlayerShipController();
             _playerShipController.Setup(CurrentShip);
-            SetShipPosition();
+            SetShipToStation();
             SetupShipCamera();
         }
 
         public void StartGame() {
-            _galaxyController.DisplayGalaxy();
-            SolarSystemController solarSystemController = _galaxyController.GetSolarSystemController(CurrentSolarSystem);
-            solarSystemController.DisplaySolarSystem();
             SetupDefaultShip();
+            _galaxyController.DisplayGalaxy();
+            _galaxyController.activeSystemController = _galaxyController.GetSolarSystemController(CurrentSolarSystem);
+            _galaxyController.activeSystemController.DisplaySolarSystem();
+            GUIController.SetupShipGUI();
             GUIController.SetupStationGUI(_currentStation);
-            
+            SetShipToStation();
         }
 
         public List<Faction> GetFactions() {
@@ -99,8 +99,10 @@ namespace Code._GameControllers {
             shipCameraController.TakeCameraControl();
         }
 
-        public void Setup(Galaxy galaxy, int minExclusionDistance) {
+        public void Setup(Galaxy galaxy, int minExclusionDistance, int galaxyWidth, int galaxyHeight) {
             MinExclusionDistance = minExclusionDistance;
+            GalaxyWidth = galaxyWidth;
+            GalaxyHeight = galaxyHeight;
             _galaxyController = FindObjectOfType<GalaxyController>();
             if (Application.isEditor) {
                 DestroyImmediate(_galaxyController);

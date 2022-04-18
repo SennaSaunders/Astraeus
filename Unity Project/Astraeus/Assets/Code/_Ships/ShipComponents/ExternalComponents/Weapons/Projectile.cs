@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Code._GameControllers;
 using Code._Ships.Controllers;
@@ -10,29 +10,50 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
         private float _maxTravelTime;
         private float _currentTravelTime;
         private GameObject _shipObject;
+        private Vector2 _velocity;
+        private bool _needsRefresh = false;
 
         public void Spawn(Weapon weapon, Vector2 shipVelocity, float damage, GameObject shipObject) {
             _shipObject = shipObject;
             Rigidbody projectileRigidbody = gameObject.AddComponent<Rigidbody>();
             projectileRigidbody.useGravity = false;
             projectileRigidbody.isKinematic = false;
-            gameObject.AddComponent<CapsuleCollider>();
-            
+            CapsuleCollider projectileCollider = gameObject.AddComponent<CapsuleCollider>();
+            List<Collider> shipColliders = _shipObject.GetComponents(typeof(Collider)).Cast<Collider>().ToList();
+            foreach (Collider shipCollider in shipColliders) {
+                Physics.IgnoreCollision(projectileCollider, shipCollider);
+            }
+
             _currentTravelTime = 0;
             _maxTravelTime = weapon.MaxTravelTime;
             _damage = damage;
-            projectileRigidbody.velocity = GetProjectileVelocity(shipVelocity, weapon.ProjectileSpeed);;
+            projectileRigidbody.velocity = GetProjectileVelocity(shipVelocity, weapon.ProjectileSpeed);
+            ;
         }
 
         private void Update() {
             if (GameController.isPaused) {
-                gameObject.GetComponent<Rigidbody>().Sleep();
+                Rigidbody projectileRigidbody = gameObject.GetComponent<Rigidbody>();
+                if (!_needsRefresh) {
+                    _velocity = projectileRigidbody.velocity;
+                }
+                projectileRigidbody.Sleep();
+                _needsRefresh = true;
+            }
+            else if (_needsRefresh) {
+                Rigidbody projectileRigidbody = gameObject.GetComponent<Rigidbody>();
+                projectileRigidbody.velocity = _velocity;
+                // projectileRigidbody.WakeUp();
+                _needsRefresh = false;
+            }
+            else {
+                MaxDistanceCheck();
             }
         }
 
         private Vector2 GetProjectileVelocity(Vector2 shipVelocity, float projectileSpeed) {
-            Quaternion rotVec = Quaternion.Euler(0,0,transform.rotation.eulerAngles.z);
-            Vector2 up = rotVec * new Vector2(0,projectileSpeed);
+            Quaternion rotVec = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z);
+            Vector2 up = rotVec * new Vector2(0, projectileSpeed);
             return shipVelocity + up;
         }
 
@@ -46,9 +67,9 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
         }
 
         private void OnCollisionEnter(Collision collision) {
-            if ( !_shipObject.GetComponents<Collider>().Contains(collision.collider)) {
+            if (!_shipObject.GetComponents<Collider>().Contains(collision.collider)) {
                 ShipController shipController = collision.gameObject.GetComponent<ShipController>();
-                if (shipController!=null) {
+                if (shipController != null) {
                     DealDamage(shipController);
                     DestroySelf();
                 }
@@ -58,6 +79,9 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
         private void MaxDistanceCheck() {
             if (_currentTravelTime > _maxTravelTime) {
                 DestroySelf();
+            }
+            else {
+                _currentTravelTime += Time.deltaTime;
             }
         }
 

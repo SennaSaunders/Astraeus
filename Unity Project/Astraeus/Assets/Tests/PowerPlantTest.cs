@@ -72,7 +72,7 @@ namespace Tests {
             _fuel = new List<Fuel>();
 
             for (int i = 0; i < fuelUnits; i++) {
-                _fuel.Add(new Fuel(100));
+                _fuel.Add(new Fuel());
             }
         }
 

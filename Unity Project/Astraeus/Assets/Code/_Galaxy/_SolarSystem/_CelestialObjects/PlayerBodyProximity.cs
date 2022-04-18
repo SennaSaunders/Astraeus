@@ -7,24 +7,43 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects {
         private Delegate _proximityFunction;
         private Body _param;
         private float _distance;
+        private KeyCode _interactKey;
+        private GameObject _interactGUI;
+        private string _guiPath;
+
+        public void Setup(KeyCode interactKey, string prefabPath) {
+            _interactKey = interactKey;
+            _guiPath = prefabPath;
+        }
+
 
         private void Update() {
             ProximityCheck();
         }
 
         private void ProximityCheck() {
-            if (GameController.CurrentShip.ShipObject != null) {
-                Vector2 distanceBetween = (Vector2)transform.position - (Vector2)GameController.CurrentShip.ShipObject.transform.position;
-            
-                if (distanceBetween.magnitude < _distance) {
-                    if (Input.GetKeyDown(KeyCode.F)) {
-                        _proximityFunction.DynamicInvoke(_param);
+            if (!GameController.isPaused) {
+                if (GameController.CurrentShip != null) {
+                    if (GameController.CurrentShip.ShipObject != null) {
+                        Vector2 distanceBetween = (Vector2)transform.position - (Vector2)GameController.CurrentShip.ShipObject.transform.position;
+                        if (distanceBetween.magnitude < _distance) {
+                            if (_interactGUI == null) {
+                                _interactGUI = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_guiPath), GameController.CurrentShip.ShipObject.transform);
+                            }
+                            if (Input.GetKey(_interactKey)) {
+                                _proximityFunction.DynamicInvoke(_param);
+                            }
+                        }else if (_interactGUI != null) {
+                            Destroy(_interactGUI);
+                        }
                     }
                 }
+            }else if (_interactGUI != null) {
+                Destroy(_interactGUI);
             }
         }
 
-        public void SetCollisionFunction<T>(Action<T> proximityFunction, Body bodyParam) {
+        public void SetProximityFunction<T>(Action<T> proximityFunction, Body bodyParam) {
             _proximityFunction = proximityFunction;
             _param = bodyParam;
             _distance = bodyParam.Tier.InteractDistance();

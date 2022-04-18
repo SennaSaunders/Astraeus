@@ -6,6 +6,7 @@ using Code._GameControllers;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.InternalComponents;
+using Code._Ships.ShipComponents.InternalComponents.JumpDrives;
 using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
 using Code._Ships.ShipComponents.InternalComponents.Shields;
 using Code._Ships.ShipComponents.InternalComponents.Storage;
@@ -20,6 +21,7 @@ namespace Code._Ships.Controllers {
         private PowerPlantController _powerPlantController;
         private ShieldController _shieldController;
         public CargoController CargoController;
+        public JumpDriveController JumpDriveController;
         private List<Ship> hostiles;
 
         public void Setup(Ship ship) {
@@ -27,6 +29,7 @@ namespace Code._Ships.Controllers {
             List<PowerPlant> powerPlants = new List<PowerPlant>();
             List<CargoBay> cargoBays = new List<CargoBay>();
             List<Shield> shields = new List<Shield>();
+            List<JumpDrive> jumpDrives = new List<JumpDrive>();
             foreach (var internalSlot in _ship.ShipHull.InternalComponents) {
                 if (internalSlot.concreteComponent != null) {
                     InternalComponent component = internalSlot.concreteComponent;
@@ -36,12 +39,15 @@ namespace Code._Ships.Controllers {
                         cargoBays.Add((CargoBay)component);
                     } else if (component.GetType().IsSubclassOf(typeof(Shield))) {
                         shields.Add((Shield)component);
+                    } else if (component.GetType() == typeof(JumpDrive)) {
+                        jumpDrives.Add((JumpDrive)component);
                     }
                 }
             }
             _powerPlantController = new PowerPlantController(powerPlants);
             _shieldController = new ShieldController(shields, _powerPlantController);
             CargoController = new CargoController(cargoBays);
+            JumpDriveController = new JumpDriveController(jumpDrives, CargoController);
             
             List<MainThruster> mainThrusters = _ship.ShipHull.MainThrusterComponents.Select(tc => tc.concreteComponent).Where(tc => tc != null).ToList();
             ManoeuvringThruster manoeuvringThrusters = _ship.ShipHull.ManoeuvringThrusterComponents.concreteComponent;

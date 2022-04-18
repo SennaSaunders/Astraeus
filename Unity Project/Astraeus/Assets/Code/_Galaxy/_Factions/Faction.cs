@@ -289,11 +289,11 @@ namespace Code._Galaxy._Factions {
         private static List<(Faction.FactionType factionType, List<(int desire, Sector sector)> sectorDesire)> _factionSectorDesires = new List<(Faction.FactionType, List<(int desire, Sector sector)>)>();
 
         public static int GetFactionSearchDistance(this Faction.FactionType factionType) {
-            if (factionType == Faction.FactionType.Agriculture) return 2;
-            if (factionType == Faction.FactionType.Commerce) return 2;
-            if (factionType == Faction.FactionType.Industrial) return 2;
-            if (factionType == Faction.FactionType.Military) return 3;
-            if (factionType == Faction.FactionType.Pirate) return 1;
+            if (factionType == Faction.FactionType.Agriculture) return 3;
+            if (factionType == Faction.FactionType.Commerce) return 3;
+            if (factionType == Faction.FactionType.Industrial) return 3;
+            if (factionType == Faction.FactionType.Military) return 4;
+            if (factionType == Faction.FactionType.Pirate) return 2;
             if (factionType == Faction.FactionType.Technology) return 4;
             else return 0;
         }

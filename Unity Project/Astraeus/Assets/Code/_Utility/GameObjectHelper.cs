@@ -25,5 +25,10 @@ namespace Code._Utility {
             TextMeshProUGUI textObject = GameObjectHelper.FindChild(parent, gameObjectName).GetComponent<TextMeshProUGUI>();
             textObject.text = text;
         }
+        public static void SetGUITextValue(GameObject parent, string gameObjectName, string text, Color colour) {
+            TextMeshProUGUI textObject = GameObjectHelper.FindChild(parent, gameObjectName).GetComponent<TextMeshProUGUI>();
+            textObject.text = text;
+            textObject.color = colour;
+        }
     }
 }

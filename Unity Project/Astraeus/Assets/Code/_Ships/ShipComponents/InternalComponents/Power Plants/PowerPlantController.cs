@@ -83,7 +83,7 @@ namespace Code._Ships.ShipComponents.InternalComponents.Power_Plants {
                         else {
                             float residualEnergy = usedFuelEnergy + currentFuelEnergy - maxEnergyCharged;
                             usedFuelEnergy += currentFuelEnergy - residualEnergy;
-                            currentFuel.Capacity = residualEnergy / currentFuel.MaxEnergy;
+                            currentFuel.Capacity = residualEnergy / Fuel.MaxEnergy;
                         }
                     }
                 }

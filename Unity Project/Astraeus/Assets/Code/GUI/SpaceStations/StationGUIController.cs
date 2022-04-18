@@ -85,11 +85,12 @@ namespace Code.GUI.SpaceStations {
         
         private void SetupExitBtn() {
             Button btn = GameObject.Find("ExitBtn").GetComponent<Button>();
-            btn.onClick.AddListener(ExitBtnCLick);
+            btn.onClick.AddListener(Exit);
         }
 
-        private void ExitBtnCLick() {
+        public void Exit() {
             GameController.isPaused = false;
+            GameController.GUIController.ToggleShipGUI();
             Destroy(stationGUI);
             Destroy(this);
         }

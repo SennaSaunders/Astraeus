@@ -3,13 +3,11 @@
 namespace Code._Ships.ShipComponents.InternalComponents.JumpDrives {
     public class JumpDrive : InternalComponent{
         public JumpDrive(ShipComponentTier componentSize) : base("Jump Drive", componentSize, 200) {
-            JumpRange = GetTierMultipliedValue(GameController.MinExclusionDistance * 2, componentSize);
-            Energy = GetTierMultipliedValue(BaseEnergyCost, componentSize);
+            JumpRange = GetTierMultipliedValue(GameController.MinExclusionDistance * ExclusionRangeScale, componentSize);
         }
-
-        private float BaseEnergyCost = 200;
         
+        private const int ExclusionRangeScale = 3;
         public float JumpRange;
-        public float Energy;
+        public const float EnergyPerLY = 1000;
     }
 }

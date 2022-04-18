@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Code._Cargo;
+using Code._Cargo.ProductTypes.Ships;
+using Code._Galaxy._SolarSystem._CelestialObjects.Star;
+using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
+using UnityEngine;
 
 namespace Code._Ships.ShipComponents.InternalComponents.Storage {
     public class CargoController {
@@ -88,6 +92,19 @@ namespace Code._Ships.ShipComponents.InternalComponents.Storage {
             List<Cargo> cargo = GetCargoOfType(cargoType);
             cargo.RemoveRange(0, cargo.Count-amount);
             return cargo;
+        }
+
+        private float fuelCountToAdd = 0;
+        private float timeToGetFuel = 0;
+        public void FuelScoop(Star star) {
+            fuelCountToAdd += (float)star.Tier/2 * Time.deltaTime;
+            timeToGetFuel += Time.deltaTime;
+            
+            while (fuelCountToAdd > 1 && GetFreeCargoSpace() > 0) {
+                Debug.Log(timeToGetFuel);
+                AddCargo(new List<Cargo>(){new Fuel()});
+                fuelCountToAdd--;
+            }
         }
     }
 }

@@ -380,7 +380,6 @@ namespace Code.GUI.SpaceStations.Services {
         private void SetupJumpDriveCard(Transform cardComponents, JumpDrive jumpDriveInstance) {
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "ComponentName", jumpDriveInstance.ComponentName + " - " + jumpDriveInstance.ComponentSize);
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Range", jumpDriveInstance.JumpRange + "LY");
-            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Energy", jumpDriveInstance.Energy + "GW");
         }
 
         private void CreateSelectionMarkers<T>(List<(Transform mountTransform, Transform selectionTransform, string slotName, T component)> shipComponents) where T : ShipComponent {
