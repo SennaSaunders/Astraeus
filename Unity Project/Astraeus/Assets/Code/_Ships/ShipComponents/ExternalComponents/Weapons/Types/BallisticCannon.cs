@@ -14,6 +14,11 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons.Types {
         private static float maxTierRotationSpeed = 3;
 
         public BallisticCannon(ShipComponentTier componentSize) : base("Ballistic Cannon", componentSize, minTierFireDelay, maxTierFireDelay, baseDamage, projectileSpeed, travelTime, basePowerDraw, minTierRotationSpeed, maxTierRotationSpeed,baseMass) {
+            ColourChannelObjectMap = new List<(List<string> objectName, Color colour)>() {
+                (new List<string>() { "GunBarrel", "RecoilCompensator", "GunBack" }, new Color(.2f,.2f,.2f)),
+                (new List<string>() { "TurretSpindle", "GunBase" }, new Color(.2f,.2f,.5f)),
+                (new List<string>() { "TurretBase" }, Color.black)
+            };
         }
 
         public override string GetFullPath() {
@@ -22,15 +27,6 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons.Types {
 
         public override string GetProjectilePath() {
             return base.GetProjectilePath() + "PhysicalProjectile";
-        }
-
-        public override void SetColourChannelObjectMap() {
-            ColourChannelObjectMap = new List<(List<string> objectName, Color colour)>() {
-                (new List<string>() { "TurretBase" }, Color.black),
-                (new List<string>() { "GunBarrel", "RecoilCompensator" }, new Color(.2f,.2f,.2f)),
-                (new List<string>() { "TurretSpindle", "GunBase" }, new Color(.2f,.2f,.5f)),
-                (new List<string>() { "GunBack" }, new Color(.2f,.2f,.5f))
-            };
         }
     }
 }

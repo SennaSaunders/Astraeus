@@ -15,6 +15,7 @@ namespace Code.GUI.GalaxyGeneration {
         private GameController _gameController;
         private Thread _galaxyGenerationThread;
         private Thread _textureGenerationThread;
+        private int _minExclusionDistance;
         
         private bool _startedGalaxyGen;
         private bool _finishedGalaxyGen;
@@ -22,7 +23,7 @@ namespace Code.GUI.GalaxyGeneration {
         public void Start() {
             SetGUIGameObject();
             _generator = gameObject.AddComponent<GalaxyGenerator>();
-            if (!LoadPreviousGeneratorConfig()) LoadDefaultGeneratorConfig();
+            // if (!LoadPreviousGeneratorConfig()) LoadDefaultGeneratorConfig();
             InitFields();
             SetupGenerateGalaxyBtn();
         }
@@ -133,6 +134,7 @@ namespace Code.GUI.GalaxyGeneration {
         
         private void GenerateGalaxy() {
             StartLoadingScreen();
+            _minExclusionDistance = _generator.systemExclusionDistance.Value;
             _generator.SetPotentialSystemNames();
             _galaxyGenerationThread = new Thread(() => {
                 _galaxy = _generator.GenGalaxy();
@@ -153,11 +155,11 @@ namespace Code.GUI.GalaxyGeneration {
         }
 
         private void GenerateStartingSystemColours() {
-            _textureGenerationThread = GameController._galaxyController.GenerateSolarSystemColours(GameController._currentSolarSystem);
+            _textureGenerationThread = GameController._galaxyController.GenerateSolarSystemPlanetColours(GameController.CurrentSolarSystem);
         }
 
         private void GenerateStartingSystemTextures() {
-            GameController._galaxyController.GenerateSolarSystemTextures(GameController._currentSolarSystem);
+            GameController._galaxyController.GenerateSolarSystemTextures(GameController.CurrentSolarSystem);
         }
 
         private void InitialiseGameController() {
@@ -165,7 +167,7 @@ namespace Code.GUI.GalaxyGeneration {
             string gameControllerObjName = "GameController";
             GameObject gameControllerObj = new GameObject(gameControllerObjName);
             _gameController = gameControllerObj.AddComponent<GameController>();
-            _gameController.SetupGalaxyController(_galaxy);
+            _gameController.Setup(_galaxy, _minExclusionDistance);
         }
 
         private void Loaded() {

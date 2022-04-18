@@ -17,8 +17,9 @@ namespace Code._GameControllers {
     public class GameController : MonoBehaviour {
         public static PrefabHandler _prefabHandler;
         public static GalaxyController _galaxyController;
-        public static GameGUIController _guiController;
-        public static SolarSystem _currentSolarSystem;
+        public static GameGUIController GUIController;
+        public static SolarSystem CurrentSolarSystem;
+        public static int MinExclusionDistance;
         public const int ShipZ = SolarSystemController.ZOffset - 100;
 
         public static PlayerProfile PlayerProfile = new PlayerProfile();
@@ -29,6 +30,7 @@ namespace Code._GameControllers {
         public List<Ship> npcShips = new List<Ship>();
         private static IStation _currentStation;
         private static ShipCreator _shipCreator;
+        public static bool isPaused = true;
 
 
         private void Awake() {
@@ -41,7 +43,7 @@ namespace Code._GameControllers {
 
         private void SetShipPosition() {
             if (_currentStation != null) {
-                Vector3 stationPos = _galaxyController.GetSolarSystemController(_currentSolarSystem).GetBodyGameObject((Body)_currentStation).transform.position;
+                Vector3 stationPos = _galaxyController.GetSolarSystemController(CurrentSolarSystem).GetBodyGameObject((Body)_currentStation).transform.position;
                 CurrentShip.ShipObject.transform.position = new Vector3(stationPos.x, stationPos.y, ShipZ);
             }
         }
@@ -77,10 +79,10 @@ namespace Code._GameControllers {
 
         public void StartGame() {
             _galaxyController.DisplayGalaxy();
-            SolarSystemController solarSystemController = _galaxyController.GetSolarSystemController(_currentSolarSystem);
+            SolarSystemController solarSystemController = _galaxyController.GetSolarSystemController(CurrentSolarSystem);
             solarSystemController.DisplaySolarSystem();
             SetupDefaultShip();
-            _guiController.SetupStationGUI(_currentStation);
+            GUIController.SetupStationGUI(_currentStation);
             
         }
 
@@ -89,7 +91,7 @@ namespace Code._GameControllers {
         }
 
         public SolarSystem GetCurrentSolarSystem() {
-            return _currentSolarSystem;
+            return CurrentSolarSystem;
         }
 
         private void SetupShipCamera() {
@@ -97,7 +99,8 @@ namespace Code._GameControllers {
             shipCameraController.TakeCameraControl();
         }
 
-        public void SetupGalaxyController(Galaxy galaxy) {
+        public void Setup(Galaxy galaxy, int minExclusionDistance) {
+            MinExclusionDistance = minExclusionDistance;
             _galaxyController = FindObjectOfType<GalaxyController>();
             if (Application.isEditor) {
                 DestroyImmediate(_galaxyController);
@@ -108,13 +111,13 @@ namespace Code._GameControllers {
 
             _galaxyController = gameObject.AddComponent<GalaxyController>();
             _galaxyController.SetGalaxy(galaxy);
-            _currentSolarSystem = GetStartingSystem();
-            _currentStation = GetStartingStation(_currentSolarSystem);
+            CurrentSolarSystem = GetStartingSystem();
+            _currentStation = GetStartingStation(CurrentSolarSystem);
         }
 
         private void SetupGameGUIController() {
-            _guiController = gameObject.AddComponent<GameGUIController>();
-            _guiController.SetupGameController(this);
+            GUIController = gameObject.AddComponent<GameGUIController>();
+            GUIController.SetupGameController(this);
         }
 
         public void CreateNPC(Faction faction, ShipCreator.ShipClass shipClass, ShipComponentTier maxTier, float loadoutEfficiency, Vector2 spawnLocation) {
@@ -129,7 +132,6 @@ namespace Code._GameControllers {
             NPCShipController shipController = ship.ShipObject.AddComponent<NPCShipController>();
             shipController.Setup(ship, ship.ShipObject.transform.position);
             npcShips.Add(ship);
-            ship.Active = true;
         }
 
         private SolarSystem GetStartingSystem() {

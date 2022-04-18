@@ -9,12 +9,14 @@ using UnityEngine;
 namespace Code._Ships.Hulls {
     //ship blueprint for the components allowed on a particular hull 
     public abstract class Hull {
-        protected Hull(Vector3 outfittingPosition, float hullMass) {
+        protected Hull(Vector3 outfittingPosition, float hullMass, float hullStrength) {
             OutfittingPosition = new Vector3(outfittingPosition.x, outfittingPosition.y, outfittingPosition.z + OutfittingCameraController.ZOffset);
             HullMass = hullMass;
+            HullStrength = hullStrength;
             SetupHull();
         }
 
+        public float HullStrength;
         protected const string BaseHullPath = "Ships/Hulls/";
         public List<(ShipComponentType componentType, ShipComponentTier maxSize, InternalComponent concreteComponent, string parentTransformName)> InternalComponents;
         public List<(ShipComponentType componentType, ShipComponentTier maxSize, Weapon concreteComponent, string parentTransformName)> WeaponComponents;
@@ -22,7 +24,7 @@ namespace Code._Ships.Hulls {
         public (ShipComponentType componentType, ShipComponentTier maxSize, ManoeuvringThruster concreteComponent, string selectionTransformName, List<(string parentTransformName, float centerOffset)> thrusters) ManoeuvringThrusterComponents;
         public List<List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string parentTransformName,bool needsBracket)>> TiedThrustersSets = new List<List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string parentTransformName,bool needsBracket)>>();  
         public float HullMass;
-        public List<GameObject> MeshObjects;
+        public List<(GameObject mesh, int channelIdx)> MeshObjects;
         public List<(List<string> objectName, Color colour)> ColourChannelObjectMap;
         
         public Vector3 OutfittingPosition { get; set; }
@@ -30,15 +32,14 @@ namespace Code._Ships.Hulls {
 
         public abstract string GetHullFullPath();
 
-        protected void SetupHull() {
+        private void SetupHull() {
             SetWeaponComponents();
             SetThrusterComponents();
             SetInternalComponents();
         }
 
-        public abstract void SetThrusterComponents();
-        public abstract void SetWeaponComponents();
-        public abstract void SetInternalComponents();
-        public abstract void SetColourChannelObjectMap();
+        protected abstract void SetThrusterComponents();
+        protected abstract void SetWeaponComponents();
+        protected abstract void SetInternalComponents();
     }
 }

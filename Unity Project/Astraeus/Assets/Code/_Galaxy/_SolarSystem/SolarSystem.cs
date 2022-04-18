@@ -31,7 +31,7 @@ namespace Code._Galaxy._SolarSystem {
 
         
 
-        public void GenerateSolarSystemColours() {
+        public void GenerateSolarSystemPlanetColours() {
             for (int i =0;i<Bodies.Count; i++) {
                 Body currentBody = Bodies[i];
                 if (currentBody.GetType() == typeof(Planet)) {

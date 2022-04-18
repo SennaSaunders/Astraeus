@@ -27,7 +27,7 @@ namespace Code._Ships.Controllers {
             //hostile distance
             //weapon range
             //time to kill hostile
-            return GameController.CurrentShip.ShipObject.GetComponent<ShipController>();//temporarily get player ship
+            return null;//GameController.CurrentShip.ShipObject.GetComponent<ShipController>();//temporarily get player ship
         }
 
         private void SetCurrentTarget() {
@@ -64,18 +64,21 @@ namespace Code._Ships.Controllers {
         }
 
 
-        public override void AimWeapons() {
-            Vector2 interceptPos = transform.position;
-            Vector2 targetPos = _currentTarget.transform.position;
-            Vector2 targetV = _currentTarget.ThrusterController.Velocity;
-            foreach (WeaponController weaponController in _weaponControllers) {
-                float interceptSpeed = weaponController.ControlledWeapon.ProjectileSpeed;
-                Vector2 intercept = GetIntercept(interceptPos, interceptSpeed, targetPos, targetV);
-                weaponController.TurnWeapon(intercept, transform.rotation);
+        protected override void AimWeapons() {
+            if (_currentTarget != null) {
+                Vector2 interceptPos = transform.position;
+                Vector2 targetPos = _currentTarget.transform.position;
+                Vector2 targetV = _currentTarget.ThrusterController.Velocity;
+                foreach (WeaponController weaponController in WeaponControllers) {
+                    float interceptSpeed = weaponController.ControlledWeapon.ProjectileSpeed;
+                    Vector2 intercept = GetIntercept(interceptPos, interceptSpeed, targetPos, targetV);
+                    weaponController.TurnWeapon(intercept, transform.rotation);
+                }
             }
+            
         }
 
-        public override void FireCheck() {
+        protected override void FireCheck() {
             FireWeapons();
             //is weapon aimed at target
             //is weapon within range
@@ -84,7 +87,7 @@ namespace Code._Ships.Controllers {
             // throw new NotImplementedException();
         }
 
-        public override Vector2 GetThrustVector() {
+        protected override Vector2 GetThrustVector() {
             Vector2 currentPosition = transform.position;
             Vector2 deltaVector = destination - currentPosition; //how far is the destination from the current position
             Vector2 velocity = ThrusterController.Velocity;
@@ -205,7 +208,7 @@ namespace Code._Ships.Controllers {
             return (initialVelocity * initialVelocity) / (2 * angularA);
         }
 
-        public override float GetTurnDirection() {
+        protected override float GetTurnDirection() {
             float angle = GetTurnAngle();
             float angularDisplacement = CalculateDisplacementTillStop(ThrusterController.AngularVelocity, ThrusterController.AngularAcceleration);
 

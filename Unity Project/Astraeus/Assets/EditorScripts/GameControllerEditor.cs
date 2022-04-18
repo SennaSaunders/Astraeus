@@ -75,7 +75,6 @@ namespace EditorScripts {
             //spawn ship button
             if (GUILayout.Button("Spawn Ship")) {
                 if (Application.isPlaying) {
-                    Debug.Log("Spawning Ship");
                     gameController.CreateNPC(spawnableFactions[selectedFactionIndex], (ShipCreator.ShipClass)selectedShipClassIndex, (ShipComponentTier)selectedTierIndex, loadoutEfficiency, spawnLocation);
                 }
             }

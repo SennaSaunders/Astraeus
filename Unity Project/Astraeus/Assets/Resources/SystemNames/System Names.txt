@@ -598,7 +598,7 @@ Eddaw
 Bolturn
 Fordenstein
 Anklage
-Þorge
+Borge
 Itōkyōta
 Alballeside
 Kikushiri
@@ -1459,7 +1459,7 @@ Geisera
 Lasyalida
 Equulelah
 Ceforntauro
-Njörþrima
+Njörbrima
 Sarangyin
 Flörratsuke
 Müchtri
@@ -2044,7 +2044,7 @@ Treyjð
 Mumdå
 Chengiå
 Zommoä
-Menkeþ
+Menkeb
 Agnitz
 Saokae
 Saipð
@@ -2064,7 +2064,7 @@ Phiro
 Pirchhein
 Sadorf
 Alten
-Johnbþ
+Johnbb
 Namikl
 Sensnuá
 Bangenza
@@ -2395,7 +2395,7 @@ Atlonx
 Mahala
 Panleybuú
 Imhamatsu
-Curiteþ
+Curiteb
 Chatzfae
 Bratslä
 Sucelburg
@@ -2459,10 +2459,10 @@ Okawater
 Sabitiej
 Ravati
 Gardsy
-Woldahdþ
+Woldahdb
 Taitolpew
 Valeburg
-Tophþ
+Tophb
 Pholzx
 Alphí
 Certusberg
@@ -2477,7 +2477,7 @@ Nackcó
 Althq
 Schenj
 Paraz
-Legnafþ
+Legnafb
 Matsurybá
 Suick
 Schwaitcitú
@@ -2670,7 +2670,7 @@ Hochins
 Osedar
 Olchi
 Monzonú
-Shimaþ
+Shimab
 Yasuuä
 Carthwaite
 Mumealß
@@ -2737,7 +2737,7 @@ Guarí
 Shibß
 Higion
 Abujy
-Malatorþ
+Malatorb
 Hartmd
 Bijieoe
 Ningwayenoe
@@ -3008,7 +3008,7 @@ Nantad
 Aquiù
 Coesq
 Matut
-Pattþ
+Pattb
 Alisad
 Monbeí
 Jarfae
@@ -3166,7 +3166,7 @@ Bornü
 Toshimy
 Westv
 Peopley
-Tripþ
+Tripb
 Billeß
 Pressō
 Gosf
@@ -3267,7 +3267,7 @@ Fulgè
 Chanx
 Maaheð
 Dassg
-Norbþ
+Norbb
 Hilcà
 Bleatak
 Waldbrō
@@ -3278,7 +3278,7 @@ Todhü
 Sakatū
 Hemmb
 Naueh
-Bukaþ
+Bukab
 Hidaō
 Propun
 Maxhl
@@ -3369,7 +3369,7 @@ Spari
 Falkep
 Haigf
 Tragonih
-Laufeþ
+Laufeb
 Alama
 Mutinuu
 Schönwu
@@ -3391,7 +3391,7 @@ Stadf
 Putlè
 Stadeè
 Aericí
-Valenþ
+Valenb
 Gargs
 Agathonl
 Analap
@@ -3511,7 +3511,7 @@ Flavä
 Pattð
 Anziß
 Suhej
-Kaldþ
+Kaldb
 Hellō
 Minatß
 Roboé
@@ -3525,7 +3525,7 @@ Herae
 Halek
 Glasé
 Borkuâ
-Thalþ
+Thalb
 Kaisō
 Crosslú
 Kamisg
@@ -3623,7 +3623,7 @@ Shikop
 Torvae
 Hohenz
 Meroph
-Amagþ
+Amagb
 Adelsp
 Beletà
 Mahl
@@ -3640,7 +3640,7 @@ Borghé
 Nethertè
 Rastf
 Lauffenó
-Eltvþ
+Eltvb
 Brücö
 Hariü
 Schönaj
@@ -3704,7 +3704,7 @@ Nashü
 Lorscoe
 Lambreà
 Yurià
-Kinsþ
+Kinsb
 Paximadas
 Kogar
 Highcunsk
@@ -3727,18 +3727,18 @@ Gujōū
 Alsiuē
 Cumrd
 Hornsè
-Yaminþ
+Yaminb
 Tondad
 Beleē
 Kalydè
-Nereþ
+Nereb
 Vilnd
 Kendf
 Tempp
 Blieó
 Remiù
 Blackó
-Schöþ
+Schöb
 Amhehe
 Condateà
 Highbj
@@ -3763,8 +3763,8 @@ Schnan
 Rheiè
 Leinú
 Bonný
-Sangþ
-Celbþ
+Sangb
+Celbb
 Telesv
 Hanoö
 Wadjū
@@ -3785,7 +3785,7 @@ Megurd
 Yamagr
 Coswe
 Diert
-Penrþ
+Penrb
 Römhið
 Vishz
 Richð
@@ -3837,7 +3837,7 @@ Monzä
 Dhakc
 Wittð
 Wismarè
-Wareþ
+Wareb
 Tambr
 Wolfhà
 Alderē
@@ -3886,7 +3886,7 @@ Marktö
 Sandak
 Meßsc
 Grasg
-Tajiþ
+Tajib
 Haßfux
 Hadamú
 Grebeø

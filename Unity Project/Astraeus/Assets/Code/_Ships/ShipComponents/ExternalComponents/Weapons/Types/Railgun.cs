@@ -14,6 +14,13 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons.Types {
         private static float maxTierRotationSpeed = 1;
 
         public Railgun(ShipComponentTier componentSize) : base("Railgun",componentSize, minTierFireDelay, maxTierFireDelay, baseDamage, projectileSpeed, travelTime, basePowerDraw, minTierRotationSpeed, maxTierRotationSpeed,baseMass) {
+            ColourChannelObjectMap = new List<(List<string> objectName, Color colour)>() {
+                (new List<string>() { "Barrel" }, new Color(.2f, .2f, .2f)),
+                (new List<string>() { "GunBack", "StrutBottom", "StrutTopLeft", "StrutTopRight" }, new Color(.4f, .1f, .5f)),
+                (new List<string>() { "TurretSpindle", "GunBase" }, new Color(.2f, .2f, .2f)),
+                (new List<string>() { "ChargingSlit" }, new Color(.3f, .5f, 1f)),
+                (new List<string>() { "TurretBase" }, new Color(.2f, .2f, .2f)),
+            };
         }
 
         public override string GetFullPath() {
@@ -22,16 +29,6 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons.Types {
         
         public override string GetProjectilePath() {
             return base.GetProjectilePath() + "PhysicalProjectile";
-        }
-
-        public override void SetColourChannelObjectMap() {
-            ColourChannelObjectMap = new List<(List<string> objectName, Color colour)>() {
-                (new List<string>() { "TurretBase" }, new Color(.2f, .2f, .2f)),
-                (new List<string>() { "Barrel" }, new Color(.2f, .2f, .2f)),
-                (new List<string>() { "TurretSpindle", "GunBase" }, new Color(.2f, .2f, .2f)),
-                (new List<string>() { "GunBack", "StrutBottom", "StrutLeft", "StrutRight" }, new Color(.4f, .1f, .5f)),
-                (new List<string>() { "ChargingSlit" }, new Color(.3f, .5f, 1f))
-            };
         }
     }
 }

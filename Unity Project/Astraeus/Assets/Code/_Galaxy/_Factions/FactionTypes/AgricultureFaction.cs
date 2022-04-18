@@ -28,7 +28,7 @@ namespace Code._Galaxy._Factions.FactionTypes {
         }
 
         public override List<(Type weaponType, int spawnWeighting)> GetAllowedWeapons() {
-            List<(Type weaponType, int spawnWeighting)> weapons = new List<(Type weaponType, int spawnWeighting)> { (typeof(BallisticCannon), 1), (typeof(LaserCannon), 1) };
+            List<(Type weaponType, int spawnWeighting)> weapons = new List<(Type weaponType, int spawnWeighting)> { (typeof(BallisticCannon), 1), (typeof(Laser), 1) };
             return weapons;
         }
 

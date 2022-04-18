@@ -31,8 +31,6 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Star {
             MeshRenderer meshRenderer = sphere.GetComponent<MeshRenderer>();
             meshRenderer.material = (Material)Resources.Load("Materials/Star/"+StarClass.GetStarShader());
             meshRenderer.material.shader = Shader.Find("Shader Graphs/StarShaderGraph");
-
-            Debug.Log("Setting texture");
             return sphere;
         }
 

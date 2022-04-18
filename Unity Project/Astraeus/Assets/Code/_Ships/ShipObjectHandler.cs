@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Code._GameControllers;
 using Code._Ships.Hulls;
@@ -15,14 +14,10 @@ namespace Code._Ships {
     public class ShipObjectHandler : MonoBehaviour {
         public Ship ManagedShip { get; set; }
 
-        public List<(Transform mountTransform, Transform selectionTransform, string slotName)> WeaponComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName)>();
-        public List<(Transform mountTransform, Transform selectionTransform, string slotName)> MainThrusterComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName)>();
-        public (List<Transform> mountTransforms, Transform selectionTransform, string slotName) ManoeuvringThrusterComponents;
-        public List<(Transform mountTransform, Transform selectionTransform, string slotName)> InternalComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName)>();
-        private static readonly int Metallic = Shader.PropertyToID("Metallic");
-        private static readonly int Smoothness = Shader.PropertyToID("Smoothness");
-        private static readonly int Property = Shader.PropertyToID("Smoothness Scale");
-
+        public List<(Transform mountTransform, Transform selectionTransform, string slotName, Weapon weapon)> WeaponComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName, Weapon weapon)>();
+        public List<(Transform mountTransform, Transform selectionTransform, string slotName, MainThruster thruster)> MainThrusterComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName, MainThruster thruster)>();
+        public (List<Transform> mountTransforms, Transform selectionTransform, string slotName, ManoeuvringThruster thruster) ManoeuvringThrusterComponents;
+        public List<(Transform mountTransform, Transform selectionTransform, string slotName, InternalComponent component)> InternalComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName, InternalComponent component)>();
 
         public GameObject CreateShip(Transform parent) {
             CreateHull();
@@ -32,87 +27,54 @@ namespace Code._Ships {
             CreateInternalComponents();
             SetDefaultShipRotation();
             ManagedShip.ShipObject.transform.SetParent(parent);
-            SetDefaultMaterials();
             return ManagedShip.ShipObject;
         }
 
-        public void SetDefaultMaterials() {
-            List<(Type objectType, List<(GameObject mesh, Color colour)> meshColour)> meshObjectMaps = GetHullMeshObjects(ManagedShip.ShipHull);
-
-            foreach ((Type objectType, List<(GameObject mesh, Color colour)> meshColour) meshObjectMap in meshObjectMaps) {
-                foreach ((GameObject mesh, Color colour) meshColour in meshObjectMap.meshColour) {
-                    Material material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-                    material.color = meshColour.colour;
-                    MeshRenderer meshRenderer = meshColour.mesh.GetComponent<MeshRenderer>();
-                    meshRenderer.material = material;
-                }
-                 
+        public void SetMappedMaterials(List<(GameObject mesh, int channelIdx)> meshObjects, List<(List<string> objectName, Color colour)> colourChannelObjectMap) {
+            foreach ((GameObject mesh, int channelIdx) meshObject in meshObjects) {
+                SetMaterial(meshObject.mesh, colourChannelObjectMap[meshObject.channelIdx].colour);
             }
         }
 
-        public void SetMaterials(List<(Type objectType, List<(GameObject mesh, Color colour)> meshColour)> meshObjectMaps) {
-            foreach ((Type objectType, List<(GameObject mesh, Color colour)> meshColour) meshObjectMap in meshObjectMaps) {
-                foreach ((GameObject mesh, Color colour) meshColour in meshObjectMap.meshColour) {
-                    Material material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-                    material.color = meshColour.colour;
-                    MeshRenderer meshRenderer = meshColour.mesh.GetComponent<MeshRenderer>();
-                    meshRenderer.material = material;
-                }
-            }
+        private void SetMaterial(GameObject mesh, Color colour) {
+            Material material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            material.color = colour;
+            MeshRenderer meshRenderer = mesh.GetComponent<MeshRenderer>();
+            meshRenderer.material = material;
         }
 
-        public List<(Type objectType, List<(GameObject mesh, Color colour)> meshColour)> GetHullMeshObjects(Hull hull) {
-            List<(Type objectType, List<(GameObject mesh, Color colour)> meshColour)> meshTypeObjects = new List<(Type objectType, List<(GameObject mesh, Color colour)> meshColour)>();
-            hull.SetColourChannelObjectMap();
-            foreach (GameObject meshObject in hull.MeshObjects) {
-                Color colour = hull.ColourChannelObjectMap.Find(channel => channel.objectName.Contains(meshObject.name)).colour;
-                if (meshTypeObjects.Select(mto => mto.objectType).Contains(hull.GetType())) {
-                    (Type objectType, List<(GameObject mesh, Color colour)> meshColour) temp = meshTypeObjects.Find(mto => mto.objectType == hull.GetType());
-                    var typeIndex = meshTypeObjects.IndexOf(temp);
-                    temp.meshColour.Add((meshObject, colour));
-                    meshTypeObjects[typeIndex] = temp;
-                }
-                else {
-                    Type hullType = hull.GetType();
-                    meshTypeObjects.Add((hullType, new List<(GameObject mesh, Color colour)>(){ (meshObject, colour)}));
-                }
+        private List<(GameObject mesh, int channelIdx)> MapHullMeshToChannel(List<GameObject> meshes, Hull hull) {
+            List<(GameObject mesh, int channelIdx)> meshChannelMap = new List<(GameObject mesh, int channelIdx)>();
+            foreach (GameObject mesh in meshes) {
+                var channelIdx = hull.ColourChannelObjectMap.FindIndex(c => c.objectName.Contains(mesh.name));
+                meshChannelMap.Add((mesh, channelIdx));
             }
-            return meshTypeObjects;
+
+            return meshChannelMap;
         }
-
-        private List<(Type objectType, List<(GameObject mesh, Color colour)> meshColour)> MapExternalComponents(List<ExternalComponent> externalComponents) {
-            List<(Type objectType, List<(GameObject mesh, Color colour)> meshColour)> meshTypeObjects = new List<(Type objectType, List<(GameObject mesh, Color colour)> meshColour)>();
-            foreach (var component in externalComponents) {
-                if (component != null) {
-                    component.SetColourChannelObjectMap();
-                    foreach (GameObject meshObject in component.MeshObjects) {
-                        Color colour = component.ColourChannelObjectMap.Find(channel => channel.objectName.Contains(meshObject.name)).colour;
-                        if (meshTypeObjects.Select(mto => mto.objectType).Contains(component.GetType())) {
-                            (Type objectType, List<(GameObject mesh, Color colour)> meshColour) temp = meshTypeObjects.Find(mto => mto.objectType == component.GetType());
-                            var typeIndex = meshTypeObjects.IndexOf(temp);
-                            temp.meshColour.Add((meshObject, colour));
-                            meshTypeObjects[typeIndex] = temp;
-                        }
-                        else {
-                            Type componentType = component.GetType();
-                            meshTypeObjects.Add((componentType , new List<(GameObject mesh, Color colour)>(){ (meshObject, colour)}));
-                        }
-                    }
+        private List<(GameObject mesh, int channelIdx)> MapExternalMeshToChannel(List<GameObject> meshes, ExternalComponent externalComponent) {
+            List<(GameObject mesh, int channelIdx)> meshChannelMap = new List<(GameObject mesh, int channelIdx)>();
+            foreach (GameObject mesh in meshes) {
+                string meshName = mesh.name;
+                string clone = "(Clone)";
+                if (mesh.name.EndsWith(clone)) {
+                    meshName = meshName.Substring(0,meshName.Length - clone.Length);
                 }
+                var channelIdx = externalComponent.ColourChannelObjectMap.FindIndex(c => c.objectName.Contains(meshName));
+                meshChannelMap.Add((mesh, channelIdx));
             }
 
-            return meshTypeObjects;
+            return meshChannelMap;
         }
 
         private void CreateHull() {
             ManagedShip.ShipObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(ManagedShip.ShipHull.GetHullFullPath()));
-            ManagedShip.ShipHull.MeshObjects = GameController._prefabHandler.GetMeshObjects(ManagedShip.ShipObject);
-            Rigidbody hullRigidbody = ManagedShip.ShipObject.AddComponent<Rigidbody>();
-            hullRigidbody.isKinematic = false;
-            hullRigidbody.useGravity = false;
-            hullRigidbody.constraints = RigidbodyConstraints.FreezeAll;
+            ManagedShip.ShipHull.MeshObjects = MapHullMeshToChannel(GameController._prefabHandler.GetMeshObjects(ManagedShip.ShipObject), ManagedShip.ShipHull);
+            SetMappedMaterials(ManagedShip.ShipHull.MeshObjects, ManagedShip.ShipHull.ColourChannelObjectMap);
         }
+
         
+
         private void CreateWeaponComponents() {
             ShipComponentType componentType = ShipComponentType.Weapon;
             List<(ShipComponentType componentType, ShipComponentTier maxSize, Weapon concreteComponent, string parentTransformName)> componentSlots = ManagedShip.ShipHull.WeaponComponents.Where(c => c.componentType == componentType).ToList();
@@ -120,7 +82,6 @@ namespace Code._Ships {
             foreach (var slot in componentSlots) {
                 SetWeaponComponent(slot.parentTransformName, slot.concreteComponent);
             }
-            SetMaterials(MapExternalComponents(componentSlots.Select(cs=>cs.concreteComponent).Cast<ExternalComponent>().ToList()));
         }
         
         private void CreateMainThrusterComponents() {
@@ -130,7 +91,6 @@ namespace Code._Ships {
             foreach (var slot in componentSlots) {
                 SetMainThrusterComponent(slot.parentTransformName, slot.concreteComponent);
             }
-            SetMaterials(MapExternalComponents(componentSlots.Select(cs=>cs.concreteComponent).Cast<ExternalComponent>().ToList()));
         }
         
         private void CreateManoeuvringThrusterComponents() {
@@ -164,8 +124,8 @@ namespace Code._Ships {
             GameObject newComponentObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(path), parent);
             newComponentObject.transform.localScale = new Vector3(scale, scale, scale);
             component.InstantiatedGameObject = newComponentObject;
-            component.MeshObjects = GameController._prefabHandler.GetMeshObjects(newComponentObject);
-            SetMaterials(MapExternalComponents(new List<ExternalComponent>(){component}));
+            component.MeshObjects = MapExternalMeshToChannel(GameController._prefabHandler.GetMeshObjects(newComponentObject), component);
+            SetMappedMaterials(component.MeshObjects, component.ColourChannelObjectMap);
         }
 
         private Transform MapPrefabTransformStringToTransformObject(string parentTransformNames) {
@@ -197,7 +157,7 @@ namespace Code._Ships {
             if (MainThrusterComponents.Select(tc => tc.mountTransform).Contains(slotTransform)) {
                 MainThrusterComponents.Remove(MainThrusterComponents.Find(tc => tc.mountTransform == slotTransform));
             }
-            MainThrusterComponents.Add((slotTransform, selectionTransform, "Main Thruster - " + slot.maxSize));
+            MainThrusterComponents.Add((slotTransform, selectionTransform, "Main Thruster - " + slot.maxSize, mainThruster));
 
             if (slotTransform != null&&mainThruster!=null) {
                 if (mainThruster.ComponentType == slot.componentType && mainThruster.ComponentSize <= slot.maxSize) {
@@ -220,6 +180,11 @@ namespace Code._Ships {
                         }
                         
                         GameObject bracket = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab("Ships/Thrusters/ThrusterBracket"), holderTransform);
+                        List<GameObject> bracketMeshes = GameController._prefabHandler.GetMeshObjects(bracket);
+                        foreach (GameObject bracketMesh in bracketMeshes) {
+                            SetMaterial(bracketMesh, Color.black);
+                        }
+                        
                         float scale = ShipComponent.GetTierMultipliedValue(1, slot.concreteComponent.ComponentSize);
                         bracket.transform.localScale = new Vector3(scale,scale,scale);
                         Transform bracketMountTransform = bracket.transform.Find("ThrusterBracket").transform.Find("ThrusterMount").transform;
@@ -248,7 +213,7 @@ namespace Code._Ships {
                 ManagedShip.ShipHull.ManoeuvringThrusterComponents.thrusters[i] = thruster;
             }
              
-            ManoeuvringThrusterComponents = (objectTransforms, selectionTransform, "Manoeuvring Thruster - " + slot.maxSize);
+            ManoeuvringThrusterComponents = (objectTransforms, selectionTransform, "Manoeuvring Thruster - " + slot.maxSize, manoeuvringThruster);
 
             if (manoeuvringThruster != null) {
                 if (manoeuvringThruster.ComponentSize <= slot.maxSize) {
@@ -288,7 +253,7 @@ namespace Code._Ships {
             Transform slotTransform = MapPrefabTransformStringToTransformObject(parentName);
             Transform selectionTransform = GetSelectionTransform(slotTransform);
             if (!WeaponComponents.Select(wc => wc.mountTransform).Contains(slotTransform)) {
-                WeaponComponents.Add((slotTransform,selectionTransform, "Weapon - " + slot.maxSize));
+                WeaponComponents.Add((slotTransform,selectionTransform, "Weapon - " + slot.maxSize, weapon));
             }
 
             if (slotTransform != null&&weapon!=null) {
@@ -322,7 +287,7 @@ namespace Code._Ships {
             Transform selectionTransform = MapPrefabTransformStringToTransformObject(parentName);
 
             if (!InternalComponents.Select(ic => ic.mountTransform).Contains(selectionTransform)) {
-                InternalComponents.Add((selectionTransform,selectionTransform, "Internal - " + slot.maxSize));
+                InternalComponents.Add((selectionTransform,selectionTransform, "Internal - " + slot.maxSize, internalComponent));
                 // InternalComponents.Remove(WeaponComponents.Find(wc => wc.mountTransform == selectionTransform));
             }
             

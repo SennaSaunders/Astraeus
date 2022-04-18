@@ -10,10 +10,11 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
         private PowerPlantController _powerPlantController;
         private float _fireCooldownTime = 0;
         private bool _flipRotation = false;
-
-        public void Setup(Weapon weapon, PowerPlantController powerPlantController) {
+        private GameObject _shipObject;
+        public void Setup(Weapon weapon, PowerPlantController powerPlantController, GameObject shipObject) {//passing the ship object so projectiles can ignore collisions with itself
             ControlledWeapon = weapon;
             _powerPlantController = powerPlantController;
+            _shipObject = shipObject;
             float epsilon = 1; 
             _flipRotation = Math.Abs(Math.Abs(ControlledWeapon.InstantiatedGameObject.transform.parent.transform.parent.localRotation.eulerAngles.y) - 180)<epsilon;
         }
@@ -30,11 +31,13 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
                 if (powerDrawEffectiveness > 0) { //only fires if there is power to expend
                     float damage = ControlledWeapon.Damage * powerDrawEffectiveness;
                     GameObject projectileSpawnPoint = GameObjectHelper.FindChild(ControlledWeapon.InstantiatedGameObject, "ProjectileSpawn");
-                    Projectile projectile = projectileSpawnPoint.AddComponent<Projectile>();
-                    projectile.transform.position = projectileSpawnPoint.transform.position;
+                    GameObject projectileObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(ControlledWeapon.GetProjectilePath()));
+                    projectileObject.transform.position = projectileSpawnPoint.transform.position;
                     Quaternion turretRotation = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z);
-                    projectile.transform.rotation = _flipRotation ? Quaternion.Inverse(turretRotation):turretRotation;
-                    projectile.Spawn(ControlledWeapon, velocityOffset, damage);
+                    projectileObject.transform.rotation = _flipRotation ? Quaternion.Inverse(turretRotation):turretRotation;
+                    Projectile projectile = projectileObject.AddComponent<Projectile>();
+                    
+                    projectile.Spawn(ControlledWeapon, velocityOffset, damage, _shipObject);
                     _fireCooldownTime = ControlledWeapon.FireDelay;
                 }
             }

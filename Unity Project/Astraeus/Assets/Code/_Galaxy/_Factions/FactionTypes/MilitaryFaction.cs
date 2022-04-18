@@ -26,7 +26,7 @@ namespace Code._Galaxy._Factions.FactionTypes {
             List<(Type weapon, int spawnWeighting)> weapons = new List<(Type weapon, int spawnWeighting)>();
             weapons.Add((typeof(Railgun), 1));
             weapons.Add((typeof(BallisticCannon), 2));
-            weapons.Add((typeof(LaserCannon), 2));
+            weapons.Add((typeof(Laser), 2));
 
             return weapons;
         }

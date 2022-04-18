@@ -2,10 +2,12 @@
 using System.Linq;
 using Code._Cargo;
 using Code._Cargo.ProductTypes.Ships;
+using Code._GameControllers;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.InternalComponents;
 using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
+using Code._Ships.ShipComponents.InternalComponents.Shields;
 using Code._Ships.ShipComponents.InternalComponents.Storage;
 using Code._Utility;
 using UnityEngine;
@@ -14,8 +16,9 @@ namespace Code._Ships.Controllers {
     public abstract class ShipController : MonoBehaviour {
         private Ship _ship;
         public ThrusterController ThrusterController;
-        protected List<WeaponController> _weaponControllers;
+        protected List<WeaponController> WeaponControllers;
         private PowerPlantController _powerPlantController;
+        private ShieldController _shieldController;
         public CargoController CargoController;
         private List<Ship> hostiles;
 
@@ -23,6 +26,7 @@ namespace Code._Ships.Controllers {
             _ship = ship;
             List<PowerPlant> powerPlants = new List<PowerPlant>();
             List<CargoBay> cargoBays = new List<CargoBay>();
+            List<Shield> shields = new List<Shield>();
             foreach (var internalSlot in _ship.ShipHull.InternalComponents) {
                 if (internalSlot.concreteComponent != null) {
                     InternalComponent component = internalSlot.concreteComponent;
@@ -30,10 +34,13 @@ namespace Code._Ships.Controllers {
                         powerPlants.Add((PowerPlant)component);
                     } else if (component.GetType() == typeof(CargoBay)) {
                         cargoBays.Add((CargoBay)component);
+                    } else if (component.GetType().IsSubclassOf(typeof(Shield))) {
+                        shields.Add((Shield)component);
                     }
                 }
             }
             _powerPlantController = new PowerPlantController(powerPlants);
+            _shieldController = new ShieldController(shields, _powerPlantController);
             CargoController = new CargoController(cargoBays);
             
             List<MainThruster> mainThrusters = _ship.ShipHull.MainThrusterComponents.Select(tc => tc.concreteComponent).Where(tc => tc != null).ToList();
@@ -41,7 +48,7 @@ namespace Code._Ships.Controllers {
             List<float> centerOffsets = _ship.ShipHull.ManoeuvringThrusterComponents.thrusters.Select(t => t.centerOffset).ToList();
 
             ThrusterController = new ThrusterController(mainThrusters, (manoeuvringThrusters, centerOffsets), GetShipMass(), _powerPlantController);
-            _weaponControllers = new List<WeaponController>();
+            WeaponControllers = new List<WeaponController>();
             foreach (var weaponComponent in ship.ShipHull.WeaponComponents) {
                 Weapon weapon = weaponComponent.concreteComponent;
                 if (weaponComponent.concreteComponent != null) {
@@ -49,18 +56,14 @@ namespace Code._Ships.Controllers {
                     GameObject spindle = GameObjectHelper.FindChild(weaponGameObject,"TurretSpindle");
 
                     var weaponController = spindle.gameObject.AddComponent<WeaponController>();
-                    weaponController.Setup(weapon, _powerPlantController);
-                    _weaponControllers.Add(weaponController);
+                    weaponController.Setup(weapon, _powerPlantController, gameObject);
+                    WeaponControllers.Add(weaponController);
                 }
             }
-
-            
-
-            
         }
 
         private void Update() {
-            if (_ship.Active) {
+            if (!GameController.isPaused) {
                 Thrust();
                 Turn();
                 AimWeapons();
@@ -102,7 +105,7 @@ namespace Code._Ships.Controllers {
             return mass;
         }
 
-        public void Thrust() {
+        private void Thrust() {
             Vector2 thrustVector = GetThrustVector();
             if (thrustVector != new Vector2()) {
                 ThrusterController.FireThrusters(thrustVector, Time.deltaTime, gameObject.transform.localRotation.eulerAngles.z);
@@ -111,7 +114,7 @@ namespace Code._Ships.Controllers {
             gameObject.transform.Translate( ThrusterController.Velocity* Time.deltaTime, Space.World);
         }
 
-        public void Turn() {
+        private void Turn() {
             var turnDir = GetTurnDirection();
 
             if (turnDir != 0) {
@@ -128,17 +131,41 @@ namespace Code._Ships.Controllers {
             }
         }
 
-        
-        public abstract void AimWeapons();
-        public abstract void FireCheck();
 
-        public void FireWeapons() {
-            foreach (WeaponController weaponController in _weaponControllers) {
+        protected abstract void AimWeapons();
+        protected abstract void FireCheck();
+
+        protected void FireWeapons() {
+            foreach (WeaponController weaponController in WeaponControllers) {
                 weaponController.Fire(ThrusterController.Velocity);
             }
         }
-        public abstract Vector2 GetThrustVector();
 
-        public abstract float GetTurnDirection();
+        protected abstract Vector2 GetThrustVector();
+
+        protected abstract float GetTurnDirection();
+
+        public void TakeDamage(float damage) {
+            damage = _shieldController.TakeDamage(damage);
+            if (_ship.ShipHull.HullStrength > 0) {
+                if (damage > 0) {
+                    _ship.ShipHull.HullStrength -= damage;
+                    if (_ship.ShipHull.HullStrength < 0) {
+                        ShipDestroyed();
+                    }
+                }
+            }
+        }
+
+        protected void ShipDestroyed() {
+            GameObject particleSystemObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab("Effects/ExplosionEffect"));
+            particleSystemObject.transform.SetParent(transform);
+            particleSystemObject.transform.localPosition = new Vector3();
+            ParticleSystem particleSystem = particleSystemObject.GetComponent<ParticleSystem>();
+            float duration = particleSystem.main.duration + particleSystem.main.startLifetimeMultiplier;
+            Destroy(particleSystemObject, duration);
+            Destroy(_ship.ShipObject, duration/2);
+            Destroy(this, duration);
+        }
     }
 }

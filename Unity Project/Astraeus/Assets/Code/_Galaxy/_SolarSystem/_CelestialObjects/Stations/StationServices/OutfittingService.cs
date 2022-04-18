@@ -73,7 +73,7 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
 
         //weapons
         private void AddAllWeapons() {
-            AddAvailableComponents<LaserCannon>();
+            AddAvailableComponents<Laser>();
             AddAvailableComponents<BallisticCannon>();
             AddAvailableComponents<Railgun>();
         }

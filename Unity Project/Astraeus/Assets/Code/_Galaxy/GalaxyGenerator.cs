@@ -21,11 +21,11 @@ namespace Code._Galaxy {
     public class GalaxyGenerator : MonoBehaviour {
         public static Random Rng = new Random();
         public GalaxyGeneratorInput seed = new GalaxyGeneratorInput(1337);
-        public GalaxyGeneratorInput maxSystems = new GalaxyGeneratorInput(100, 2000, 500);
+        public GalaxyGeneratorInput maxSystems = new GalaxyGeneratorInput(200, 2000, 200);
         public GalaxyGeneratorInput minBodiesPerSystem = new GalaxyGeneratorInput(1, 5, 1);
         public GalaxyGeneratorInput maxBodiesPerSystem = new GalaxyGeneratorInput(5, 20, 5);
-        public GalaxyGeneratorInput width = new GalaxyGeneratorInput(50, 2000, 1000);
-        public GalaxyGeneratorInput height = new GalaxyGeneratorInput(50, 2000, 1000);
+        public GalaxyGeneratorInput width = new GalaxyGeneratorInput(300, 2000, 300);
+        public GalaxyGeneratorInput height = new GalaxyGeneratorInput(300, 2000, 300);
         public GalaxyGeneratorInput systemExclusionDistance = new GalaxyGeneratorInput(5, 20, 5);
         private List<string> potentialSystemNames;
 
@@ -39,8 +39,7 @@ namespace Code._Galaxy {
         }
 
         //has to be called before galaxy generation as getting Application.dataPath has to be on the main thread
-        public void SetPotentialSystemNames() { 
-            Debug.Log(Application.dataPath);
+        public void SetPotentialSystemNames() {
             string path = Application.dataPath + "/Resources/SystemNames/System Names.txt";
             string[] lines = File.ReadAllLines(path);
             

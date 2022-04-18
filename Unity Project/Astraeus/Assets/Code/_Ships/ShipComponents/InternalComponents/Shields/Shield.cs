@@ -1,6 +1,6 @@
 ﻿namespace Code._Ships.ShipComponents.InternalComponents.Shields {
     public abstract class Shield : InternalComponent {
-        public Shield(string nameSpecifier, ShipComponentTier componentSize, float baseMass, float strengthCapacity, float rechargeRate, float damageRecoveryTime, float depletionRecoveryTime) : base(nameSpecifier + " Shield", componentSize, baseMass) {
+        protected Shield(string nameSpecifier, ShipComponentTier componentSize, float baseMass, float strengthCapacity, float rechargeRate, float damageRecoveryTime, float depletionRecoveryTime) : base(nameSpecifier + " Shield", componentSize, baseMass) {
             StrengthCapacity = GetTierMultipliedValue(strengthCapacity, componentSize);
             CurrentStrength = StrengthCapacity;
             RechargeRate = GetTierMultipliedValue(rechargeRate, componentSize);
@@ -19,17 +19,17 @@
     }
     
     public class ShieldHighRecharge:Shield {
-        public ShieldHighRecharge(ShipComponentTier componentSize) : base("High Recharge", componentSize, 500, 3000, 500, 1.5f, 10) {
+        public ShieldHighRecharge(ShipComponentTier componentSize) : base("High Recharge", componentSize, 300, 250, 10, 1.5f, 10) {
         }
     }
 
     public class ShieldHighCapacity : Shield {
-        public ShieldHighCapacity(ShipComponentTier componentSize) : base("High Capacity", componentSize, 700, 10000, 100, .5f, 30) {
+        public ShieldHighCapacity(ShipComponentTier componentSize) : base("High Capacity", componentSize, 400, 500, 5, .5f, 20) {
         }
     }
 
     public class ShieldBalanced : Shield {
-        public ShieldBalanced(ShipComponentTier componentSize) : base("Balanced", componentSize, 400, 5000, 200, 1, 20) {
+        public ShieldBalanced(ShipComponentTier componentSize) : base("Balanced", componentSize, 200, 325, 7.5f, 1, 15) {
         }
     }
 }

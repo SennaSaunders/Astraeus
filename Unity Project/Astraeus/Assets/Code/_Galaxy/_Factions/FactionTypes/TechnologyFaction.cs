@@ -32,7 +32,7 @@ namespace Code._Galaxy._Factions.FactionTypes {
         }
 
         public override List<(Type weaponType, int spawnWeighting)> GetAllowedWeapons() {
-            return new List<(Type weaponType, int spawnWeighting)> { (typeof(Railgun), 1), (typeof(LaserCannon), 5) };
+            return new List<(Type weaponType, int spawnWeighting)> { (typeof(Railgun), 1), (typeof(Laser), 5) };
         }
 
         public override List<(Type mainThrusterType, int spawnWeighting)> GetAllowedMainThrusters() {

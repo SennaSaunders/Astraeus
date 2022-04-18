@@ -5,15 +5,25 @@ using UnityEngine.UI;
 
 namespace Code.GUI.SpaceStations.Services {
     public class ColourPicker : MonoBehaviour {
-        private Color selectedColour;
+        private Color _selectedColour;
         public int spacing = 10;
         public int colourBoxSize = 70;
+        private ShipColourGUIController _shipColourGUIController;
+        private float _saturation;
+        
+        private int _startMod;
         void Start() {
             GenerateColourBoxes();
         }
 
-        public void ChangeBackgroundColour() {
-            GameObject.Find("Background").GetComponent<Image>().color = selectedColour;
+        public void Setup(ShipColourGUIController shipColourGUIController, float saturation, bool trimStart) {
+            _shipColourGUIController = shipColourGUIController;
+            _saturation = saturation;
+            _startMod = trimStart ? 1 : 0;
+        }
+
+        private void ChangeColour() {
+            _shipColourGUIController.SetColour(_selectedColour);
         } 
 
         private void GenerateColourBoxes() {
@@ -25,7 +35,8 @@ namespace Code.GUI.SpaceStations.Services {
             float xRemainder = (spacing + (spacing + colourBoxSize) * xCount - areaSize.x);
             float yRemainder = (spacing + (spacing + colourBoxSize) * yCount - areaSize.y);
 
-            var colours = GetColours(xCount, yCount);
+            // var colours = GetColoursHS(xCount, yCount);
+            var colours = GetColoursHV(xCount, yCount, _saturation);
             
             for (int i = 0; i < xCount; i++) {
                 float x = spacing + (spacing + colourBoxSize) * i - xRemainder/2;
@@ -42,19 +53,29 @@ namespace Code.GUI.SpaceStations.Services {
                 }
             }
         }
-        private List<Color> GetColours(int x, int y) {
+        private List<Color> GetColoursHS(int x, int y, float brightness) {
             List<Color> colours = new List<Color>();
             float saturationMin = 0.5f;
             float saturationMax = 1;
             for (int i = x; i > 0; i--) {
                 for (int j = y; j > 0; j--) {
-                    float satRatio = (float)(i) / x;
-                    
+                    float satRatio = (float)(i+_startMod) / x;
                     float saturation = (satRatio * (saturationMax- saturationMin))+saturationMin;
-                    
-                    
-                    float hue = (float)(j) / y;
-                    colours.Add(Color.HSVToRGB(hue, saturation, 1));
+                    float hue = (float)(j+_startMod) / y;
+                    colours.Add(Color.HSVToRGB(hue, saturation, brightness));
+                }
+            }
+            return colours;
+        }
+        
+        private List<Color> GetColoursHV(int x, int y, float saturation) {
+            List<Color> colours = new List<Color>();
+            
+            for (int i = x; i > 0; i--) {
+                for (int j = y; j > 0; j--) {
+                    float hue = (float)(i+_startMod) / x;
+                    float brightness = (float)(j+_startMod) / y;
+                    colours.Add(Color.HSVToRGB(hue,saturation,  brightness));
                 }
             }
 
@@ -81,8 +102,8 @@ namespace Code.GUI.SpaceStations.Services {
             }
 
             public void OnPointerClick(PointerEventData eventData) {
-                _colourPicker.selectedColour = _colour;
-                _colourPicker.ChangeBackgroundColour();
+                _colourPicker._selectedColour = _colour;
+                _colourPicker.ChangeColour();
                 
             }
         }

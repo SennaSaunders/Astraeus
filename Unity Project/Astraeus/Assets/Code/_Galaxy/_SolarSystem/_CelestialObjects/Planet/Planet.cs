@@ -20,8 +20,6 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Planet {
             MeshRenderer meshRenderer = sphere.GetComponent<MeshRenderer>();
             meshRenderer.material.mainTexture = SurfaceTexture;
             meshRenderer.material.shader = Shader.Find("Unlit/Texture");
-            
-            Debug.Log("Setting texture");
             return sphere;
         }
 

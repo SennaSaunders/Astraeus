@@ -15,7 +15,7 @@ namespace Code._Ships.Controllers {
             mouseCollider.size = new Vector2(1000, 1000);
         }
 
-        public override void AimWeapons() {
+        protected override void AimWeapons() {
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
 
 
@@ -28,18 +28,18 @@ namespace Code._Ships.Controllers {
         }
 
         public void AimWeapons(Vector2 aimTarget) {
-            foreach (WeaponController weaponController in _weaponControllers) {
+            foreach (WeaponController weaponController in WeaponControllers) {
                 weaponController.TurnWeapon(aimTarget, transform.rotation);
             }
         }
 
-        public override void FireCheck() {
+        protected override void FireCheck() {
             if (Input.GetMouseButton(0)) {
                 FireWeapons();
             }
         }
 
-        public override Vector2 GetThrustVector() {
+        protected override Vector2 GetThrustVector() {
             Vector2 forwards = Input.GetKey(KeyCode.W) ? Vector2.up : new Vector2();
             Vector2 back = Input.GetKey(KeyCode.S) ? Vector2.down : new Vector2();
             Vector2 left = Input.GetKey(KeyCode.A) ? Vector2.left : new Vector2();
@@ -47,7 +47,7 @@ namespace Code._Ships.Controllers {
             return forwards + back + left + right;
         }
 
-        public override float GetTurnDirection() {
+        protected override float GetTurnDirection() {
             float left = Input.GetKey(KeyCode.Q) ? 1 : 0;
             float right = Input.GetKey(KeyCode.E) ? -1 : 0;
             return left + right;

@@ -17,16 +17,10 @@ namespace Code._Galaxy {
         private void Start() {
             _camera = UnityEngine.Camera.main;
         }
-
-        // void Update() {
-        //     SolarSystemRaycast();
-        // }
         
-        
-
-        public Thread GenerateSolarSystemColours(SolarSystem solarSystem) {
+        public Thread GenerateSolarSystemPlanetColours(SolarSystem solarSystem) {
             Thread generationThread = new Thread(() => {
-                solarSystem.GenerateSolarSystemColours();
+                solarSystem.GenerateSolarSystemPlanetColours();
             });
             generationThread.Start();
             return generationThread;

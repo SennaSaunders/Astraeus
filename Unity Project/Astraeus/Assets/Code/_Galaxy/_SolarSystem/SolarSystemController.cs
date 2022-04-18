@@ -59,9 +59,8 @@ namespace Code._Galaxy._SolarSystem {
                 // }
                 if (body.GetType() == typeof(SpaceStation)) {
                     bodyObject.transform.localPosition = new Vector3(0, 0, SpaceStationZ);
-                    Debug.Log("SpaceStation");
                     PlayerBodyProximity playerBodyProximity = bodyObject.AddComponent<PlayerBodyProximity>();
-                    playerBodyProximity.SetCollisionFunction<SpaceStation>(GameController._guiController.SetupStationGUI, (SpaceStation)body);
+                    playerBodyProximity.SetCollisionFunction<SpaceStation>(GameController.GUIController.SetupStationGUI, (SpaceStation)body);
 
                 }
                 bodyHolders.Add(bodyHolder);
