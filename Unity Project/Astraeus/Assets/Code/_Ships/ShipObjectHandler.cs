@@ -19,15 +19,26 @@ namespace Code._Ships {
         public (List<Transform> mountTransforms, Transform selectionTransform, string slotName, ManoeuvringThruster thruster) ManoeuvringThrusterComponents;
         public List<(Transform mountTransform, Transform selectionTransform, string slotName, InternalComponent component)> InternalComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName, InternalComponent component)>();
 
-        public GameObject CreateShip(Transform parent) {
+        public GameObject CreateShip(Transform parent, Color markerColour) {
             CreateHull();
             CreateMainThrusterComponents();
             CreateManoeuvringThrusterComponents();
             CreateWeaponComponents();
             CreateInternalComponents();
             SetDefaultShipRotation();
+            AddShipMarker(markerColour);
             ManagedShip.ShipObject.transform.SetParent(parent);
             return ManagedShip.ShipObject;
+        }
+
+        private void AddShipMarker(Color colour) {
+            GameObject shipMarker = Instantiate((GameObject)Resources.Load("Misc/ShipMarker"));
+            shipMarker.GetComponent<Renderer>().material.color = colour;
+            shipMarker.name = "ShipMarker";
+            shipMarker.layer = LayerMask.NameToLayer("LocalMap");
+            shipMarker.transform.localScale = new Vector3(150, 150, 150);
+            shipMarker.transform.localPosition = new Vector3(0, 0, -400);//places ship marker above other map objects
+            shipMarker.transform.SetParent(ManagedShip.ShipObject.transform);
         }
 
         public void SetMappedMaterials(List<(GameObject mesh, int channelIdx)> meshObjects, List<(List<string> objectName, Color colour)> colourChannelObjectMap) {
@@ -68,12 +79,23 @@ namespace Code._Ships {
         }
 
         private void CreateHull() {
-            ManagedShip.ShipObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(ManagedShip.ShipHull.GetHullFullPath()));
-            ManagedShip.ShipHull.MeshObjects = MapHullMeshToChannel(GameController._prefabHandler.GetMeshObjects(ManagedShip.ShipObject), ManagedShip.ShipHull);
+            ManagedShip.ShipObject = Instantiate((GameObject)Resources.Load(ManagedShip.ShipHull.GetHullFullPath()));
+            ManagedShip.ShipHull.MeshObjects = MapHullMeshToChannel(GetMeshObjects(ManagedShip.ShipObject), ManagedShip.ShipHull);
             SetMappedMaterials(ManagedShip.ShipHull.MeshObjects, ManagedShip.ShipHull.ColourChannelObjectMap);
         }
 
-        
+        public List<GameObject> GetMeshObjects(GameObject meshObject) {
+            List<GameObject> meshObjects = new List<GameObject>();
+            MeshRenderer meshRenderer = meshObject.GetComponent<MeshRenderer>();
+            if (meshRenderer != null) {
+                meshObjects.Add(meshObject);
+            }
+            for (int i = 0; i < meshObject.transform.childCount; i++) {
+                meshObjects.AddRange(GetMeshObjects(meshObject.transform.GetChild(i).gameObject));
+            }
+
+            return meshObjects;
+        }
 
         private void CreateWeaponComponents() {
             ShipComponentType componentType = ShipComponentType.Weapon;
@@ -121,10 +143,10 @@ namespace Code._Ships {
 
             string path = component.GetFullPath();
 
-            GameObject newComponentObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(path), parent);
+            GameObject newComponentObject = Instantiate((GameObject)Resources.Load(path), parent);
             newComponentObject.transform.localScale = new Vector3(scale, scale, scale);
             component.InstantiatedGameObject = newComponentObject;
-            component.MeshObjects = MapExternalMeshToChannel(GameController._prefabHandler.GetMeshObjects(newComponentObject), component);
+            component.MeshObjects = MapExternalMeshToChannel(GetMeshObjects(newComponentObject), component);
             SetMappedMaterials(component.MeshObjects, component.ColourChannelObjectMap);
         }
 
@@ -179,8 +201,8 @@ namespace Code._Ships {
                             }
                         }
                         
-                        GameObject bracket = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab("Ships/Thrusters/ThrusterBracket"), holderTransform);
-                        List<GameObject> bracketMeshes = GameController._prefabHandler.GetMeshObjects(bracket);
+                        GameObject bracket = Instantiate((GameObject)Resources.Load("Ships/Thrusters/ThrusterBracket"), holderTransform);
+                        List<GameObject> bracketMeshes = GetMeshObjects(bracket);
                         foreach (GameObject bracketMesh in bracketMeshes) {
                             SetMaterial(bracketMesh, Color.black);
                         }
@@ -206,11 +228,9 @@ namespace Code._Ships {
 
             Transform selectionTransform = MapPrefabTransformStringToTransformObject(ManagedShip.ShipHull.ManoeuvringThrusterComponents.selectionTransformName);
             List<Transform> objectTransforms = new List<Transform>();
-            for (int i = 0; i < slot.thrusters.Count;i++) {
-                var thruster = ManagedShip.ShipHull.ManoeuvringThrusterComponents.thrusters[i];
-                objectTransforms.Add(MapPrefabTransformStringToTransformObject(thruster.parentTransformName));
-                thruster.centerOffset = objectTransforms[i].localPosition.y;
-                ManagedShip.ShipHull.ManoeuvringThrusterComponents.thrusters[i] = thruster;
+            for (int i = 0; i < slot.parentTransformNames.Count;i++) {
+                string thrusterTransformName = ManagedShip.ShipHull.ManoeuvringThrusterComponents.parentTransformNames[i];
+                objectTransforms.Add(MapPrefabTransformStringToTransformObject(thrusterTransformName));
             }
              
             ManoeuvringThrusterComponents = (objectTransforms, selectionTransform, "Manoeuvring Thruster - " + slot.maxSize, manoeuvringThruster);

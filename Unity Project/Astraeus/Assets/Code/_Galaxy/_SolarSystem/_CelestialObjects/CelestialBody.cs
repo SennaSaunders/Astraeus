@@ -1,26 +1,15 @@
-﻿using Code._GameControllers;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Code._Galaxy._SolarSystem._CelestialObjects {
     public abstract class CelestialBody : Body {
-        protected CelestialBody(Body primary, Vector2 coordinate, BodyTier tier) : base(primary, coordinate, tier) {//constructor for CelestialBody as a system primary
+        protected CelestialBody(Body primary, Vector2 coordinate, BodyTier tier, Color mapColour) : base(primary, coordinate, tier, mapColour) {//constructor for CelestialBody as a system primary
         }
 
-        protected CelestialBody(Body primary, BodyTier tier) : base(primary, tier) {//constructor for CelestialBody as a satellite
-        }
-        
-        public override GameObject GetSystemObject() {
-            GameObject obj = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab("Sphere/WarpSphere"));
-            float scale = Tier.SystemScale();
-            obj.transform.localScale = new Vector3(scale, scale, scale);
-            return obj;
+        protected CelestialBody(Body primary, BodyTier tier, Color mapColour) : base(primary, tier, mapColour) {//constructor for CelestialBody as a satellite
         }
 
-        public virtual GameObject GetMapObject() {
-            GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            float scale = Tier.MapScale();
-            obj.transform.localScale = new Vector3(scale, scale, scale);
-            return obj;
+        public GameObject GetMapObject() {
+            return GetSystemObject();
         }
     }
 }

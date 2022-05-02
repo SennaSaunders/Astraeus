@@ -13,38 +13,23 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Star {
         }
 
         public StarType StarClass { get; }
+        private static Color starColor = new Color(1,1,0); 
 
         //prefab
-        public Star(Body primary, Vector2 coordinate, StarType starClass) : base(primary, coordinate, TierFromType(starClass)) {
+        public Star(Body primary, Vector2 coordinate, StarType starClass) : base(primary, coordinate, TierFromType(starClass),starColor) {
             StarClass = starClass;
         }
 
-        public Star(Body primary, StarType starClass) : base(primary, TierFromType(starClass)) {
+        public Star(Body primary, StarType starClass) : base(primary, TierFromType(starClass),starColor) {
             StarClass = starClass;
         }
 
         public override GameObject GetSystemObject() {
-            GameObject sphere = base.GetSystemObject();
-            //slap generated texture on the sphere
-            //move noise generation to here
-
-            MeshRenderer meshRenderer = sphere.GetComponent<MeshRenderer>();
-            meshRenderer.material = (Material)Resources.Load("Materials/Star/"+StarClass.GetStarShader());
-            meshRenderer.material.shader = Shader.Find("Shader Graphs/StarShaderGraph");
-            return sphere;
+            GameObject starObject = (GameObject)Resources.Load(StarClass.GetStarObjectPath());
+            return starObject;
         }
 
-        public override GameObject GetMapObject() {
-            
-            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            MeshRenderer meshRenderer = sphere.GetComponent<MeshRenderer>();
-            meshRenderer.material = (Material)Resources.Load("Materials/Star/"+StarClass.GetStarShader());
-            meshRenderer.material.shader = Shader.Find("Shader Graphs/StarShaderGraph");
-            
-            float scale = Tier.MapScale();
-            sphere.transform.localScale = new Vector3(scale, scale, scale);
-            return sphere;
-        }
+        
 
         private static BodyTier TierFromType(StarType type) {
             return type switch {
@@ -56,22 +41,23 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Star {
     }
 
     public static class StarTypeExtension {
-        public static string GetStarShader(this Star.StarType type) {
+        public static string GetStarObjectPath(this Star.StarType type) {
+            string basePath = "Bodies/Celestial/Star/Prefabs/";
             switch (type) {
                 case Star.StarType.O:
-                    return "StarO"; //super blue
+                    return basePath + "StarO"; //super blue
                 case Star.StarType.B:
-                    return "StarB"; //light blue
+                    return basePath + "StarB"; //light blue
                 case Star.StarType.A: 
-                    return "StarA"; //blue tinge 
+                    return basePath + "StarA"; //blue tinge 
                 case Star.StarType.F: 
-                    return "StarF"; //white 
+                    return basePath + "StarF"; //white 
                 case Star.StarType.G:
-                    return "StarG"; //yellow
+                    return basePath + "StarG"; //yellow
                 case Star.StarType.K:
-                    return "StarK"; //red
+                    return basePath + "StarK"; //red
                 default:
-                    return "StarM"; //orange
+                    return basePath + "StarM"; //orange
             }
         }
     }

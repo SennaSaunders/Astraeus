@@ -10,7 +10,7 @@
         public float CurrentDepletionTime;
         public bool Depleted = false;
         
-        public PowerPlant(string name, ShipComponentTier componentSize, float baseEnergyCapacity, float baseRechargeRate) : base(name + " Power Plant", componentSize, baseMass) {
+        public PowerPlant(string name, ShipComponentTier componentSize, float baseEnergyCapacity, float baseRechargeRate, int basePrice) : base(name + " Power Plant", componentSize, baseMass, basePrice) {
             EnergyCapacity = GetTierMultipliedValue(baseEnergyCapacity, componentSize);
             CurrentEnergy = EnergyCapacity;
             RechargeRate = GetTierMultipliedValue(baseRechargeRate, componentSize);
@@ -18,26 +18,26 @@
     }
 
     public class PowerPlantHighRecharge : PowerPlant {
-        private static float baseEnergyCapacity = 1000;
-        private static float baseRechargeRate = 250;
+        private static float baseEnergyCapacity = 500;
+        private static float baseRechargeRate = 50;
 
-        public PowerPlantHighRecharge(ShipComponentTier componentSize) : base("High Recharge",componentSize, baseEnergyCapacity, baseRechargeRate) {
+        public PowerPlantHighRecharge(ShipComponentTier componentSize) : base("High Recharge",componentSize, baseEnergyCapacity, baseRechargeRate, 3000) {
         }
     }
     
     public class PowerPlantHighCapacity : PowerPlant {
-        private static float baseEnergyCapacity = 3000;
-        private static float baseRechargeRate = 100;
+        private static float baseEnergyCapacity = 1500;
+        private static float baseRechargeRate = 10;
 
-        public PowerPlantHighCapacity(ShipComponentTier componentSize) : base("High Capacity",componentSize, baseEnergyCapacity, baseRechargeRate) {
+        public PowerPlantHighCapacity(ShipComponentTier componentSize) : base("High Capacity",componentSize, baseEnergyCapacity, baseRechargeRate, 2500) {
         }
     }
     
     public class PowerPlantBalanced : PowerPlant {
-        private static float baseEnergyCapacity = 2000;
-        private static float baseRechargeRate = 200;
+        private static float baseEnergyCapacity = 750;
+        private static float baseRechargeRate = 30;
 
-        public PowerPlantBalanced(ShipComponentTier componentSize) : base("Balanced",componentSize, baseEnergyCapacity, baseRechargeRate) {
+        public PowerPlantBalanced(ShipComponentTier componentSize) : base("Balanced",componentSize, baseEnergyCapacity, baseRechargeRate, 1500) {
         }
     }
 }

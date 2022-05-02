@@ -16,17 +16,19 @@ namespace Code._Ships.ShipComponents {
         T5
     }
     public class ShipComponent {
-        public ShipComponent(string componentName, ShipComponentType componentType, ShipComponentTier componentSize, float baseMass) {
+        public ShipComponent(string componentName, ShipComponentType componentType, ShipComponentTier componentSize, float baseMass, int basePrice) {
             ComponentName = componentName;
             ComponentType = componentType;
             ComponentSize = componentSize;
             ComponentMass = GetTierMultipliedValue(baseMass, componentSize);
+            ComponentPrice = (int)GetTierMultipliedValue(basePrice, componentSize);
         }
 
         public string ComponentName;
         public ShipComponentType ComponentType;
         public ShipComponentTier ComponentSize;
         public float ComponentMass;
+        public int ComponentPrice { get; }
 
         public static float GetTierMultipliedValue(float value, ShipComponentTier tier) {
             return value * (1 + 0.5f * (int)tier);

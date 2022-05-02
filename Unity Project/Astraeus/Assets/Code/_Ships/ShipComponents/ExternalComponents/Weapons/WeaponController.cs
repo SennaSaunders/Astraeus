@@ -16,7 +16,7 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
             _powerPlantController = powerPlantController;
             _shipObject = shipObject;
             float epsilon = 1; 
-            _flipRotation = Math.Abs(Math.Abs(ControlledWeapon.InstantiatedGameObject.transform.parent.transform.parent.localRotation.eulerAngles.y) - 180)<epsilon;
+            _flipRotation = !(Math.Abs(Math.Abs(ControlledWeapon.InstantiatedGameObject.transform.parent.transform.parent.localRotation.eulerAngles.y) - 180) < epsilon);
         }
 
         private void Update() {
@@ -31,7 +31,7 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
                 if (powerDrawEffectiveness > 0) { //only fires if there is power to expend
                     float damage = ControlledWeapon.Damage * powerDrawEffectiveness;
                     GameObject projectileSpawnPoint = GameObjectHelper.FindChild(ControlledWeapon.InstantiatedGameObject, "ProjectileSpawn");
-                    GameObject projectileObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(ControlledWeapon.GetProjectilePath()), GameObject.Find("ProjectileHolder").transform);
+                    GameObject projectileObject = Instantiate((GameObject)Resources.Load(ControlledWeapon.GetProjectilePath()), GameObject.Find("ProjectileHolder").transform);
                     projectileObject.transform.position = projectileSpawnPoint.transform.position;
                     Quaternion turretRotation = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z);
                     projectileObject.transform.rotation = _flipRotation ? Quaternion.Inverse(turretRotation):turretRotation;

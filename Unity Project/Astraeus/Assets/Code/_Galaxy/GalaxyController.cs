@@ -1,33 +1,18 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
 using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
-using Code._GameControllers;
 using Code._Utility;
 using UnityEngine;
 
 namespace Code._Galaxy {
     public class GalaxyController : MonoBehaviour {
         public const int ZOffset = 2500;
-        private Galaxy _galaxy;
+        public Galaxy _galaxy { get; private set; }
         public GameObject _galaxyHolder;
         public SolarSystemController activeSystemController;
         private List<SolarSystemController> _solarSystemControllers = new List<SolarSystemController>();
-        
-        
-        public Thread GenerateSolarSystemPlanetColours(SolarSystem solarSystem) {
-            Thread generationThread = new Thread(() => {
-                solarSystem.GenerateSolarSystemPlanetColours();
-            });
-            generationThread.Start();
-            return generationThread;
-        }
 
-        public void GenerateSolarSystemTextures(SolarSystem solarSystem) {
-            solarSystem.GenerateSolarSystemTextures();
-        }
-        
         public void SetGalaxy(Galaxy galaxy) {
             _galaxy = galaxy;
         }
@@ -41,35 +26,37 @@ namespace Code._Galaxy {
             else {
                 Destroy(_galaxyHolder);
             }
+
             _galaxyHolder = new GameObject(holderName);
             _galaxyHolder.transform.position = new Vector3(0, 0, ZOffset);
         }
-        
+
         private void DisplaySolarSystemPrimary(SolarSystem solarSystem, int num) {
             CelestialBody primary = (CelestialBody)solarSystem.Bodies[0];
-            GameObject primaryObject = primary.GetMapObject();  //change out for Instantiate() when prefabs are made
-            primaryObject.transform.SetParent(_galaxyHolder.transform);
+            GameObject primaryObject = Instantiate(primary.GetMapObject(), _galaxyHolder.transform, true);
+            float scale = solarSystem.Bodies[0].Tier.MapScale();
+            primaryObject.transform.localScale = new Vector3(scale, scale, scale);
+            primaryObject.layer = LayerMask.NameToLayer("GalaxyMap");
             primaryObject.transform.localPosition = new Vector3(solarSystem.Coordinate.x, solarSystem.Coordinate.y);
             primaryObject.name = "System: " + num + " Tier: " + primary.Tier;
             SolarSystemController controller = primaryObject.AddComponent<SolarSystemController>();
             controller.AssignSystem(solarSystem);
             _solarSystemControllers.Add(controller);
-            GameObject systemName = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab("GUIPrefabs/Map/SystemName"));
+            GameObject systemName = Instantiate((GameObject)Resources.Load("GUIPrefabs/Map/SystemName"), primaryObject.transform, true);
+            systemName.layer = LayerMask.NameToLayer("GalaxyMap");
             if (solarSystem.OwnerFaction != null) {
-                GameObjectHelper.SetGUITextValue(systemName, "SystemNameValue", controller._solarSystem.SystemName, new Color(53 / 255f, 157 / 255f, 255 / 255f));
+                GameObjectHelper.SetGUITextValue(systemName, "SystemNameValue", controller._solarSystem.SystemName, solarSystem.OwnerFaction.factionType.MapColor());
             }
             else {
                 GameObjectHelper.SetGUITextValue(systemName, "SystemNameValue", controller._solarSystem.SystemName);
             }
-            
-            
-            systemName.transform.SetParent(primaryObject.transform);
-            systemName.transform.localPosition = new Vector3(0, -1, -1);
+
+            systemName.transform.localPosition = new Vector3(0, -1, 0);
         }
 
-        public void DisplayGalaxy(Galaxy galaxy) {
-            for (int i = 0; i < galaxy.Systems.Count; i++) {   //can potentially be changed to only display some systems later e.g. hidden systems/maybe culling?
-                DisplaySolarSystemPrimary(galaxy.Systems[i], i+1);
+        private void DisplayGalaxy(Galaxy galaxy) {
+            for (int i = 0; i < galaxy.Systems.Count; i++) {
+                DisplaySolarSystemPrimary(galaxy.Systems[i], i + 1);
             }
         }
 
@@ -85,7 +72,5 @@ namespace Code._Galaxy {
         public List<Faction> GetFactions() {
             return _galaxy.Factions;
         }
-        
-        //also should contain functions that advance and control the galaxy's state e.g. public void ChangeGalaxyState(){}
     }
 }

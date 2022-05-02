@@ -18,9 +18,10 @@ namespace Tests {
             
             List<ManoeuvringThruster> manoeuvringThrusters=new List<ManoeuvringThruster>();
             ManoeuvringThruster manoeuvringThruster = new ManoeuvringThruster(ShipComponentTier.T1);
-            List<float> centerOffsets = new List<float>(){-5,-5,5,5};
+            int manThrusterCount = 4;
+            float angularAccel = 90;
             int shipMass = 1000;
-            _thrusterController = new ThrusterController(mainThrusters, (manoeuvringThruster, centerOffsets), shipMass, new PowerPlantController(new List<PowerPlant>()));
+            _thrusterController = new ThrusterController(mainThrusters, manoeuvringThruster, manThrusterCount, angularAccel, shipMass, new PowerPlantController(new List<PowerPlant>()));
         }
 
         [Test]

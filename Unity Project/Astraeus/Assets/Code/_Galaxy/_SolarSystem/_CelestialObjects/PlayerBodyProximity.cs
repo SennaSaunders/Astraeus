@@ -22,13 +22,13 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects {
         }
 
         private void ProximityCheck() {
-            if (!GameController.isPaused) {
+            if (!GameController.IsPaused) {
                 if (GameController.CurrentShip != null) {
                     if (GameController.CurrentShip.ShipObject != null) {
                         Vector2 distanceBetween = (Vector2)transform.position - (Vector2)GameController.CurrentShip.ShipObject.transform.position;
                         if (distanceBetween.magnitude < _distance) {
                             if (_interactGUI == null) {
-                                _interactGUI = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_guiPath), GameController.CurrentShip.ShipObject.transform);
+                                _interactGUI = Instantiate((GameObject)Resources.Load(_guiPath), GameController.CurrentShip.ShipObject.transform);
                             }
                             if (Input.GetKey(_interactKey)) {
                                 _proximityFunction.DynamicInvoke(_param);

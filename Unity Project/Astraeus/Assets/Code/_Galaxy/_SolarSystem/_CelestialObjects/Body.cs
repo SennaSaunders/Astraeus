@@ -3,21 +3,27 @@ using UnityEngine;
 
 namespace Code._Galaxy._SolarSystem._CelestialObjects {
     public abstract class Body {
-        protected Body(Body primary, Vector2 coordinate, BodyTier tier) {
+        protected Body(Body primary, Vector2 coordinate, BodyTier tier, Color mapColour) {
             SetPrimary(primary);
             Coordinate = coordinate;
             Tier = tier;
+            MapColour = mapColour;
         }
 
-        protected Body(Body primary, BodyTier tier) {
+        protected Body(Body primary, BodyTier tier, Color mapColour) {
             SetPrimary(primary);
             Tier = tier;
+            MapColour = mapColour;
         }
-
+        
+        public BodyTier Tier { get; }
         public Body Primary { get; private set; }
-
         public List<Body> Children { get; } = new List<Body>();
-
+        public Color MapColour;
+        public Vector2 Coordinate { get; set; }
+        public float RotationStart { get; set; }
+        public float RotationCurrent { get; set; }
+        
         private void SetPrimary(Body primary) {
             Primary = primary;
             if (primary != null) {
@@ -28,11 +34,6 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects {
         private void AddChild(Body body) {
             Children.Add(body);     
         }
-
-        public Vector2 Coordinate { get; set; }
-        public float RotationBase { get; set; }
-        public float OrbitalPeriod { get; set; }
-        public float RotationCurrent { get; set; }
 
         public enum BodyTier {
             T0, //space stations
@@ -47,9 +48,11 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects {
             T9 //largest
         }
 
-        public BodyTier Tier { get; }
-
         public abstract GameObject GetSystemObject();
+
+        public virtual GameObject GetMiniMapObject() {
+            return GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        }
 
         public void RotateBody(float timeDelta) { //do i need this? i dont think so i think the controller should do it
             // (timeDelta /_orbitalPeriod) * 360 * gameSpeed

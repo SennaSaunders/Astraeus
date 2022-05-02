@@ -7,13 +7,13 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons.Types {
         private static float maxTierFireDelay = 5;
         private static float baseDamage = 30;
         private static float basePowerDraw = 15;
-        private static float projectileSpeed = 150;
-        private static float travelTime = 15;
+        private static float projectileSpeed = 500;
+        private static float travelTime = 3;
         private static int baseMass = 200;
         private static float minTierRotationSpeed = 3;
         private static float maxTierRotationSpeed = 1;
 
-        public Railgun(ShipComponentTier componentSize) : base("Railgun",componentSize, minTierFireDelay, maxTierFireDelay, baseDamage, projectileSpeed, travelTime, basePowerDraw, minTierRotationSpeed, maxTierRotationSpeed,baseMass) {
+        public Railgun(ShipComponentTier componentSize) : base("Railgun",componentSize, minTierFireDelay, maxTierFireDelay, baseDamage, projectileSpeed, travelTime, basePowerDraw, minTierRotationSpeed, maxTierRotationSpeed,baseMass,3000) {
             ColourChannelObjectMap = new List<(List<string> objectName, Color colour)>() {
                 (new List<string>() { "Barrel" }, new Color(.2f, .2f, .2f)),
                 (new List<string>() { "GunBack", "StrutBottom", "StrutTopLeft", "StrutTopRight" }, new Color(.4f, .1f, .5f)),

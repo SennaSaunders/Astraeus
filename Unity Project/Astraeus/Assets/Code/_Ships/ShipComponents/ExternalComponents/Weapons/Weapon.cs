@@ -11,7 +11,7 @@
         //ammo type
         //public AmmoType ammoType //needs to be initialised in specific weapon types - contains a class
         
-        protected Weapon(string componentName, ShipComponentTier componentSize, float minTierFireRate, float maxTierFireRate, float baseDamage, float projectileSpeed, float travelTime, float basePowerDraw, float minTierRotationSpeed, float maxTierRotationSpeed, int baseMass) : base(componentName, ShipComponentType.Weapon, componentSize, baseMass) {
+        protected Weapon(string componentName, ShipComponentTier componentSize, float minTierFireRate, float maxTierFireRate, float baseDamage, float projectileSpeed, float travelTime, float basePowerDraw, float minTierRotationSpeed, float maxTierRotationSpeed, int baseMass, int basePrice) : base(componentName, ShipComponentType.Weapon, componentSize, baseMass,basePrice) {
             FireDelay = GetTierNormalizedStat(minTierFireRate, maxTierFireRate, componentSize);
             Damage = GetTierMultipliedValue(baseDamage, componentSize);
             ProjectileSpeed = projectileSpeed;

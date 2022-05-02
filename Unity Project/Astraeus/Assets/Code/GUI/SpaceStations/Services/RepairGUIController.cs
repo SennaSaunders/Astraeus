@@ -17,7 +17,7 @@ namespace Code.GUI.SpaceStations.Services {
         
         private void SetupGUI() {
             _stationGUIController.stationGUI.SetActive(false);
-            _guiGameObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_repairService.GUIPath));
+            _guiGameObject = Instantiate((GameObject)Resources.Load(_repairService.GUIPath));
             SetupHomeBtn();
         }
 

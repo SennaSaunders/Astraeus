@@ -4,12 +4,13 @@ using System.Linq;
 using Code._Cargo;
 using Code._Cargo.ProductTypes.Ships;
 using Code._Galaxy._SolarSystem._CelestialObjects.Star;
-using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
+using Code.GUI.ObserverPattern;
 using UnityEngine;
 
 namespace Code._Ships.ShipComponents.InternalComponents.Storage {
-    public class CargoController {
+    public class CargoController : ISubject<IItemObserver<int>> {
         private List<CargoBay> _cargoBays;
+        private List<IItemObserver<int>> _fuelObservers = new List<IItemObserver<int>>();
 
         public CargoController(List<CargoBay> cargoBays) {
             _cargoBays = cargoBays;
@@ -43,6 +44,7 @@ namespace Code._Ships.ShipComponents.InternalComponents.Storage {
                     }
                 }
             }
+            NotifyObservers();
         }
 
         public void RemoveCargo(List<Cargo> cargoToRemove) {
@@ -56,6 +58,7 @@ namespace Code._Ships.ShipComponents.InternalComponents.Storage {
                     }
                 }
             }
+            NotifyObservers();
         }
 
         public int GetMaxCargoSpace() {
@@ -95,15 +98,32 @@ namespace Code._Ships.ShipComponents.InternalComponents.Storage {
         }
 
         private float fuelCountToAdd = 0;
-        private float timeToGetFuel = 0;
         public void FuelScoop(Star star) {
-            fuelCountToAdd += (float)star.Tier/2 * Time.deltaTime;
-            timeToGetFuel += Time.deltaTime;
+            if (GetFreeCargoSpace() > 0) {
+                fuelCountToAdd += (float)star.Tier/2 * Time.deltaTime;
             
-            while (fuelCountToAdd > 1 && GetFreeCargoSpace() > 0) {
-                Debug.Log(timeToGetFuel);
-                AddCargo(new List<Cargo>(){new Fuel()});
-                fuelCountToAdd--;
+                while (fuelCountToAdd > 1 && GetFreeCargoSpace() > 0) {
+                    AddCargo(new List<Cargo>(){new Fuel()});
+                    fuelCountToAdd--;
+                }
+            }
+        }
+
+        public void AddObserver(IItemObserver<int> observer) {
+            _fuelObservers.Add(observer);
+        }
+
+        public void RemoveObserver(IItemObserver<int> observer) {
+            _fuelObservers.Remove(observer);
+        }
+        
+        public void ClearObservers() {
+            _fuelObservers = new List<IItemObserver<int>>();
+        }
+
+        public void NotifyObservers() {
+            foreach (var observer in _fuelObservers) {
+                observer.UpdateSelf(GetCargoOfType(typeof(Fuel)).Count);
             }
         }
     }

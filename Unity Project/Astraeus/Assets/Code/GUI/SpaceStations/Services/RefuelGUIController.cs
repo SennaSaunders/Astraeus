@@ -7,7 +7,6 @@ using Code._GameControllers;
 using Code._Ships.Controllers;
 using Code._Ships.ShipComponents.InternalComponents.Storage;
 using Code._Utility;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,9 +18,9 @@ namespace Code.GUI.SpaceStations.Services {
         private CargoController _cargoController;
         private Slider _slider;
 
-        private GameObject notEnoughCreditsMsg;
-        private float creditMsgTime = 3;
-        private float creditMsgCountdown = 0;
+        private GameObject _notEnoughCreditsMsg;
+        private float _creditMsgTime = 3;
+        private float _creditMsgCountdown = 0;
 
         public void StartRefuelGUI(RefuelService refuelService, StationGUIController stationGUIController) {
             _refuelService = refuelService;
@@ -30,11 +29,11 @@ namespace Code.GUI.SpaceStations.Services {
         }
         
         private void Update() {
-            if (notEnoughCreditsMsg != null) {
-                if (notEnoughCreditsMsg.activeSelf) {
-                    creditMsgCountdown -= Time.deltaTime;
-                    if (creditMsgCountdown <= 0) {
-                        notEnoughCreditsMsg.SetActive(false);
+            if (_notEnoughCreditsMsg != null) {
+                if (_notEnoughCreditsMsg.activeSelf) {
+                    _creditMsgCountdown -= Time.deltaTime;
+                    if (_creditMsgCountdown <= 0) {
+                        _notEnoughCreditsMsg.SetActive(false);
                     }
                 }
             }
@@ -42,10 +41,10 @@ namespace Code.GUI.SpaceStations.Services {
 
         private void SetupGUI() {
             _stationGUIController.stationGUI.SetActive(false);
-            _guiGameObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_refuelService.GUIPath));
+            _guiGameObject = Instantiate((GameObject)Resources.Load(_refuelService.GUIPath));
             _cargoController = GameController.CurrentShip.ShipObject.GetComponent<ShipController>().CargoController;
-            notEnoughCreditsMsg = GameObjectHelper.FindChild(_guiGameObject, "NotEnoughCredits");
-            notEnoughCreditsMsg.SetActive(false);
+            _notEnoughCreditsMsg = GameObjectHelper.FindChild(_guiGameObject, "NotEnoughCredits");
+            _notEnoughCreditsMsg.SetActive(false);
             SetupHomeBtn();
             SetupSlider();
             SetupPurchaseBtn();
@@ -75,18 +74,15 @@ namespace Code.GUI.SpaceStations.Services {
             _slider.minValue = 0;
             _slider.value = currentFuelUnits;
             _slider.maxValue = _cargoController.GetFreeCargoSpace() + currentFuelUnits;
-            TextMeshProUGUI fullTxt = GameObject.Find("FullValue").GetComponentInChildren<TextMeshProUGUI>();
-            fullTxt.text = _slider.maxValue.ToString();
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "FullValue", _slider.maxValue.ToString());
         }
 
         private void SliderChange() {
             int currentFuelUnits = _cargoController.GetCargoOfType(typeof(Fuel)).Count;
             int total = (int)_slider.value;
             int change = total - currentFuelUnits;
-            TextMeshProUGUI totalTxt = GameObject.Find("TotalValue").GetComponentInChildren<TextMeshProUGUI>();
-            totalTxt.text = total.ToString();
-            TextMeshProUGUI changeTxt = GameObject.Find("ChangeValue").GetComponentInChildren<TextMeshProUGUI>();
-            changeTxt.text = change <= 0 ? change.ToString() : "+" + change;
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "TotalValue", total.ToString());
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "ChangeValue", change <= 0 ? change.ToString() : "+" + change);
             UpdateCredits();
         }
 
@@ -136,8 +132,8 @@ namespace Code.GUI.SpaceStations.Services {
             }
         }
         private void NotEnoughCredits() {
-            notEnoughCreditsMsg.SetActive(true);
-            creditMsgCountdown = creditMsgTime;
+            _notEnoughCreditsMsg.SetActive(true);
+            _creditMsgCountdown = _creditMsgTime;
         }
     }
 }

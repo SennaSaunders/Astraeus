@@ -1,24 +1,40 @@
 ﻿using System.Collections.Generic;
 using Code._Cargo.ProductTypes.Ships;
-using UnityEngine;
+using Code.GUI.ObserverPattern;
 
 namespace Code._Ships.ShipComponents.InternalComponents.Power_Plants {
-    public class PowerPlantController {
+    public class PowerPlantController : ISubject<IItemObserver<float>> {
         public PowerPlantController(List<PowerPlant> powerPlants) {
             _powerPlants = powerPlants;
         }
 
         public List<PowerPlant> _powerPlants;
+        private List<IItemObserver<float>> _observers = new List<IItemObserver<float>>();
+
+        private float GetCurrentEnergy() {
+            float totalCurrentEnergyCapacity = 0;
+
+            foreach (PowerPlant powerPlant in _powerPlants) {
+                totalCurrentEnergyCapacity += powerPlant.CurrentEnergy;
+            }
+
+            return totalCurrentEnergyCapacity;
+        }
+
+        private float GetTotalEnergyCapacity() {
+            float energyCapacity = 0;
+
+            foreach (PowerPlant powerPlant in _powerPlants) {
+                energyCapacity += powerPlant.EnergyCapacity;
+            }
+
+            return energyCapacity;
+        }
 
         public float DrainPower(float powerRequested) {
             if (powerRequested > 0) {
                 //load balancing split the load equally between all power plants relative to their current total power
-                float totalCurrentEnergyCapacity = 0;
-
-                foreach (PowerPlant powerPlant in _powerPlants) {
-                    totalCurrentEnergyCapacity += powerPlant.CurrentEnergy;
-                }
-                // Debug.Log("Power level: " + totalCurrentEnergyCapacity + "Power Requested: "+powerRequested);
+                float totalCurrentEnergyCapacity = GetCurrentEnergy();
 
                 List<(float energyRequested, PowerPlant powerPlant)> powerDrainedPerPowerPlant = new List<(float energyRequested, PowerPlant powerPlant)>();
 
@@ -41,7 +57,9 @@ namespace Code._Ships.ShipComponents.InternalComponents.Power_Plants {
                         }
                     }
                 }
-                
+
+                NotifyObservers();
+
                 return powerProvided / powerRequested;
             }
 
@@ -90,8 +108,27 @@ namespace Code._Ships.ShipComponents.InternalComponents.Power_Plants {
 
                 powerPlant.CurrentEnergy += usedFuelEnergy;
             }
-
+            NotifyObservers();
             return depletedFuel;
+        }
+
+        public void AddObserver(IItemObserver<float> observer) {
+            _observers.Add(observer);
+        }
+
+        public void RemoveObserver(IItemObserver<float> observer) {
+            _observers.Remove(observer);
+        }
+
+        public void ClearObservers() {
+            _observers = new List<IItemObserver<float>>();
+        }
+
+        public void NotifyObservers() {
+            float value = GetCurrentEnergy() / GetTotalEnergyCapacity();
+            foreach (IItemObserver<float> observer in _observers) {
+                observer.UpdateSelf(value);
+            }
         }
     }
 }

@@ -41,8 +41,13 @@ namespace Code._Galaxy {
             _observers.Remove(observer);
         }
 
+        public void ClearObservers() {
+            _observers = new List<IItemObserver<int>>();
+        }
+
         public void NotifyObservers() {
-            foreach (var observer in _observers.Where(observer => observer.UpdateNeeded(Value))) {
+            // foreach (var observer in _observers.Where(observer => observer.UpdateNeeded(Value))) {
+            foreach (var observer in _observers) {
                 observer.UpdateSelf(Value);
             }
         }

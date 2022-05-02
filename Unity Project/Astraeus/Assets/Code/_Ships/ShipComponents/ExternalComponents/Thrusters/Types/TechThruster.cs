@@ -6,7 +6,7 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Thrusters.Types {
         private static int _baseMass = 4000;
         private static float _baseForce = 100000;
         private static float _basePowerDraw = 50;
-        public TechThruster(ShipComponentTier componentSize) : base("Tech",componentSize, _baseMass, _baseForce, _basePowerDraw) {
+        public TechThruster(ShipComponentTier componentSize) : base("Tech",componentSize, _baseMass, _baseForce, _basePowerDraw, 3000) {
             ColourChannelObjectMap = new List<(List<string> objectName, Color colour)>() {
                 (new List<string>() { "TechThruster" }, new Color(.7f, .4f, .2f))
             };

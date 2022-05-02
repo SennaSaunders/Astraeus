@@ -1,4 +1,8 @@
-﻿using Code._Ships.ShipComponents.ExternalComponents.Weapons;
+﻿using System;
+using Code._GameControllers;
+using Code._Ships.ShipComponents.ExternalComponents.Weapons;
+using Code._Utility;
+using Code.GUI.ShipGUI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -16,11 +20,30 @@ namespace Code._Ships.Controllers {
             mouseCollider.size = new Vector2(1000, 1000);
         }
 
+        public override void Setup(Ship ship) {
+            base.Setup(ship);
+            SetupPowerGUI();
+            SetupFuelGUI();
+        }
+
+        private void SetupFuelGUI() {
+            FuelObserver fuelObserver = GameObjectHelper.FindChild(GameController.GUIController.shipGUIController.guiGameObject, "FuelPanel").AddComponent<FuelObserver>();
+            CargoController.AddObserver(fuelObserver);
+        }
+
+        private void SetupPowerGUI() {
+            _powerPlantController.ClearObservers();
+            GameObject powerGUI = Instantiate((GameObject)Resources.Load("GUIPrefabs/Ship/Power"), _shipHealthGUI.transform, false);
+            ShipBarObserver powerObserver = GameObjectHelper.FindChild(powerGUI, "PowerBar").AddComponent<ShipBarObserver>();
+            _powerPlantController.AddObserver(powerObserver);
+            _powerPlantController.NotifyObservers();
+        }
+
         protected override void AimWeapons() {
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
-
-
-            if (Physics.Raycast(ray, out RaycastHit hit)) {
+            LayerMask ignoreLayer = 1<<LayerMask.NameToLayer("LocalMap");
+            ignoreLayer = ~ ignoreLayer;
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity,ignoreLayer)) {
                 if (hit.collider != null) {
                     Vector2 target = hit.point;
                     AimWeapons(target);
@@ -56,6 +79,17 @@ namespace Code._Ships.Controllers {
             float left = Input.GetKey(KeyCode.Q) ? 1 : 0;
             float right = Input.GetKey(KeyCode.E) ? -1 : 0;
             return left + right;
+        }
+
+        protected override void ShipDestroyed() {
+            base.ShipDestroyed();
+            RespawnGUI();
+            
+        }
+
+        private void RespawnGUI() {
+            GameController.GUIController.SetShipGUIActive(false);
+            Instantiate((GameObject)Resources.Load("GUIPrefabs/Ship/ShipDestroyedGUI"));
         }
     }
 }

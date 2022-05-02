@@ -33,7 +33,9 @@ namespace Code.TextureGen {
                 planet = new Planet(null, tier, new RockyWorldGen(seed, tier.TextureSize()));
             }
             planet.PlanetGen.GenColors();
-            _meshRenderer.material.mainTexture = planet.PlanetGen.GenTexture();
+            Material material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            material.mainTexture = planet.PlanetGen.GenTexture();
+            _meshRenderer.material = material;
         }
     }
 }

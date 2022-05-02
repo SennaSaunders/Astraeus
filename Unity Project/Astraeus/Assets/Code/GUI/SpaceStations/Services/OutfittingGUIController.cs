@@ -15,6 +15,7 @@ using Code._Ships.ShipComponents.InternalComponents.Shields;
 using Code._Ships.ShipComponents.InternalComponents.Storage;
 using Code._Utility;
 using Code.Camera;
+using Code.GUI.ShipGUI;
 using Code.GUI.Utility;
 using TMPro;
 using Unity.VectorGraphics;
@@ -24,7 +25,7 @@ using UnityEngine.UI;
 
 namespace Code.GUI.SpaceStations.Services {
     public class OutfittingGUIController : MonoBehaviour {
-        private StationGUIController _stationGUIController;
+        private GameObject _previousGUI;
         private OutfittingService _outfittingService;
         private GameObject _guiGameObject,_shipObject,_thrusterSubCategories,_weaponSubCategories, _internalSubCategories, _errorMsg, _hoverInfo;
         private ShipObjectHandler _shipObjectHandler;
@@ -48,19 +49,22 @@ namespace Code.GUI.SpaceStations.Services {
         private float currentErrorTime = 0;
 
         private GameController _gameController;
+        private Ship _ship;
 
 
         private void SetShipObjectHandler() {
             _shipObjectHandler = _guiGameObject.AddComponent<ShipObjectHandler>();
         }
 
-        public void StartOutfitting(OutfittingService outfittingService, StationGUIController stationGUIController, GameController gameController) {
+        public void StartOutfitting(OutfittingService outfittingService, GameObject previousGUI, GameController gameController, Ship ship) {
             // _outfittingService = new OutfittingService();
             // _outfittingService.SetAllAvailableComponents();
+            CameraUtility.SolidSkybox();
             _outfittingService = outfittingService;
-            _stationGUIController = stationGUIController;
-            _stationGUIController.stationGUI.SetActive(false);
+            _previousGUI = previousGUI;
+            _previousGUI.SetActive(false);
             _gameController = gameController;
+            _ship = ship;
             
             SetupCamera();
             SetupGUI();
@@ -123,9 +127,10 @@ namespace Code.GUI.SpaceStations.Services {
 
 
         private void ExitOutfitting() {
+            CameraUtility.NormalSkybox();
             _camera.farClipPlane = 3000;
             _gameController.RefreshPlayerShip();
-            _stationGUIController.stationGUI.SetActive(true);
+            _previousGUI.SetActive(true);
             FindObjectOfType<ShipCameraController>().enabled = true;
             Destroy(_cameraController);
             Destroy(_guiGameObject);
@@ -133,8 +138,8 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void DisplayShip() {
-            _shipObjectHandler.ManagedShip = GameController.CurrentShip;
-            _shipObject = _shipObjectHandler.CreateShip(GameObject.Find("ShipPanel").transform);
+            _shipObjectHandler.ManagedShip = _ship;
+            _shipObject = _shipObjectHandler.CreateShip(GameObject.Find("ShipPanel").transform, Color.black);
             _shipObject.transform.position = _shipObjectHandler.ManagedShip.ShipHull.OutfittingPosition;
             _shipObject.transform.rotation = _shipObjectHandler.ManagedShip.ShipHull.OutfittingRotation;
             AddDraggableToShipPanel();
@@ -146,9 +151,8 @@ namespace Code.GUI.SpaceStations.Services {
             shipRotatable.RotatableObject = _shipObjectHandler.ManagedShip.ShipObject;
         }
 
-
         private void SetupGUI() {
-            _guiGameObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_outfittingService.GUIPath));
+            _guiGameObject = Instantiate((GameObject)Resources.Load(_outfittingService.GUIPath));
             SetShipObjectHandler();
             _errorMsg = GameObjectHelper.FindChild(_guiGameObject, "ErrorMsg");
             _hoverInfo = GameObjectHelper.FindChild(_guiGameObject, "HoverInfo");
@@ -410,12 +414,12 @@ namespace Code.GUI.SpaceStations.Services {
 
                 foreach ((Transform mountTransform, Transform selectionTransform, string slotName, ShipComponent component) selection in shipComponents) {
                     Transform canvas = _guiGameObject.transform.Find("Canvas");
-                    GameObject marker = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_outfittingPath + "ShipComponentMarker"), canvas.Find("SelectionMarkers"));
+                    GameObject marker = Instantiate((GameObject)Resources.Load(_outfittingPath + "ShipComponentMarker"), canvas.Find("SelectionMarkers"));
                     _selectionMarkers.Add(marker);
                     SlotSelector slotSelector = marker.AddComponent<SlotSelector>();
                     slotSelector.Setup(selection.mountTransform, selection.selectionTransform, selection.slotName, this, selection.component);
 
-                    GameObject markerText = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_outfittingPath + "ShipComponentMarkerName"), marker.transform);
+                    GameObject markerText = Instantiate((GameObject)Resources.Load(_outfittingPath + "ShipComponentMarkerName"), marker.transform);
                     TextMeshProUGUI slotName = markerText.transform.GetComponentInChildren<TextMeshProUGUI>();
                     slotName.text = selection.slotName;
                 }
@@ -431,7 +435,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private GameObject CreateComponentCard(string cardSpecifier, Transform parent) {
-            return GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_outfittingPath + cardSpecifier), parent);
+            return Instantiate((GameObject)Resources.Load(_outfittingPath + cardSpecifier), parent);
         }
 
         private GameObject CreateComponentCardModifier(string cardSpecifier, Type componentType, ShipComponentTier tier) {
@@ -593,7 +597,8 @@ namespace Code.GUI.SpaceStations.Services {
             }
 
             public void OnPointerEnter(PointerEventData eventData) {
-                Debug.Log("Hovering: " + _shipComponent.ComponentName);
+                if (_shipComponent != null) {
+                    Debug.Log("Hovering: " + _shipComponent.ComponentName);
 
                 if (_shipComponent.GetType().IsSubclassOf(typeof(Thruster))) {
                     _hoverInfo = _outfittingGUIController.CreateComponentCard(_outfittingGUIController._thrusterCardPath, _outfittingGUIController._hoverInfo.transform);
@@ -623,6 +628,7 @@ namespace Code.GUI.SpaceStations.Services {
                 RectTransform rectTransform =_hoverInfo.GetComponent<RectTransform>(); 
                 rectTransform.localPosition = new Vector3();
                 rectTransform.pivot = new Vector2(.5f, 0);
+                }
             }
 
             public void OnPointerExit(PointerEventData eventData) {

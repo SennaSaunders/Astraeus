@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Code._Cargo;
+using Code._Cargo.ProductTypes.Ships;
 using Code._Galaxy._Factions;
 using Code._Ships;
+using Code._Ships.Controllers;
 using Code._Ships.Hulls;
+using Code._Ships.Hulls.Types.Cargo;
+using Code._Ships.Hulls.Types.Fighter;
 using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters.Types;
@@ -30,11 +35,14 @@ namespace Code._GameControllers {
             Fighter
         }
 
+        public Ship CreateShipFromHull(Hull hull) {
+            return new Ship(hull);
+        }
+
         public Ship CreateDefaultShip(GameObject objectContainer) {
-            Ship ship = objectContainer.AddComponent<Ship>();
-            ship.ShipHull = new SmallFighterHull();
+            Ship ship = new Ship(new SmallFighterHull());
             shipObjectHandler.ManagedShip = ship;
-            shipObjectHandler.CreateShip(objectContainer.transform);
+            shipObjectHandler.CreateShip(objectContainer.transform, Color.green);
             //manoeuvring thrusters
             shipObjectHandler.SetManoeuvringThrusterComponent(new ManoeuvringThruster(ShipComponentTier.T1));
             //main thrusters
@@ -83,17 +91,17 @@ namespace Code._GameControllers {
             }
             
             //cargo
-            int numOfCargoBays=0;
+            // int numOfCargoBays=0;
             do {
                 addedPart = AddInternalToBestSlot(ship, typeof(CargoBay));
-                if (addedPart) {
-                    numOfCargoBays++;
-                }
+                // if (addedPart) {
+                //     numOfCargoBays++;
+                // }
             } while (addedPart);
-            Debug.Log("Added "+ numOfCargoBays + " cargo bays.");
+            // Debug.Log("Added "+ numOfCargoBays + " cargo bays.");
         }
 
-        public int GetBestEmptyInternalSlotIndex(Ship ship) {
+        private int GetBestEmptyInternalSlotIndex(Ship ship) {
             int bestIndex = -1; //if -1 is returned then there will be no empty slot
             ShipComponentTier bestTier = ShipComponentTier.T1; //smallest slot size by default
             for (int i = 0; i < ship.ShipHull.InternalComponents.Count; i++) {
@@ -133,10 +141,11 @@ namespace Code._GameControllers {
             int hullIdx = r.Next(0, hulls.Count);
             Hull chosenHull = hulls[hullIdx];
 
-            Ship ship = objectContainer.AddComponent<Ship>();
-            ship.ShipHull = chosenHull;
+            // Ship ship = objectContainer.AddComponent<Ship>();
+            Ship ship = new Ship(chosenHull);
+            ship.Faction = faction;
             shipObjectHandler.ManagedShip = ship;
-            shipObjectHandler.CreateShip(objectContainer.transform);
+            shipObjectHandler.CreateShip(objectContainer.transform, Color.blue);
 
             //choose thrusters
             List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string parentTransformName, bool needsBracket)> mainThrusterSlots = shipObjectHandler.ManagedShip.ShipHull.MainThrusterComponents;
@@ -209,8 +218,18 @@ namespace Code._GameControllers {
             }
 
             SetupBasicLoadout(shipObjectHandler.ManagedShip);
-
+            
             return shipObjectHandler.ManagedShip;
+        }
+
+        public void FuelShip(Ship ship) {
+            CargoController cargoController  =ship.ShipObject.GetComponent<NPCShipController>().CargoController;
+            int freeSpace = cargoController.GetFreeCargoSpace();
+            List<Fuel> fuels = new List<Fuel>();
+            for (int i = 0; i < freeSpace; i++) {
+                fuels.Add(new Fuel());
+            }
+            cargoController.AddCargo(fuels.Cast<Cargo>().ToList());
         }
 
         private MainThruster RollForMainThruster(float slotEfficiency, ShipComponentTier slotAdjustedMaxTier, Faction faction, Random r) {
@@ -291,11 +310,11 @@ namespace Code._GameControllers {
         }
 
         private List<Hull> GetTransportHulls() {
-            return new List<Hull>() { new SmallCargoHull() };
+            return new List<Hull>() { new SmallCargoHull(), new TriHauler() };
         }
 
         private List<Hull> GetFighterHulls() {
-            return new List<Hull>() { new SmallFighterHull() };
+            return new List<Hull>() { new SmallFighterHull(), new SleekFighter(), new HeavyFighter() };
         }
     }
 }

@@ -8,6 +8,7 @@ using Code._Ships.ShipComponents.ExternalComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Utility;
+using Code.GUI.ShipGUI;
 using Code.GUI.Utility;
 using TMPro;
 using UnityEngine;
@@ -34,7 +35,7 @@ namespace Code.GUI.SpaceStations.Services {
             _shipObjectHandler = shipObjectHandler;
             _outfittingGUIGameObject = outfittingGUIGameObject;
             outfittingGUIGameObject.SetActive(false);
-            _shipColourGUI = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab("GUIPrefabs/Station/Services/Outfitting/ShipColourGUI"));
+            _shipColourGUI = Instantiate((GameObject)Resources.Load("GUIPrefabs/Station/Services/Outfitting/ShipColourGUI"));
             SetupColourPickers();
             SetupButtons();
             GroupAllComponents();

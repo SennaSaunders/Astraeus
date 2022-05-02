@@ -12,23 +12,24 @@ using UnityEngine.UI;
 
 namespace Code.GUI.SpaceStations {
     public class StationGUIController : MonoBehaviour {
-        public IStation _station { get; private set; }
+        private IStation Station { get; set; }
         private GameController _gameController;
 
-        private string _stationGUIBasePath = "GUIPrefabs/Station/";
-        private string _serviceButtonPathSpecifier = "ServiceButton"; 
-        private string _stationGUIPathSpecifier = "StationGUI";
+        private readonly string _stationGUIBasePath = "GUIPrefabs/Station/";
+        private readonly string _serviceButtonPathSpecifier = "ServiceButton"; 
+        private readonly string _stationGUIPathSpecifier = "StationGUI";
         public GameObject stationGUI;
 
         public void Setup(IStation station, GameController gameController) {
-            _station = station;
+            Station = station;
             _gameController = gameController;
             LoadGUI();
         }
 
-        public void LoadGUI() {
-            stationGUI = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_stationGUIBasePath+_stationGUIPathSpecifier));
-            GameController.isPaused = true;
+        private void LoadGUI() {
+            stationGUI = Instantiate((GameObject)Resources.Load(_stationGUIBasePath+_stationGUIPathSpecifier));
+            GameController.IsPaused = true;
+            GameController.GUIController.SetShipGUIActive(false);
             SetupStationInfo();
             SetupButtons();
         }
@@ -84,21 +85,21 @@ namespace Code.GUI.SpaceStations {
         }
         
         private void SetupExitBtn() {
-            Button btn = GameObject.Find("ExitBtn").GetComponent<Button>();
+            Button btn = GameObjectHelper.FindChild(stationGUI, "ExitBtn").GetComponent<Button>();
             btn.onClick.AddListener(Exit);
         }
 
-        public void Exit() {
-            GameController.isPaused = false;
-            GameController.GUIController.ToggleShipGUI();
+        private void Exit() {
+            GameController.IsPaused = false;
+            GameController.GUIController.SetShipGUIActive(true);
             Destroy(stationGUI);
             Destroy(this);
         }
         
         private void CreateServiceButtons() {
-            foreach (StationService stationService in _station.StationServices) {
+            foreach (StationService stationService in Station.StationServices) {
                 //instantiate button
-                GameObject buttonPrefab = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_stationGUIBasePath + _serviceButtonPathSpecifier), GetScrollContainer());
+                GameObject buttonPrefab = Instantiate((GameObject)Resources.Load(_stationGUIBasePath + _serviceButtonPathSpecifier), GetScrollContainer());
 
                 UnityAction buttonMethod = null;
                 if(stationService.GetType()==typeof(OutfittingService)) {
@@ -120,14 +121,14 @@ namespace Code.GUI.SpaceStations {
             }
         }
 
-        private StationService FindStationService<T>() {
-            return _station.StationServices.Find(s => s.GetType() == typeof(T));
+        public StationService FindStationService<T>() {
+            return Station.StationServices.Find(s => s.GetType() == typeof(T));
         }
         
         private void OutfittingBtnClick() {
             OutfittingGUIController outfittingGUIController = gameObject.AddComponent<OutfittingGUIController>();
             OutfittingService outfittingService = (OutfittingService)FindStationService<OutfittingService>();
-            outfittingGUIController.StartOutfitting(outfittingService, this, _gameController);
+            outfittingGUIController.StartOutfitting(outfittingService, stationGUI, _gameController, GameController.CurrentShip);
         }
 
         private void RefuelBtnClick() {

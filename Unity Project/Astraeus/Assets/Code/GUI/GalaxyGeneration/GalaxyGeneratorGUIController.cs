@@ -10,15 +10,16 @@ namespace Code.GUI.GalaxyGeneration {
     public class GalaxyGeneratorGUIController : MonoBehaviour {
         private GalaxyGenerator _generator;
         private GameObject _guiGameObject;
-        private GameObject _loadingScreen;
+        private LoadingScreenController _loadingScreenController;
         private Galaxy _galaxy;
         private GameController _gameController;
         private Thread _galaxyGenerationThread;
         private Thread _textureGenerationThread;
-        
+
         private bool _startedGalaxyGen;
         private bool _finishedGalaxyGen;
         private bool _startedTextureGen;
+
         public void Start() {
             SetGUIGameObject();
             _generator = gameObject.AddComponent<GalaxyGenerator>();
@@ -44,7 +45,7 @@ namespace Code.GUI.GalaxyGeneration {
             _generator.maxBodiesPerSystem.SetValue(10);
             _generator.systemExclusionDistance.SetValue(5);
         }
-        
+
         private void InitSlider(string newName, GalaxyGeneratorInput input) {
             GameObject inputObject = GameObject.Find(newName);
             GalaxyGenSliderController sliderController = inputObject.GetComponent<GalaxyGenSliderController>();
@@ -52,7 +53,7 @@ namespace Code.GUI.GalaxyGeneration {
             if (sliderController == null) {
                 sliderController = inputObject.AddComponent<GalaxyGenSliderController>();
             }
-            
+
             input.AddObserver(sliderController);
             sliderController.SetInput(input);
         }
@@ -63,6 +64,7 @@ namespace Code.GUI.GalaxyGeneration {
             if (inputController == null) {
                 inputController = inputObject.AddComponent<GalaxyGenInputController>();
             }
+
             input.AddObserver(inputController);
             inputController.SetInput(input);
         }
@@ -72,57 +74,57 @@ namespace Code.GUI.GalaxyGeneration {
             GalaxyGeneratorInput input = _generator.seed;
             InitTextField(fieldName, input);
             input.NotifyObservers();
-            
+
             fieldName = "WidthInput";
             input = _generator.width;
             InitTextField(fieldName, input);
-            
-            fieldName= "WidthSlider";
-            InitSlider(fieldName,input);
+
+            fieldName = "WidthSlider";
+            InitSlider(fieldName, input);
             input.NotifyObservers();
 
             fieldName = "HeightInput";
             input = _generator.height;
-            InitTextField(fieldName,input);
+            InitTextField(fieldName, input);
 
             fieldName = "HeightSlider";
-            InitSlider(fieldName,input);
+            InitSlider(fieldName, input);
             input.NotifyObservers();
-            
+
             fieldName = "MaxSystemsInput";
             input = _generator.maxSystems;
-            InitTextField(fieldName,input);
-            
+            InitTextField(fieldName, input);
+
             fieldName = "MaxSystemsSlider";
             input = _generator.maxSystems;
-            InitSlider(fieldName,input);
+            InitSlider(fieldName, input);
             input.NotifyObservers();
-            
+
             fieldName = "SmallestSystemInput";
             input = _generator.minBodiesPerSystem;
-            InitTextField(fieldName,input);
-            
+            InitTextField(fieldName, input);
+
             fieldName = "SmallestSystemSlider";
             input = _generator.minBodiesPerSystem;
-            InitSlider(fieldName,input);
+            InitSlider(fieldName, input);
             input.NotifyObservers();
-            
+
             fieldName = "LargestSystemInput";
             input = _generator.maxBodiesPerSystem;
-            InitTextField(fieldName,input);
-            
+            InitTextField(fieldName, input);
+
             fieldName = "LargestSystemSlider";
             input = _generator.maxBodiesPerSystem;
-            InitSlider(fieldName,input);
+            InitSlider(fieldName, input);
             input.NotifyObservers();
-            
+
             fieldName = "MinSystemDistanceInput";
             input = _generator.systemExclusionDistance;
-            InitTextField(fieldName,input);
-            
+            InitTextField(fieldName, input);
+
             fieldName = "MinSystemDistanceSlider";
             input = _generator.systemExclusionDistance;
-            InitSlider(fieldName,input);
+            InitSlider(fieldName, input);
             input.NotifyObservers();
         }
 
@@ -130,50 +132,26 @@ namespace Code.GUI.GalaxyGeneration {
             Button button = GetComponentInChildren<Button>();
             button.onClick.AddListener(delegate { GenerateGalaxy(); });
         }
-        
+
         private void GenerateGalaxy() {
             StartLoadingScreen();
             _generator.SetPotentialSystemNames();
-            _galaxyGenerationThread = new Thread(() => {
-                _galaxy = _generator.GenGalaxy();
-            });
+            _galaxyGenerationThread = new Thread(() => { _galaxy = _generator.GenGalaxy(); });
             _galaxyGenerationThread.Start();
         }
 
         private void StartLoadingScreen() {
-            _loadingScreen = (GameObject)Resources.Load("GUIPrefabs/LoadingGUI");
-            _loadingScreen = Instantiate(_loadingScreen);
-            LoadingScreenController.SetLoadingText("Generating Galaxy");
-            Destroy(GameObject.Find("GUIHolder"));//removes visual elements of the GUI so that it doesn't cover the loading screen
-        }
-
-        private void DestroyLoadingScreen() {
-            Destroy(_loadingScreen);
-            Destroy(_guiGameObject);
-        }
-
-        private void GenerateStartingSystemColours() {
-            _textureGenerationThread = GameController._galaxyController.GenerateSolarSystemPlanetColours(GameController.CurrentSolarSystem);
-        }
-
-        private void GenerateStartingSystemTextures() {
-            GameController._galaxyController.GenerateSolarSystemTextures(GameController.CurrentSolarSystem);
+            _loadingScreenController = Instantiate((GameObject)Resources.Load("GUIPrefabs/LoadingGUI")).GetComponent<LoadingScreenController>();
+            _loadingScreenController.StartLoadingScreen("Generating Galaxy", GameController.StartGame);
+            Destroy(GameObject.Find("GUIHolder")); //removes visual elements of the GUI so that it doesn't cover the loading screen
         }
 
         private void InitialiseGameController() {
             Destroy(GameObject.Find("EventSystem"));
             string gameControllerObjName = "GameController";
-            GameObject gameControllerObj = new GameObject(gameControllerObjName);
+            GameObject gameControllerObj = new GameObject(gameControllerObjName) { tag = "GameController" };
             _gameController = gameControllerObj.AddComponent<GameController>();
-            _gameController.Setup(_galaxy, _generator.systemExclusionDistance.Value,_generator.width.Value, _generator.height.Value );
-        }
-
-        private void Loaded() {
-            //start game controller. pass galaxy through
-            
-            _gameController.StartGame();
-            DestroyLoadingScreen();
-            
+            _gameController.Setup(_galaxy, _generator.systemExclusionDistance.Value, _generator.width.Value, _generator.height.Value, _loadingScreenController.GetComponent<LoadingScreenController>());
         }
 
         public void Update() {
@@ -184,31 +162,16 @@ namespace Code.GUI.GalaxyGeneration {
                         _startedGalaxyGen = !_startedGalaxyGen;
                     }
                 }
-                else if(!_finishedGalaxyGen){
+                else if (!_finishedGalaxyGen) {
                     Debug.Log("Finished Generating Galaxy");
                     _finishedGalaxyGen = true;
                 }
             }
 
             if (_finishedGalaxyGen) {
-                if (!_startedTextureGen) {
-                    Debug.Log("Initialising Game Controller");
-                    InitialiseGameController();
-                    Debug.Log("Generating planet textures");
-                    LoadingScreenController.SetLoadingText("Generating Planet Textures");
-                    _startedTextureGen = true;
-                    GenerateStartingSystemColours();
-                    
-                }
-                else {
-                    if (_textureGenerationThread != null) {
-                        if (!_textureGenerationThread.IsAlive) {
-                            GenerateStartingSystemTextures();
-                            Loaded();
-                        }
-                    }
-                }
-                
+                Debug.Log("Initialising Game Controller");
+                InitialiseGameController();
+                Destroy(_guiGameObject);
             }
         }
     }

@@ -20,7 +20,6 @@ namespace Code.GUI.MainMenu {
                 (GameObject.Find("ContinueBtn"), ContinueBtnClick),
                 (GameObject.Find("NewGameBtn"), NewGameBtnClick),
                 (GameObject.Find("LoadGameBtn"), LoadGameBtnClick),
-                (GameObject.Find("SettingsBtn"), SettingsBtnClick),
                 (GameObject.Find("ExitBtn"), ExitBtnClick)
             };
         }
@@ -99,14 +98,10 @@ namespace Code.GUI.MainMenu {
             Debug.Log("Pressed Load Game");
         }
 
-        private static void SettingsBtnClick() {
-            //goes to settings
-            Debug.Log("Pressed Settings");
-        }
-
         private static void ExitBtnClick() {
             //pops up a confirmation prompt which quits the game if yes
             Debug.Log("Pressed Exit");
+            Application.Quit();
         }
     }
 }

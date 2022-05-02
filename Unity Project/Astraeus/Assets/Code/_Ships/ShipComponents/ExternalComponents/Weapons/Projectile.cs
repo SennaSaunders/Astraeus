@@ -2,6 +2,7 @@
 using System.Linq;
 using Code._GameControllers;
 using Code._Ships.Controllers;
+using Code._Utility;
 using UnityEngine;
 
 namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
@@ -14,6 +15,7 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
         private bool _needsRefresh = false;
 
         public void Spawn(Weapon weapon, Vector2 shipVelocity, float damage, GameObject shipObject) {
+            gameObject.layer = LayerMask.NameToLayer("Projectile");
             _shipObject = shipObject;
             Rigidbody projectileRigidbody = gameObject.AddComponent<Rigidbody>();
             projectileRigidbody.useGravity = false;
@@ -32,7 +34,7 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
         }
 
         private void Update() {
-            if (GameController.isPaused) {
+            if (GameController.IsPaused) {
                 Rigidbody projectileRigidbody = gameObject.GetComponent<Rigidbody>();
                 if (!_needsRefresh) {
                     _velocity = projectileRigidbody.velocity;
@@ -57,18 +59,50 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
             return shipVelocity + up;
         }
 
-        private void DealDamage(ShipController shipController) {
-            //check for collisions with ships that aren't the ship that fired it
-            //set hostile status with ships that aren't currently hostile
-            //deals damage to hit ship
-            // Debug.Log("Dealing damage: " + _damage);
-            shipController.TakeDamage(_damage);
+        private void DealDamage(ShipController hitShipController) {
+            //if firing ship hasn't been destroyed
+            if (_shipObject != null) { 
+                //set hostile status with ships that aren't currently hostile
+                ShipController firingShipController = _shipObject.GetComponent<ShipController>();
+                if (!firingShipController.hostiles.Contains(hitShipController._ship)) {
+                    firingShipController.hostiles.Add(hitShipController._ship);
+                    ChangeShipMarkerColour(hitShipController, firingShipController);
+                }
+
+                if (!hitShipController.hostiles.Contains(firingShipController._ship)) {
+                    hitShipController.hostiles.Add(firingShipController._ship);
+                    ChangeShipMarkerColour(hitShipController, firingShipController);
+                }
+            }
+            
+            hitShipController.TakeDamage(_damage);
             Debug.Log("Dealing damage");
         }
 
+        private void ChangeShipMarkerColour(ShipController hitShipController, ShipController firingShipController) {
+            if (hitShipController.GetType() == typeof(PlayerShipController)) {
+                ChangeShipMarkerHostile(firingShipController._ship.ShipObject);
+            }
+            if (firingShipController.GetType() == typeof(PlayerShipController)) {
+                ChangeShipMarkerHostile(hitShipController._ship.ShipObject);
+            }
+        }
+
+        private void ChangeShipMarkerHostile(GameObject shipObject) {
+            GameObject shipMarker = GameObjectHelper.FindChild(shipObject, "ShipMarker");
+            shipMarker.GetComponent<Renderer>().material.color = Color.red;
+        }
+
         private void OnCollisionEnter(Collision collision) {
-            if (!_shipObject.GetComponents<Collider>().Contains(collision.collider)) {
-                ShipController shipController = collision.gameObject.GetComponent<ShipController>();
+            bool hitSelf = false;
+            //prevents missing ref exception if the firing ship has been destroyed before the projectile
+            if (_shipObject != null) {
+                if (_shipObject.GetComponentsInChildren<Collider>().Contains(collision.collider)) {
+                    hitSelf = true;
+                }
+            }
+            if (!hitSelf) {
+                ShipController shipController = collision.gameObject.GetComponentInParent<ShipController>();
                 if (shipController != null) {
                     DealDamage(shipController);
                     DestroySelf();

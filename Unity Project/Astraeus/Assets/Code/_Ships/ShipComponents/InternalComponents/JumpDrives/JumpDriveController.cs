@@ -27,7 +27,7 @@ namespace Code._Ships.ShipComponents.InternalComponents.JumpDrives {
         }
 
         private float GetJumpDistance(SolarSystem destination) {
-            return (GameController._galaxyController.activeSystemController._solarSystem.Coordinate - destination.Coordinate).magnitude;
+            return (GameController.GalaxyController.activeSystemController._solarSystem.Coordinate - destination.Coordinate).magnitude;
         }
 
         public float CalculateFuelEnergyUse(float distance) {

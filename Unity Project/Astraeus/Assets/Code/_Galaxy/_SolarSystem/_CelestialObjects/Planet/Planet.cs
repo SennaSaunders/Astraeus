@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Code._Galaxy._SolarSystem._CelestialObjects.Planet {
     public class Planet : CelestialBody {
-        public Planet(Body primary, BodyTier tier, PlanetGen planetGen) : base(primary, tier) {
+        public Planet(Body primary, BodyTier tier, PlanetGen planetGen) : base(primary, tier,planetGen.MapColour) {
             PlanetGen = planetGen;
         }
 
@@ -13,13 +13,11 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Planet {
         public PlanetGen PlanetGen { get; }
         public Texture2D SurfaceTexture;
         public override GameObject GetSystemObject() {
-            GameObject sphere = base.GetSystemObject();
-            //slap generated texture on the sphere
-            //move noise generation to here
-            
+            GameObject sphere = (GameObject)Resources.Load("Bodies/Celestial/Sphere/WarpSphere");;
             MeshRenderer meshRenderer = sphere.GetComponent<MeshRenderer>();
-            meshRenderer.material.mainTexture = SurfaceTexture;
-            meshRenderer.material.shader = Shader.Find("Unlit/Texture");
+            Material material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            material.mainTexture = SurfaceTexture;
+            meshRenderer.material = material;
             return sphere;
         }
 

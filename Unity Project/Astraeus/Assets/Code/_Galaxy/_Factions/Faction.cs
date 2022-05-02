@@ -12,6 +12,7 @@ using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.InternalComponents.Power_Plants;
 using Code._Ships.ShipComponents.InternalComponents.Shields;
+using UnityEngine;
 
 namespace Code._Galaxy._Factions {
     public abstract class Faction {
@@ -289,12 +290,12 @@ namespace Code._Galaxy._Factions {
         private static List<(Faction.FactionType factionType, List<(int desire, Sector sector)> sectorDesire)> _factionSectorDesires = new List<(Faction.FactionType, List<(int desire, Sector sector)>)>();
 
         public static int GetFactionSearchDistance(this Faction.FactionType factionType) {
-            if (factionType == Faction.FactionType.Agriculture) return 3;
-            if (factionType == Faction.FactionType.Commerce) return 3;
-            if (factionType == Faction.FactionType.Industrial) return 3;
+            if (factionType == Faction.FactionType.Agriculture) return 5;
+            if (factionType == Faction.FactionType.Commerce) return 5;
+            if (factionType == Faction.FactionType.Industrial) return 5;
             if (factionType == Faction.FactionType.Military) return 4;
-            if (factionType == Faction.FactionType.Pirate) return 2;
-            if (factionType == Faction.FactionType.Technology) return 4;
+            if (factionType == Faction.FactionType.Pirate) return 3;
+            if (factionType == Faction.FactionType.Technology) return 6;
             else return 0;
         }
 
@@ -430,7 +431,7 @@ namespace Code._Galaxy._Factions {
                     "Researchers",
                     "Empiricists"
                 };
-            else return new List<string> { "Faction" };
+            return new List<string> { "Faction" };
         }
 
         public static int GetFactionRatio(this Faction.FactionType factionType) {
@@ -438,19 +439,19 @@ namespace Code._Galaxy._Factions {
             if (factionType == Faction.FactionType.Commerce) return 7;
             if (factionType == Faction.FactionType.Industrial) return 5;
             if (factionType == Faction.FactionType.Military) return 4;
-            if (factionType == Faction.FactionType.Pirate) return 8;
+            if (factionType == Faction.FactionType.Pirate) return 10;
             if (factionType == Faction.FactionType.Technology) return 2;
-            else return 0; //if generic unfocused factions are desired this can be increased to allow for them
+            return 0; //if generic unfocused factions are desired this can be increased to allow for them
         }
 
         public static int GetFactionSprawlRatio(this Faction.FactionType factionType) {
-            if (factionType == Faction.FactionType.Agriculture) return 5;
-            if (factionType == Faction.FactionType.Commerce) return 5;
-            if (factionType == Faction.FactionType.Industrial) return 5;
-            if (factionType == Faction.FactionType.Military) return 10;
-            if (factionType == Faction.FactionType.Pirate) return 2;
-            if (factionType == Faction.FactionType.Technology) return 3;
-            else return 0; //if generic unfocused factions are desired this can be increased to allow for them
+            if (factionType == Faction.FactionType.Agriculture) return 10;
+            if (factionType == Faction.FactionType.Commerce) return 10;
+            if (factionType == Faction.FactionType.Industrial) return 10;
+            if (factionType == Faction.FactionType.Military) return 15;
+            if (factionType == Faction.FactionType.Pirate) return 3;
+            if (factionType == Faction.FactionType.Technology) return 5;
+            return 0; //if generic unfocused factions are desired this can be increased to allow for them
         }
 
         public static float GetFactionGrowthChance(this Faction.FactionType factionType) {
@@ -460,7 +461,7 @@ namespace Code._Galaxy._Factions {
             if (factionType == Faction.FactionType.Military) return 0.75f;
             if (factionType == Faction.FactionType.Pirate) return 0.3f;
             if (factionType == Faction.FactionType.Technology) return 0.4f;
-            else return 0;
+            return 0;
         }
 
         public static int GetPreCalcSectorDesire(this Faction.FactionType factionType, Sector sector) {
@@ -481,7 +482,7 @@ namespace Code._Galaxy._Factions {
                 desireSum += factionType.CelestialBodyDesire((CelestialBody)body);
             }
 
-            return desireSum; //if generic factions are desired this can be altered to allow for them
+            return desireSum;
         }
 
         public static int CelestialBodyDesire(this Faction.FactionType factionType, CelestialBody celestialBody) {
@@ -491,7 +492,17 @@ namespace Code._Galaxy._Factions {
             if (factionType == Faction.FactionType.Military) return MilitaryFaction.GetMilitaryFactionCelestialBodyDesire(celestialBody);
             if (factionType == Faction.FactionType.Pirate) return PirateFaction.GetPirateFactionCelestialBodyDesire(celestialBody);
             if (factionType == Faction.FactionType.Technology) return TechnologyFaction.GetTechnologyFactionCelestialBodyDesire(celestialBody);
-            else return 0; //if generic factions are desired this can be altered to allow for them
+            return 0;
+        }
+
+        public static Color MapColor(this Faction.FactionType factionType) {
+            if (factionType == Faction.FactionType.Agriculture) return new Color(0,1,0);
+            if (factionType == Faction.FactionType.Commerce) return new Color(1,1,0);
+            if (factionType == Faction.FactionType.Industrial) return new Color(.4f,.3f,0);
+            if (factionType == Faction.FactionType.Military) return new Color(.4f,.1f,1);
+            if (factionType == Faction.FactionType.Pirate) return new Color(1, 0, 0);
+            if (factionType == Faction.FactionType.Technology) return new Color(0,.3f,1);
+            return new Color();
         }
     }
 }

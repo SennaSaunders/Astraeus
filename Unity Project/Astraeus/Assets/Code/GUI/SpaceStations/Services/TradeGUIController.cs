@@ -49,7 +49,7 @@ namespace Code.GUI.SpaceStations.Services {
 
         private void SetupGUI() {
             _stationGUIController.stationGUI.SetActive(false);
-            _guiGameObject = GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab(_tradeService.GUIPath));
+            _guiGameObject = Instantiate((GameObject)Resources.Load(_tradeService.GUIPath));
             _cargoController = GameController.CurrentShip.ShipObject.GetComponent<ShipController>().CargoController;
             notEnoughCreditsMsg = GameObjectHelper.FindChild(_guiGameObject, "NotEnoughCredits");
             notEnoughCreditsMsg.SetActive(false);
@@ -137,7 +137,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private GameObject GetProductCardObject() {
-            return GameController._prefabHandler.InstantiateObject(GameController._prefabHandler.LoadPrefab("GUIPrefabs/Station/Services/Trade/ProductCard"));
+            return Instantiate((GameObject)Resources.Load("GUIPrefabs/Station/Services/Trade/ProductCard"));
         }
 
         private void SetupButtons() {

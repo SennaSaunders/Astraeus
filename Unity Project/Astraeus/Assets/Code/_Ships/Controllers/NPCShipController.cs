@@ -1,5 +1,4 @@
 ﻿using System;
-using Code._GameControllers;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
@@ -10,29 +9,19 @@ namespace Code._Ships.Controllers {
     public class NPCShipController : ShipController {
         //translates destination to thrust vectors and rotation angles
 
-        public Vector2 destination; //public to change in the inspector
+        public Vector2 destination;
         private Vector2 _correctionVector;
         private Transform _shipTransform;
-        private ShipController _currentTarget;
+        public ShipController currentTarget;
+        private NPCItineraryController _npcItineraryController;
 
-        public void Setup(Ship ship, Vector2 initialDestination) {
-            destination = initialDestination;
-            destination = GameController.CurrentShip.ShipObject.transform.position;
+        public override void Setup(Ship ship) {
             base.Setup(ship);
             _shipTransform = transform;
-            SetCurrentTarget();
+            _npcItineraryController = gameObject.AddComponent<NPCItineraryController>();
         }
 
-        private ShipController GetPriorityTarget() {
-            //hostile distance
-            //weapon range
-            //time to kill hostile
-            return null;//GameController.CurrentShip.ShipObject.GetComponent<ShipController>();//temporarily get player ship
-        }
-
-        private void SetCurrentTarget() {
-            _currentTarget = GetPriorityTarget();
-        }
+        
 
         //  Each weapon may shoot projectiles of different velocities
         //  So may need a separate target for each gun
@@ -55,20 +44,17 @@ namespace Code._Ships.Controllers {
                 t = t1 < t2 ? t2 : t1;
                 aimVec = targetPos + targetV * t;
             }
-            
-            // t = t1 > 0 ? t1 < t2 ? t1 : t2 : t2;
-            
+
             Debug.DrawLine(interceptPos, aimVec);
             
             return aimVec;
         }
 
-
         protected override void AimWeapons() {
-            if (_currentTarget != null) {
+            if (currentTarget != null) {
                 Vector2 interceptPos = transform.position;
-                Vector2 targetPos = _currentTarget.transform.position;
-                Vector2 targetV = _currentTarget.ThrusterController.Velocity;
+                Vector2 targetPos = currentTarget.transform.position;
+                Vector2 targetV = currentTarget.ThrusterController.Velocity;
                 foreach (WeaponController weaponController in WeaponControllers) {
                     float interceptSpeed = weaponController.ControlledWeapon.ProjectileSpeed;
                     Vector2 intercept = GetIntercept(interceptPos, interceptSpeed, targetPos, targetV);
@@ -79,11 +65,23 @@ namespace Code._Ships.Controllers {
         }
 
         protected override void FireCheck() {
-            FireWeapons();
+            if (currentTarget) {
+                float weaponRange = 0;
+                foreach (WeaponController weaponController in WeaponControllers) {
+                    Weapon weapon = weaponController.ControlledWeapon;
+                    weaponRange += weapon.ProjectileSpeed * weapon.MaxTravelTime;
+                }
+
+                weaponRange /= WeaponControllers.Count;
+                
+                if ((currentTarget.transform.position - transform.position).magnitude < weaponRange) {
+                    FireWeapons();
+                }
+            }
+            
             //is weapon aimed at target
             //is weapon within range
             //if so then fire
-
             // throw new NotImplementedException();
         }
 
@@ -137,13 +135,10 @@ namespace Code._Ships.Controllers {
                     if (Vector2.Angle(shipFacing, _correctionVector) < angleEpsilon) {
                         thrustVec = Vector2.up;
                     }
-
-                    Debug.Log("On target");
                 }
                 else if (Math.Abs(driftAngle) < offCourseAngle) { //if drifting perpendicular or less 
                     //turn perpendicular to destination and burn to reduce drift angle to 0
-                    Debug.Log("Drifting");
-
+                    
                     //get perpendicular vector from destination
                     float perpendicularAngle = driftAngle < 0 ? 90 : -90;
                     Vector2 perpendicularVec = Quaternion.Euler(0, 0, perpendicularAngle) * (deltaVector);
@@ -158,7 +153,6 @@ namespace Code._Ships.Controllers {
                 }
                 else { //if drifting backwards
                     //burn in opposite direction else it will drift more off target
-                    Debug.Log("Way off course");
                     Vector2 velocityOpposite = Quaternion.Euler(0, 0, 180) * velocity;
                     _correctionVector = velocityOpposite;
 
@@ -181,7 +175,6 @@ namespace Code._Ships.Controllers {
             Debug.DrawLine(currentPosition, currentPosition + _correctionVector, Color.blue);
             Vector2 shipRotatedThrust = Quaternion.Euler(0, 0, shipRotation) * thrustVec;
             Debug.DrawLine(currentPosition, currentPosition + (shipRotatedThrust * 10), Color.cyan);
-
             return thrustVec;
         }
 
@@ -211,8 +204,6 @@ namespace Code._Ships.Controllers {
         protected override float GetTurnDirection() {
             float angle = GetTurnAngle();
             float angularDisplacement = CalculateDisplacementTillStop(ThrusterController.AngularVelocity, ThrusterController.AngularAcceleration);
-
-            // Debug.Log("\nAngularV: " + angularV + "\nAngularA: " + angularA+ "\nAngle: " + angle + "\nCurrent Displacement: " + angularDisplacement);
             float turnEpsilon = .0001f;
             float delta = Math.Abs(angle) - angularDisplacement;
             if (delta > turnEpsilon) {
@@ -223,15 +214,8 @@ namespace Code._Ships.Controllers {
             return 0;
         }
 
-        public void SetDestination(Vector2 newDestination) {
-            destination = newDestination;
-        }
-
         private float GetTurnAngle() {
             var forwardVec = _shipTransform.TransformDirection(Vector3.up);
-            // Debug.DrawLine(transform.position, forwardVec*100, Color.red, .1f);
-            // Debug.DrawLine(transform.position, destination, Color.green);
-            // return Vector2.SignedAngle(forwardVec, (destination+correctionVector) - (Vector2)transform.position);
             return Vector2.SignedAngle(forwardVec, _correctionVector);
         }
     }

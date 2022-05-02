@@ -40,13 +40,12 @@ namespace Code._Galaxy {
 
         //has to be called before galaxy generation as getting Application.dataPath has to be on the main thread
         public void SetPotentialSystemNames() {
-            string path = Application.dataPath + "/Resources/SystemNames/System Names.txt";
-            string[] lines = File.ReadAllLines(path);
-            
+            TextAsset namesTxt= (TextAsset)Resources.Load("SystemNames/System Names");
+            var lines = namesTxt.text.Split('\n');
             potentialSystemNames = new List<string>();
             foreach (string line in lines) {
                 if (!line.StartsWith("*")) {
-                    potentialSystemNames.Add(line);
+                    potentialSystemNames.Add(line.TrimEnd('\n', '\r'));
                 }
             }
         }
@@ -108,7 +107,7 @@ namespace Code._Galaxy {
                         }
                     }
 
-                    SpaceStation spaceStation = new SpaceStation(bestBody);
+                    SpaceStation spaceStation = new SpaceStation(bestBody, solarSystem);
                     //need to decided how to choose whether there is an outfitting service and a shipyard
                     //only refuel and repair should be everywhere
                     //for the moment just instantiate the outfitter with the faction specific parts
@@ -145,7 +144,7 @@ namespace Code._Galaxy {
                 maxFactionAmounts.Add((factionType, (int)Math.Ceiling(factionRatioMultiplier * factionType.GetFactionRatio())));
             }
 
-            FactionTypeExtension.PreCalcDesireValues(sectors); //Pre calculate (for performance) the preferences for each sector/system for each faction
+            FactionTypeExtension.PreCalcDesireValues(sectors); //Pre calculate the preferences for each sector/system for each faction
 
             //choose a home world for each faction
             //get the top sector in the list and add it to a chosen sector list
@@ -368,12 +367,9 @@ namespace Code._Galaxy {
         }
 
         private static List<Body> SetupRotations(List<Body> bodies) {
-            //orbital period  - relative to distance from primary? random?
-            //what units to use - seconds, minutes, hours?
-            //rotation base set randomly
             foreach (Body body in bodies) {
-                body.RotationBase = (float)Rng.NextDouble();
-                body.RotationCurrent = body.RotationBase;
+                body.RotationStart = (float)Rng.NextDouble();
+                body.RotationCurrent = body.RotationStart;
             }
 
             return bodies;

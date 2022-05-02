@@ -1,20 +1,24 @@
-﻿using System.Collections.Generic;
-using Code._Ships.Hulls;
+﻿using System;
+using System.Collections.Generic;
+using Code._Ships.Hulls.Types.Cargo;
+using Code._Ships.Hulls.Types.Fighter;
 
 namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
     public class ShipyardService : StationService {
-        private List<Hull> hulls;
-
         protected override void SetGUIStrings() {
             ServiceName = "Shipyard";
             GUIPath = "GUIPrefabs/Station/Services/Shipyard/ShipyardGUI";
         }
-        void SetShipHulls() {
-            hulls = new List<Hull>();
-            hulls.Add(new SmallCargoHull());
-            hulls.Add(new SmallFighterHull());
-        }
-
         
+        public List<Type> GetShipHulls() {
+            List<Type> hullTypes = new List<Type> {
+                typeof(SmallCargoHull),
+                typeof(TriHauler),
+                typeof(SmallFighterHull),
+                typeof(SleekFighter),
+                typeof(HeavyFighter)
+            };
+            return hullTypes;
+        }
     }
 }

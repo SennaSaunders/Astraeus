@@ -7,7 +7,7 @@
         public override string GetFullPath() {
             return base.GetFullPath() + ComponentTypePath;
         }
-        protected Thruster(string componentName, ShipComponentType componentType, ShipComponentTier componentSize, int baseMass, float baseForce, float basePowerDraw) : base(componentName,componentType, componentSize, baseMass) {
+        protected Thruster(string componentName, ShipComponentType componentType, ShipComponentTier componentSize, int baseMass, float baseForce, float basePowerDraw, int basePrice) : base(componentName,componentType, componentSize, baseMass, basePrice) {
             Force = GetTierMultipliedValue(baseForce, componentSize);
             PowerDraw = GetTierMultipliedValue(basePowerDraw, componentSize);
         }

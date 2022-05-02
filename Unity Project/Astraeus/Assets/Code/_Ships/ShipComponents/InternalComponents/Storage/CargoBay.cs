@@ -3,7 +3,7 @@ using Code._Cargo;
 
 namespace Code._Ships.ShipComponents.InternalComponents.Storage {
     public class CargoBay : InternalComponent{
-        public CargoBay(ShipComponentTier componentSize) : base("Cargo Bay", componentSize, 0) {
+        public CargoBay(ShipComponentTier componentSize) : base("Cargo Bay", componentSize, 0, 500) {
             CargoVolume = (int)GetTierMultipliedValue(BaseCargoVolume, componentSize);
             StoredCargo = new List<Cargo>();
         }
