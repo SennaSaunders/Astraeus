@@ -15,8 +15,7 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects {
             _interactKey = interactKey;
             _guiPath = prefabPath;
         }
-
-
+        
         private void Update() {
             ProximityCheck();
         }

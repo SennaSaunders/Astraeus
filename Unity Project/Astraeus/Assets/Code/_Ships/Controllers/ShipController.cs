@@ -14,6 +14,7 @@ using Code._Utility;
 using Code.GUI.ShipGUI;
 using Code.GUI.Utility;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Code._Ships.Controllers {
     public abstract class ShipController : MonoBehaviour {
@@ -24,10 +25,11 @@ namespace Code._Ships.Controllers {
         private ShieldController _shieldController;
         public CargoController CargoController;
         public JumpDriveController JumpDriveController;
-        //ship health gui
         protected GameObject _shipHealthGUI;
+        private GameObject speedIndicator;
         
         public List<Ship> hostiles = new List<Ship>();
+        public bool beingDestroyed = false;
 
         public virtual void Setup(Ship ship) {
             _ship = ship;
@@ -72,6 +74,7 @@ namespace Code._Ships.Controllers {
                 }
             }
             SetupShipHealthGUI();
+            ThrustIndicator();
         }
 
         private void SetupShipHealthGUI() {
@@ -135,12 +138,39 @@ namespace Code._Ships.Controllers {
             return mass;
         }
 
+        private void ThrustIndicator() {
+            if (speedIndicator == null) {
+                speedIndicator = Instantiate((GameObject)Resources.Load("GUIPrefabs/Ship/SpeedIndicator"), gameObject.transform);
+                GameObjectHelper.FindChild(speedIndicator, "SpeedTxtValue").AddComponent<RotateToPlayer>();;
+            }
+
+            
+            var speedArea = GameObjectHelper.FindChild(speedIndicator, "SpeedArea");
+            float velocityRotation = Vector2.SignedAngle(Vector2.up, ThrusterController.Velocity);
+            speedArea.transform.rotation = Quaternion.Euler(0,0,velocityRotation);
+            Vector2 speedBarMaxSize = speedArea.GetComponent<RectTransform>().sizeDelta;
+            float relativeThrustSize = ThrusterController.Velocity.magnitude / ThrusterController.MaxSpeed;
+            
+            GameObject speedBar = GameObjectHelper.FindChild(speedIndicator, "SpeedBar");
+            speedBar.GetComponent<RectTransform>().sizeDelta = new Vector2(speedBarMaxSize.x, relativeThrustSize * speedBarMaxSize.y);
+
+            speedBar.GetComponent<Image>().color = new Color(1, 1- relativeThrustSize, 0);
+
+            string speedTxt = ThrusterController.Velocity.magnitude.ToString("0.0") + "m/s";
+            GameObjectHelper.SetGUITextValue(speedIndicator, "SpeedTxtValue", speedTxt);
+        }
+
         private void Thrust() {
-            Vector2 thrustVector = GetThrustVector();
-            if (thrustVector != new Vector2()) {
+            Vector2 thrustVector = new Vector2();
+            if (!beingDestroyed) {
+                thrustVector = GetThrustVector();
+            }
+            
+            if (thrustVector != new Vector2()) {//skips thrust calculations if no thrust is being applied
                 ThrusterController.FireThrusters(thrustVector, Time.deltaTime, gameObject.transform.localRotation.eulerAngles.z);
             }
             gameObject.transform.Translate( ThrusterController.Velocity * Time.deltaTime, Space.World);
+            ThrustIndicator();
         }
 
         private void Turn() {
@@ -165,8 +195,10 @@ namespace Code._Ships.Controllers {
         protected abstract void FireCheck();
 
         protected void FireWeapons() {
-            foreach (WeaponController weaponController in WeaponControllers) {
-                weaponController.Fire(ThrusterController.Velocity);
+            if (!beingDestroyed) {
+                foreach (WeaponController weaponController in WeaponControllers) {
+                    weaponController.Fire(ThrusterController.Velocity);
+                }
             }
         }
 
@@ -188,11 +220,14 @@ namespace Code._Ships.Controllers {
 
         public void RemoveHostility() {
             foreach (Ship hostile in hostiles) {
-                hostile.ShipObject.GetComponent<ShipController>().hostiles.Remove(_ship);
+                if (hostile.ShipObject != null) {//check if the hostile ship hasn't been destroyed
+                    hostile.ShipObject.GetComponent<ShipController>().hostiles.Remove(_ship);
+                }
             }
         }
 
         protected virtual void ShipDestroyed() {
+            beingDestroyed = true;
             RemoveHostility();
             
             GameObject particleSystemObject = Instantiate((GameObject)Resources.Load("Effects/ExplosionEffect"), transform, true);

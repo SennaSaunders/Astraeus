@@ -5,8 +5,8 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons.Types {
     public class Laser : Weapon {
         private static float minTierFireDelay = .3f;
         private static float maxTierFireDelay = 1f;
-        private static float baseDamage = 5;
-        private static float basePowerDraw = 5;
+        private static float baseDamage = 30;
+        private static float basePowerDraw = 30;
         private static float projectileSpeed = 500;
         private static float travelTime = 2;
         private static int baseMass = 100;

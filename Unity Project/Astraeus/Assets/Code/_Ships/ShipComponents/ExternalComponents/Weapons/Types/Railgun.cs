@@ -5,8 +5,8 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons.Types {
     public class Railgun :Weapon{
         private static float minTierFireDelay = 2;
         private static float maxTierFireDelay = 5;
-        private static float baseDamage = 30;
-        private static float basePowerDraw = 15;
+        private static float baseDamage = 200;
+        private static float basePowerDraw = 100;
         private static float projectileSpeed = 500;
         private static float travelTime = 3;
         private static int baseMass = 200;

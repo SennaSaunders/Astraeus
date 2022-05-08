@@ -94,11 +94,8 @@ namespace Code._GameControllers {
             // int numOfCargoBays=0;
             do {
                 addedPart = AddInternalToBestSlot(ship, typeof(CargoBay));
-                // if (addedPart) {
-                //     numOfCargoBays++;
-                // }
             } while (addedPart);
-            // Debug.Log("Added "+ numOfCargoBays + " cargo bays.");
+            
         }
 
         private int GetBestEmptyInternalSlotIndex(Ship ship) {
@@ -222,11 +219,11 @@ namespace Code._GameControllers {
             return shipObjectHandler.ManagedShip;
         }
 
-        public void FuelShip(Ship ship) {
-            CargoController cargoController  =ship.ShipObject.GetComponent<NPCShipController>().CargoController;
+        public void FuelShip(Ship ship, float relativeFill) {
+            CargoController cargoController  =ship.ShipObject.GetComponent<ShipController>().CargoController;
             int freeSpace = cargoController.GetFreeCargoSpace();
             List<Fuel> fuels = new List<Fuel>();
-            for (int i = 0; i < freeSpace; i++) {
+            for (int i = 0; i < (int)(freeSpace * relativeFill); i++) {
                 fuels.Add(new Fuel());
             }
             cargoController.AddCargo(fuels.Cast<Cargo>().ToList());

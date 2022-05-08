@@ -8,7 +8,6 @@ using Code._Galaxy._SolarSystem._CelestialObjects.Planet;
 using Code._Galaxy._SolarSystem._CelestialObjects.Star;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
 using Code._GameControllers;
-using Code._Ships.Controllers;
 using Code._Ships.ShipComponents;
 using UnityEngine;
 
@@ -19,8 +18,7 @@ namespace Code._Galaxy._SolarSystem {
         private List<(Body body, GameObject bodyObject)> bodyObjectMap;
         public const int ZOffset = 0;
         public const int SpaceStationZ = -80;
-        public int _maxNPCsInhabited = 10;
-        public int _maxNPCsUninhabited = 3;
+        public int _maxNPCs = 0;
         private float spawnTimer = 0;
         private float timeTillSpawn = 5;
         public bool Active { get; set; }
@@ -111,12 +109,7 @@ namespace Code._Galaxy._SolarSystem {
             spawnTimer -= Time.deltaTime;
             if (spawnTimer <= 0) {
                 if (inhabited) {
-                    if (numNPCs < _maxNPCsInhabited) {
-                        SpawnShip();
-                    }
-                }
-                else {
-                    if (numNPCs < _maxNPCsUninhabited) {
+                    if (numNPCs < _maxNPCs) {
                         SpawnShip();
                     }
                 }
@@ -177,6 +170,9 @@ namespace Code._Galaxy._SolarSystem {
 
         public void AssignSystem(SolarSystem solarSystem) {
             _solarSystem = solarSystem;
+            bool inhabited = _solarSystem.OwnerFaction != null;
+            _maxNPCs = (inhabited ? solarSystem.Bodies.Count - 1 : _solarSystem.Bodies.Count / 2);
+
         }
 
         private void SetupSolarSystemHolder() {
@@ -237,7 +233,7 @@ namespace Code._Galaxy._SolarSystem {
                 if (body.GetType() == typeof(Star)) {
                     PlayerBodyProximity playerBodyProximity = bodyObject.AddComponent<PlayerBodyProximity>();
                     playerBodyProximity.Setup(KeyCode.Space, proximityGUIBase + "FuelScoopGUI");
-                    playerBodyProximity.SetProximityFunction<Star>(GameController.CurrentShip.ShipObject.GetComponent<ShipController>().CargoController.FuelScoop, (Star)body);
+                    playerBodyProximity.SetProximityFunction(GetFuelScoopFunc(), (Star)body);
                 }
 
                 bodyHolders.Add(bodyHolder);
@@ -267,6 +263,10 @@ namespace Code._Galaxy._SolarSystem {
             }
 
             GameObject projectileHolder = new GameObject("ProjectileHolder");
+        }
+
+        private Action<Star> GetFuelScoopFunc() {
+            return GameController.PlayerShipController.CargoController.FuelScoop;
         }
     }
 }

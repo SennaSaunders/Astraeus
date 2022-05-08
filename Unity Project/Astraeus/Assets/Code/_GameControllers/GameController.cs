@@ -23,7 +23,7 @@ namespace Code._GameControllers {
         public static bool IsPaused = true;
         public static Ship CurrentShip { get; set; }
         private GameObject _playerShipContainer;
-        private PlayerShipController _playerShipController;
+        public static PlayerShipController PlayerShipController;
         public List<Ship> npcShips = new List<Ship>();
         public static ShipCreator ShipCreator;
         
@@ -56,6 +56,7 @@ namespace Code._GameControllers {
             GalaxyController.activeSystemController = solarSystemController;
             CurrentSolarSystem = solarSystemController._solarSystem;
             solarSystemController.DisplaySolarSystem(shipGUI);
+            GUIController.shipGUIController.SetSystemDetails();
         }
 
         private static void SetShipToStation() {
@@ -76,14 +77,15 @@ namespace Code._GameControllers {
             PlayerProfile.Ships.Add(CurrentShip);
             CurrentShip.ShipObject.transform.SetParent(_playerShipContainer.transform);
             SetPlayerShipController();
-            _playerShipController.Setup(CurrentShip);
+            PlayerShipController.Setup(CurrentShip);
+            ShipCreator.FuelShip(CurrentShip, .5f);
             SetupShipCamera();
             
         }
 
         private void SetPlayerShipController() {
-            _playerShipController = CurrentShip.ShipObject.AddComponent<PlayerShipController>();
-            _playerShipController.gameObject.tag = "Player";
+            PlayerShipController = CurrentShip.ShipObject.AddComponent<PlayerShipController>();
+            PlayerShipController.gameObject.tag = "Player";
         }
 
         public void RefreshPlayerShip() {
@@ -95,7 +97,7 @@ namespace Code._GameControllers {
             ShipCreator.shipObjectHandler.ManagedShip = CurrentShip;
             ShipCreator.shipObjectHandler.CreateShip(_playerShipContainer.transform, Color.green);
             SetPlayerShipController();
-            _playerShipController.Setup(CurrentShip);
+            PlayerShipController.Setup(CurrentShip);
             SetShipToStation();
             SetupShipCamera();
         }
@@ -136,9 +138,9 @@ namespace Code._GameControllers {
             GalaxyController = gameObject.AddComponent<GalaxyController>();
             GalaxyController.SetGalaxy(galaxy);
             GalaxyController.DisplayGalaxy();
+            GUIController.SetupShipGUI();
             ChangeSolarSystem(GalaxyController.GetSolarSystemController(GetStartingSystem()), false);
             CurrentStation = GetStartingStation(CurrentSolarSystem);
-            GUIController.SetupShipGUI();
             SetupDefaultShip();
         }
 
@@ -170,7 +172,7 @@ namespace Code._GameControllers {
             ship.ShipObject.transform.position = new Vector3(spawnLocation.x, spawnLocation.y, ShipZ);
             NPCShipController shipController = ship.ShipObject.AddComponent<NPCShipController>();
             shipController.Setup(ship);
-            ShipCreator.FuelShip(ship);
+            ShipCreator.FuelShip(ship, 1);
             npcShips.Add(ship);
         }
 

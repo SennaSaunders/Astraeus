@@ -19,7 +19,7 @@
 
     public class PowerPlantHighRecharge : PowerPlant {
         private static float baseEnergyCapacity = 500;
-        private static float baseRechargeRate = 50;
+        private static float baseRechargeRate = 200;
 
         public PowerPlantHighRecharge(ShipComponentTier componentSize) : base("High Recharge",componentSize, baseEnergyCapacity, baseRechargeRate, 3000) {
         }
@@ -27,7 +27,7 @@
     
     public class PowerPlantHighCapacity : PowerPlant {
         private static float baseEnergyCapacity = 1500;
-        private static float baseRechargeRate = 10;
+        private static float baseRechargeRate = 100;
 
         public PowerPlantHighCapacity(ShipComponentTier componentSize) : base("High Capacity",componentSize, baseEnergyCapacity, baseRechargeRate, 2500) {
         }
@@ -35,7 +35,7 @@
     
     public class PowerPlantBalanced : PowerPlant {
         private static float baseEnergyCapacity = 750;
-        private static float baseRechargeRate = 30;
+        private static float baseRechargeRate = 150;
 
         public PowerPlantBalanced(ShipComponentTier componentSize) : base("Balanced",componentSize, baseEnergyCapacity, baseRechargeRate, 1500) {
         }

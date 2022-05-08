@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
@@ -53,8 +52,8 @@ namespace Code._Ships.Hulls {
             SetInternalComponents();
         }
 
-        protected abstract void SetThrusterComponents();
         protected abstract void SetWeaponComponents();
+        protected abstract void SetThrusterComponents();
         protected abstract void SetInternalComponents();
 
         public void TakeDamage(float damage) {

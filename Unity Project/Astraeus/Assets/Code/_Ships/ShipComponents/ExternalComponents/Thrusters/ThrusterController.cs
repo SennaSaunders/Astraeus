@@ -32,8 +32,8 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Thrusters {
         public float AngularAcceleration { get; private set; }
         public float AngularVelocity = 0;
 
-        public float GetMainThrusterAcceleration() {
-            return _mainThrustForce / _shipMass;
+        public Vector2 GetAcceleration() {
+            return new Vector2(_mainThrustForce / _shipMass, _manoeuvreThrustForce / _shipMass);
         }
 
         private float GetMainThrustForce(List<MainThruster> thrusters) {
@@ -82,21 +82,7 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Thrusters {
             Quaternion shipFacingQuaternion = Quaternion.Euler(0, 0, facingAngle);
             shipFacingQuaternion.Normalize();
             Vector2 shipRotatedThrustVector = shipFacingQuaternion * shipThrustVector;
-
-            float thrustVelocityDifferenceAngle = Vector2.Angle(Velocity, shipRotatedThrustVector);
-
-            float v = Velocity.magnitude < MaxSpeed ? Velocity.magnitude : MaxSpeed; //correct for velocity being slightly larger than max speed
-
-            double lorentzFactor = 1 / Math.Sqrt(1 - (v * v) / (MaxSpeed * MaxSpeed));
-            float adjustedMass = _shipMass * (float)lorentzFactor;
-
-            Vector2 a;
-            if (thrustVelocityDifferenceAngle < 90) { //reduce thrust effectiveness if less than perpendicular to direction of travel
-                a = shipRotatedThrustVector / adjustedMass;
-            }
-            else {
-                a = shipRotatedThrustVector / _shipMass;
-            }
+            var a = shipRotatedThrustVector / _shipMass;
 
             Velocity += a * deltaTime;
             float scale = Velocity.magnitude / MaxSpeed;

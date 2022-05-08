@@ -6,7 +6,7 @@
             Capacity = 1;
         }
 
-        public const float MaxEnergy = 200;
+        public const float MaxEnergy = 1000;
         public float Capacity { get; set; } // defines how full this unit of fuel is from 0 - 1
         public static int fuelPrice = 5;
         public override float GetMass() {

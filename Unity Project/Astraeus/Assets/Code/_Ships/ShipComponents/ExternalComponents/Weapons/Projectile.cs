@@ -54,9 +54,9 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
         }
 
         private Vector2 GetProjectileVelocity(Vector2 shipVelocity, float projectileSpeed) {
-            Quaternion rotVec = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z);
-            Vector2 up = rotVec * new Vector2(0, projectileSpeed);
-            return shipVelocity + up;
+            Quaternion rotation = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z);
+            Vector2 firingVector = rotation * new Vector2(0, projectileSpeed);
+            return shipVelocity + firingVector;
         }
 
         private void DealDamage(ShipController hitShipController) {

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Code._Ships.Hulls.Types.Cargo {
     public class SmallCargoHull : Hull {
-        public SmallCargoHull() : base("Hermes",new Vector3(0, 0, 20), 15000,5, 20, 100, 15000) {
+        public SmallCargoHull() : base("Hermes",new Vector3(0, 0, 20), 15000,5, 20, 400, 15000) {
             ColourChannelObjectMap = new List<(List<string> objectName, Color colour)>() {
                 (new List<string>() { "Hull" }, new Color(.2f, 0, .6f)),
                 (new List<string>() { "Cockpit" }, new Color(.1f, .1f, .1f)),

@@ -14,7 +14,6 @@ namespace Code.GUI.ShipGUI {
         private void SetupShipGUI() {
             guiGameObject = Instantiate((GameObject)Resources.Load("GUIPrefabs/Ship/ShipGUI"));
             SetupButtons();
-            UpdateTextValues();
         }
 
         private void SetupButtons() {
@@ -34,13 +33,9 @@ namespace Code.GUI.ShipGUI {
             GameController.GUIController.SetupLocalMapGUI();
         }
 
-        public void UpdateTextValues() {
-            SetSystemDetails();
-        }
-        
-        private void SetSystemDetails() {
+        public void SetSystemDetails() {
             GameObjectHelper.SetGUITextValue(guiGameObject, "SystemName",GameController.CurrentSolarSystem.SystemName);
-            GameObjectHelper.SetGUITextValue(guiGameObject, "FactionValue",GameController.CurrentSolarSystem.OwnerFaction.GetFactionName());
+            GameObjectHelper.SetGUITextValue(guiGameObject, "FactionValue", GameController.CurrentSolarSystem.OwnerFaction == null ? "Unoccupied" : GameController.CurrentSolarSystem.OwnerFaction.GetFactionName());
         }
     }
 }

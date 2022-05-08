@@ -1,5 +1,4 @@
-﻿using System;
-using Code._GameControllers;
+﻿using Code._GameControllers;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using Code._Utility;
 using Code.GUI.ShipGUI;
@@ -51,7 +50,7 @@ namespace Code._Ships.Controllers {
             }
         }
 
-        public void AimWeapons(Vector2 aimTarget) {
+        private void AimWeapons(Vector2 aimTarget) {
             foreach (WeaponController weaponController in WeaponControllers) {
                 weaponController.TurnWeapon(aimTarget, transform.rotation);
             }
@@ -83,8 +82,12 @@ namespace Code._Ships.Controllers {
 
         protected override void ShipDestroyed() {
             base.ShipDestroyed();
-            RespawnGUI();
+            GameObject projectiles = GameObject.Find("ProjectileHolder");
+            for(int i = projectiles.transform.childCount; i >= 0;i--) {
+                Destroy(projectiles.transform.GetChild(0).gameObject);
+            }
             
+            RespawnGUI();
         }
 
         private void RespawnGUI() {
