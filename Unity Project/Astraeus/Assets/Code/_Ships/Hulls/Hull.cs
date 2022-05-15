@@ -5,6 +5,7 @@ using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.InternalComponents;
 using Code.Camera;
 using Code.GUI.ObserverPattern;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Code._Ships.Hulls {
@@ -38,12 +39,17 @@ namespace Code._Ships.Hulls {
         public (ShipComponentType componentType, ShipComponentTier maxSize, ManoeuvringThruster concreteComponent, string selectionTransformName, List<string> parentTransformNames) ManoeuvringThrusterComponents;
         public List<List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string parentTransformName, bool needsBracket)>> TiedThrustersSets = new List<List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string parentTransformName, bool needsBracket)>>();
 
+        [JsonIgnore]
         public List<(GameObject mesh, int channelIdx)> MeshObjects;
+        [JsonIgnore]
         public List<(List<string> objectName, Color colour)> ColourChannelObjectMap;
         private List<IItemObserver<float>> _observers = new List<IItemObserver<float>>();
 
+        [JsonIgnore]
         public Vector3 OutfittingPosition { get; }
+        [JsonIgnore]
         public Vector3 HealthGUIOffset { get; }
+        [JsonIgnore]
         public Quaternion OutfittingRotation { get; } = Quaternion.Euler(50, 0, -30);
 
         public abstract string GetHullFullPath();

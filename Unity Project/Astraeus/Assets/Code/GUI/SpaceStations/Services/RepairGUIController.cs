@@ -84,6 +84,7 @@ namespace Code.GUI.SpaceStations.Services {
             if (health.current < health.max) {
                 if (GameController.PlayerProfile.ChangeCredits(GetRepairCost())) {
                     GameController.CurrentShip.ShipHull.CurrentHullStrength = GameController.CurrentShip.ShipHull.BaseHullStrength;
+                    GameController.CurrentShip.ShipHull.NotifyObservers();
                     SetFeedbackMsg("Ship Repaired", Color.green);
                     Refresh();
                 }

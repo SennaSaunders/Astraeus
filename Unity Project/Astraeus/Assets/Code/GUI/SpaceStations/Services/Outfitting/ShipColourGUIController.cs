@@ -291,7 +291,7 @@ namespace Code.GUI.SpaceStations.Services {
 
             List<(List<(List<GameObject>, int channelIdx)> meshChannels, List<T> externalComponents)> meshChannelMap = new List<(List<(List<GameObject>, int channelIdx)> meshChannels, List<T> externalComponents)>();
             foreach (Type type in externalTypes) {
-                var externalOfSameType = components.Where(c => c.GetType() == type).ToList();
+                var externalOfSameType = components.Where(c => c !=null && c.GetType() == type).ToList();
                 List<(GameObject mesh, int channelIdx)> meshObjects = new List<(GameObject mesh, int channelIdx)>();
                 List<Color> channelColours = externalOfSameType[0].ColourChannelObjectMap.Select(cc => cc.colour).ToList();
                 //get meshes of same type components

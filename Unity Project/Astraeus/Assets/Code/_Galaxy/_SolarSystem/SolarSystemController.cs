@@ -172,19 +172,14 @@ namespace Code._Galaxy._SolarSystem {
             _solarSystem = solarSystem;
             bool inhabited = _solarSystem.OwnerFaction != null;
             _maxNPCs = (inhabited ? solarSystem.Bodies.Count - 1 : _solarSystem.Bodies.Count / 2);
-
         }
 
         private void SetupSolarSystemHolder() {
             const string systemName = "SolarSystem";
             _solarSystemHolder = GameObject.Find(systemName);
-            if (Application.isEditor) {
+            if (_solarSystemHolder) {
                 DestroyImmediate(_solarSystemHolder);
-            }
-            else {
-                Destroy(_solarSystemHolder);
-            }
-
+            }            
             _solarSystemHolder = new GameObject(systemName);
         }
 

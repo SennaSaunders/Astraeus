@@ -35,26 +35,30 @@ namespace Code.GUI.SpaceStations.Services.Missions {
         private void SetupBaseGUI(GameObject parent, TradeMission mission) {
             _tradeMission = mission;
             _guiGameObject = (GameObject)Instantiate(Resources.Load(path), parent.transform);
-            SetBaseGUIValues();
+            SetBaseGUIValues(false);
         }
 
-        public void SetBaseGUIValues() {
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "MissionTitle", GetMissionName());
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "RewardValue", _tradeMission.RewardCredits + "Cr");
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "Description", GetMissionDescription());
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "FactionValue", _tradeMission.MissionGiver.GetFactionName());
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "PickupValue", _tradeMission.MissionPickupLocation.SolarSystem.SystemName + " Station");
+        public void SetBaseGUIValues(bool refresh) {
+            if (!refresh) {
+                GameObjectHelper.SetGUITextValue(_guiGameObject, "MissionTitle", GetMissionName());
+                GameObjectHelper.SetGUITextValue(_guiGameObject, "RewardValue", _tradeMission.RewardCredits + "Cr");
+                GameObjectHelper.SetGUITextValue(_guiGameObject, "Description", GetMissionDescription());
+                GameObjectHelper.SetGUITextValue(_guiGameObject, "FactionValue", _tradeMission.MissionGiver.GetFactionName());
+                GameObjectHelper.SetGUITextValue(_guiGameObject, "PickupValue", _tradeMission.MissionPickupLocation.SolarSystem.SystemName + " Station");
+                GameObjectHelper.SetGUITextValue(_guiGameObject, "DestinationValue", _tradeMission.Destination.SolarSystem.SystemName + " Station");
+                
+                Vector2 currentSystemPos = GameController.GalaxyController.activeSystemController._solarSystem.Coordinate;
+                string pickupDistString = (currentSystemPos - _tradeMission.MissionPickupLocation.SolarSystem.Coordinate).magnitude.ToString("0.0"); 
+                GameObjectHelper.SetGUITextValue(_guiGameObject, "PickupDistanceValue", pickupDistString + " LY");
+                string destDistString = (currentSystemPos - _tradeMission.Destination.SolarSystem.Coordinate).magnitude.ToString("0.0");
+                GameObjectHelper.SetGUITextValue(_guiGameObject, "DestinationDistanceValue", destDistString + " LY");
+                Button pickupMapBtn = GameObjectHelper.FindChild(_guiGameObject, "PickupMapBtn").GetComponent<Button>();
+                pickupMapBtn.onClick.AddListener(delegate { MapBtn(_tradeMission.MissionPickupLocation.SolarSystem); });
+                Button destinationMapBtn = GameObjectHelper.FindChild(_guiGameObject, "DestinationMapBtn").GetComponent<Button>();
+                destinationMapBtn.onClick.AddListener(delegate { MapBtn(_tradeMission.Destination.SolarSystem); });
+            }
+            
             GameObjectHelper.SetGUITextValue(_guiGameObject, "QuotaValue", _tradeMission.CargoDelivered + "/" + _tradeMission.CargoQuota);
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "DestinationValue", _tradeMission.Destination.SolarSystem.SystemName + " Station");
-            Vector2 currentSystemPos = GameController.GalaxyController.activeSystemController._solarSystem.Coordinate;
-            string pickupDistString = (currentSystemPos - _tradeMission.MissionPickupLocation.SolarSystem.Coordinate).magnitude.ToString("0.0"); 
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "PickupDistanceValue", pickupDistString + " LY");
-            string destDistString = (currentSystemPos - _tradeMission.Destination.SolarSystem.Coordinate).magnitude.ToString("0.0"); 
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "DestinationDistanceValue", destDistString + " LY");
-            Button pickupMapBtn = GameObjectHelper.FindChild(_guiGameObject, "PickupMapBtn").GetComponent<Button>();
-            pickupMapBtn.onClick.AddListener(delegate { MapBtn(_tradeMission.MissionPickupLocation.SolarSystem); });
-            Button destinationMapBtn = GameObjectHelper.FindChild(_guiGameObject, "DestinationMapBtn").GetComponent<Button>();
-            destinationMapBtn.onClick.AddListener(delegate { MapBtn(_tradeMission.Destination.SolarSystem); });
         }
 
         private void MapBtn(SolarSystem solarSystem) {

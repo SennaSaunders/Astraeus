@@ -20,11 +20,8 @@ namespace Code._Galaxy {
         public void SetupGalaxyHolder() {
             string holderName = "Galaxy";
             _galaxyHolder = GameObject.Find(holderName);
-            if (Application.isEditor) {
+            if (_galaxyHolder) {
                 DestroyImmediate(_galaxyHolder);
-            }
-            else {
-                Destroy(_galaxyHolder);
             }
 
             _galaxyHolder = new GameObject(holderName);

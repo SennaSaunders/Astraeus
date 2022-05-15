@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Code._GameControllers;
 using Code._Ships.Hulls;
 using Code._Ships.ShipComponents;
 using Code._Ships.ShipComponents.ExternalComponents;
@@ -174,7 +173,7 @@ namespace Code._Ships {
 
             return selectionTransforms[0];
         }
-
+        
         public bool SetMainThrusterComponent(string parentName, MainThruster mainThruster) {
             //get ShipComponent slot
             var slot = ManagedShip.ShipHull.MainThrusterComponents.Find(ec => ec.parentTransformName == parentName);
@@ -183,57 +182,59 @@ namespace Code._Ships {
             Transform slotTransform = MapPrefabTransformStringToTransformObject(parentName);
             Transform selectionTransform = GetSelectionTransform(slotTransform);
 
-            if (mainThruster == null || mainThruster.ComponentSize <= slot.maxSize) {
-                if (MainThrusterComponents.Select(tc => tc.mountTransform).Contains(slotTransform)) {
-                    MainThrusterComponents.Remove(MainThrusterComponents.Find(tc => tc.mountTransform == slotTransform));
+            if (mainThruster == null || mainThruster.ComponentSize <= slot.maxSize) {//if valid assignment
+                if (MainThrusterComponents.Select(tc => tc.mountTransform).Contains(slotTransform)) {//if the transform belongs to main thrusters
+                    MainThrusterComponents.Remove(MainThrusterComponents.Find(tc => tc.mountTransform == slotTransform));//remove the slot
                 }
-                MainThrusterComponents.Add((slotTransform, selectionTransform, "Main Thruster - " + slot.maxSize, ShipComponentType.MainThruster, mainThruster));
-            }
-            
 
-            if (slotTransform != null) {
-                Transform holderTransform = slotTransform.Find("ComponentHolder");
-                if (holderTransform == null) {
-                    GameObject componentHolder = new GameObject("ComponentHolder");
-                    componentHolder.transform.SetParent(slotTransform, false);
-                    holderTransform = componentHolder.transform;
-                }
-                int slotIndex = ManagedShip.ShipHull.MainThrusterComponents.IndexOf(slot);
-                slot.concreteComponent = mainThruster;
-                ManagedShip.ShipHull.MainThrusterComponents[slotIndex] = slot;
-                
-                if (mainThruster != null) {
-                    if (mainThruster.ComponentType == slot.componentType && mainThruster.ComponentSize <= slot.maxSize) {
-                        if (slot.needsBracket) {
-                            if (holderTransform.childCount > 0) { //clear already assigned components
-                                for (int i = holderTransform.childCount; i > 0; i--) {
-                                    Destroy(holderTransform.GetChild(i - 1).gameObject);
+                MainThrusterComponents.Add((slotTransform, selectionTransform, "Main Thruster - " + slot.maxSize, ShipComponentType.MainThruster, mainThruster));//recreate the slot with the new component
+                if (slotTransform != null) {
+                    Transform holderTransform = slotTransform.Find("ComponentHolder");
+                    if (holderTransform == null) {
+                        GameObject componentHolder = new GameObject("ComponentHolder");
+                        componentHolder.transform.SetParent(slotTransform, false);
+                        holderTransform = componentHolder.transform;
+                    }
+
+                    int slotIndex = ManagedShip.ShipHull.MainThrusterComponents.IndexOf(slot);
+                    slot.concreteComponent = mainThruster;
+                    ManagedShip.ShipHull.MainThrusterComponents[slotIndex] = slot;
+
+                    if (mainThruster != null) {
+                        if (mainThruster.ComponentType == slot.componentType && mainThruster.ComponentSize <= slot.maxSize) {
+                            if (slot.needsBracket) {
+                                if (holderTransform.childCount > 0) { //clear already assigned components
+                                    for (int i = holderTransform.childCount; i > 0; i--) {
+                                        Destroy(holderTransform.GetChild(i - 1).gameObject);
+                                    }
                                 }
+
+                                GameObject bracket = Instantiate((GameObject)Resources.Load("Ships/Thrusters/ThrusterBracket"), holderTransform);
+                                List<GameObject> bracketMeshes = GetMeshObjects(bracket);
+                                foreach (GameObject bracketMesh in bracketMeshes) {
+                                    SetMaterial(bracketMesh, Color.black);
+                                }
+
+                                float scale = ShipComponent.GetTierMultipliedValue(1, slot.concreteComponent.ComponentSize);
+                                bracket.transform.localScale = new Vector3(scale, scale, scale);
+                                Transform bracketMountTransform = bracket.transform.Find("ThrusterBracket").transform.Find("ThrusterMount").transform;
+
+                                CreateExternalShipComponent(bracketMountTransform, slot.concreteComponent, 1);
+                            }
+                            else {
+                                CreateExternalShipComponent(holderTransform, slot.concreteComponent, ShipComponent.GetTierMultipliedValue(1, slot.concreteComponent.ComponentSize));
                             }
 
-                            GameObject bracket = Instantiate((GameObject)Resources.Load("Ships/Thrusters/ThrusterBracket"), holderTransform);
-                            List<GameObject> bracketMeshes = GetMeshObjects(bracket);
-                            foreach (GameObject bracketMesh in bracketMeshes) {
-                                SetMaterial(bracketMesh, Color.black);
-                            }
-
-                            float scale = ShipComponent.GetTierMultipliedValue(1, slot.concreteComponent.ComponentSize);
-                            bracket.transform.localScale = new Vector3(scale, scale, scale);
-                            Transform bracketMountTransform = bracket.transform.Find("ThrusterBracket").transform.Find("ThrusterMount").transform;
-
-                            CreateExternalShipComponent(bracketMountTransform, slot.concreteComponent, 1);
+                            return true;
                         }
-                        else {
-                            CreateExternalShipComponent(holderTransform, slot.concreteComponent, ShipComponent.GetTierMultipliedValue(1, slot.concreteComponent.ComponentSize));
-                        }
-
+                    }
+                    else { //removes component
+                        CreateExternalShipComponent(holderTransform, null, 0);
                         return true;
                     }
                 }
-                else {//removes component
-                    CreateExternalShipComponent(holderTransform, null, 0);
-                }
             }
+
 
             return false;
         }
@@ -248,39 +249,42 @@ namespace Code._Ships {
                     string thrusterTransformName = ManagedShip.ShipHull.ManoeuvringThrusterComponents.parentTransformNames[i];
                     objectTransforms.Add(MapPrefabTransformStringToTransformObject(thrusterTransformName));
                 }
-                ManoeuvringThrusterComponents = (objectTransforms, selectionTransform, "Manoeuvring Thruster - " + slot.maxSize,ShipComponentType.ManoeuvringThruster, manoeuvringThruster);
-            }
 
-            List<Transform> holderTransforms = new List<Transform>();
-            foreach (var manoeuvringThrusterTransform in ManoeuvringThrusterComponents.mountTransforms) {
-                Transform holderTransform = manoeuvringThrusterTransform.Find("Component Holder");
-                if (holderTransform == null) {
-                    GameObject componentHolder = new GameObject("Component Holder");
-                    componentHolder.transform.SetParent(manoeuvringThrusterTransform, false);
-                    holderTransform = componentHolder.transform;
-                }
-
-                holderTransforms.Add(holderTransform);
-            }
-
-            if (manoeuvringThruster != null) {
-                if (manoeuvringThruster.ComponentSize <= slot.maxSize) {
-                    slot.concreteComponent = manoeuvringThruster;
-                    ManagedShip.ShipHull.ManoeuvringThrusterComponents.concreteComponent = manoeuvringThruster;
-                    foreach (var holderTransform in holderTransforms) {
-                        CreateExternalShipComponent(holderTransform, slot.concreteComponent, ShipComponent.GetTierMultipliedValue(1, slot.concreteComponent.ComponentSize));
+                ManoeuvringThrusterComponents = (objectTransforms, selectionTransform, "Manoeuvring Thruster - " + slot.maxSize, ShipComponentType.ManoeuvringThruster, manoeuvringThruster);
+                List<Transform> holderTransforms = new List<Transform>();
+                foreach (var manoeuvringThrusterTransform in ManoeuvringThrusterComponents.mountTransforms) {
+                    Transform holderTransform = manoeuvringThrusterTransform.Find("Component Holder");
+                    if (holderTransform == null) {
+                        GameObject componentHolder = new GameObject("Component Holder");
+                        componentHolder.transform.SetParent(manoeuvringThrusterTransform, false);
+                        holderTransform = componentHolder.transform;
                     }
 
+                    holderTransforms.Add(holderTransform);
+                }
+
+                if (manoeuvringThruster != null) {
+                    if (manoeuvringThruster.ComponentSize <= slot.maxSize) {
+                        slot.concreteComponent = manoeuvringThruster;
+                        ManagedShip.ShipHull.ManoeuvringThrusterComponents.concreteComponent = manoeuvringThruster;
+                        foreach (var holderTransform in holderTransforms) {
+                            CreateExternalShipComponent(holderTransform, slot.concreteComponent, ShipComponent.GetTierMultipliedValue(1, slot.concreteComponent.ComponentSize));
+                        }
+
+                        return true;
+                    }
+                }
+                else { //removes component
+                    slot.concreteComponent = null;
+                    ManagedShip.ShipHull.ManoeuvringThrusterComponents.concreteComponent = null;
+                    foreach (var holderTransform in holderTransforms) {
+                        CreateExternalShipComponent(holderTransform, null, 0);
+                    }
                     return true;
                 }
             }
-            else { //removes component
-                slot.concreteComponent = null;
-                ManagedShip.ShipHull.ManoeuvringThrusterComponents.concreteComponent = null;
-                foreach (var holderTransform in holderTransforms) {
-                    CreateExternalShipComponent(holderTransform, null, 0);
-                }
-            }
+
+            
 
             return false;
         }
@@ -294,31 +298,31 @@ namespace Code._Ships {
             Transform selectionTransform = GetSelectionTransform(slotTransform);
             if (weapon == null || weapon.ComponentSize <= slot.maxSize) {
                 if (!WeaponComponents.Select(wc => wc.mountTransform).Contains(slotTransform)) {
-                    WeaponComponents.Add((slotTransform, selectionTransform, "Weapon - " + slot.maxSize, ShipComponentType.Weapon,weapon));
+                    WeaponComponents.Add((slotTransform, selectionTransform, "Weapon - " + slot.maxSize, ShipComponentType.Weapon, weapon));
                 }
-            }
+                if (slotTransform != null) {
+                    Transform holderTransform = slotTransform.Find("ComponentHolder");
+                    if (holderTransform == null) {
+                        GameObject componentHolder = new GameObject("ComponentHolder");
+                        componentHolder.transform.SetParent(slotTransform, false);
+                        holderTransform = componentHolder.transform;
+                    }
 
-            if (slotTransform != null) {
-                Transform holderTransform = slotTransform.Find("ComponentHolder");
-                if (holderTransform == null) {
-                    GameObject componentHolder = new GameObject("ComponentHolder");
-                    componentHolder.transform.SetParent(slotTransform, false);
-                    holderTransform = componentHolder.transform;
-                }
-
-                //assign new component
-                int slotIndex = ManagedShip.ShipHull.WeaponComponents.IndexOf(slot);
-                slot.concreteComponent = weapon;
-                ManagedShip.ShipHull.WeaponComponents[slotIndex] = slot;
-                if (weapon != null) {
-                    if (weapon.ComponentType == slot.componentType && weapon.ComponentSize <= slot.maxSize) {
-                        //instantiate
-                        CreateExternalShipComponent(holderTransform, slot.concreteComponent, ShipComponent.GetTierMultipliedValue(1, slot.concreteComponent.ComponentSize));
+                    //assign new component
+                    int slotIndex = ManagedShip.ShipHull.WeaponComponents.IndexOf(slot);
+                    slot.concreteComponent = weapon;
+                    ManagedShip.ShipHull.WeaponComponents[slotIndex] = slot;
+                    if (weapon != null) {
+                        if (weapon.ComponentType == slot.componentType && weapon.ComponentSize <= slot.maxSize) {
+                            //instantiate
+                            CreateExternalShipComponent(holderTransform, slot.concreteComponent, ShipComponent.GetTierMultipliedValue(1, slot.concreteComponent.ComponentSize));
+                            return true;
+                        }
+                    }
+                    else {
+                        CreateExternalShipComponent(holderTransform, null, 0);
                         return true;
                     }
-                }
-                else {
-                    CreateExternalShipComponent(holderTransform, null, 0);
                 }
             }
 
@@ -333,7 +337,7 @@ namespace Code._Ships {
             Transform selectionTransform = MapPrefabTransformStringToTransformObject(parentName);
 
             if (!InternalComponents.Select(ic => ic.mountTransform).Contains(selectionTransform)) {
-                InternalComponents.Add((selectionTransform, selectionTransform, "Internal - " + slot.maxSize,ShipComponentType.Internal, internalComponent));
+                InternalComponents.Add((selectionTransform, selectionTransform, "Internal - " + slot.maxSize, ShipComponentType.Internal, internalComponent));
             }
 
             if (selectionTransform != null && internalComponent != null) {

@@ -64,7 +64,7 @@ namespace Code.GUI.SpaceStations.Services.Missions {
 
         public void RefreshAcceptedMissions() {
             foreach (TradeMissionGUIController tradeMissionGUIController in _acceptedTradeMissions) {
-                tradeMissionGUIController.SetBaseGUIValues();
+                tradeMissionGUIController.SetBaseGUIValues(true);
                 tradeMissionGUIController.SetAcceptedValues();
             }
         }

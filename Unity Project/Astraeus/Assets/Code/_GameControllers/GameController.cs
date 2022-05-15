@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Code._Galaxy;
 using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem;
@@ -27,11 +28,11 @@ namespace Code._GameControllers {
         public static PlayerShipController PlayerShipController;
         public List<Ship> npcShips = new List<Ship>();
         public static ShipCreator ShipCreator;
-        
+
         public static int MinExclusionDistance, GalaxyWidth, GalaxyHeight;
         public const int ShipZ = SolarSystemController.ZOffset - 100;
         public static LayerMask DefaultGameMask;
-        
+
 
         private void Awake() {
             Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Projectile"), LayerMask.NameToLayer("LocalMap"));
@@ -54,6 +55,7 @@ namespace Code._GameControllers {
             if (GalaxyController.activeSystemController != null) {
                 GalaxyController.activeSystemController.Active = false;
             }
+
             GalaxyController.activeSystemController = solarSystemController;
             CurrentSolarSystem = solarSystemController._solarSystem;
             solarSystemController.DisplaySolarSystem(shipGUI);
@@ -62,7 +64,6 @@ namespace Code._GameControllers {
 
         private static void SetShipToStation() {
             if (CurrentStation != null) {
-                
                 Vector3 stationPos = GalaxyController.activeSystemController.GetBodyGameObject(CurrentStation).transform.position;
                 CurrentShip.ShipObject.transform.position = new Vector3(stationPos.x, stationPos.y, ShipZ);
                 CurrentShip.ShipObject.GetComponent<ShipController>().ThrusterController.Velocity = new Vector2();
@@ -81,7 +82,6 @@ namespace Code._GameControllers {
             PlayerShipController.Setup(CurrentShip);
             ShipCreator.FuelShip(CurrentShip, .5f);
             SetupShipCamera();
-            
         }
 
         private void SetPlayerShipController() {
@@ -95,6 +95,7 @@ namespace Code._GameControllers {
                     Destroy(_playerShipContainer.transform.GetChild(i).gameObject);
                 }
             }
+
             ShipCreator.shipObjectHandler.ManagedShip = CurrentShip;
             ShipCreator.shipObjectHandler.CreateShip(_playerShipContainer.transform, Color.green);
             SetPlayerShipController();
@@ -128,14 +129,9 @@ namespace Code._GameControllers {
             GUIController.loadingScreenController = loadingScreenController;
             GalaxyController = FindObjectOfType<GalaxyController>();
             if (GalaxyController) {
-                if (Application.isEditor) {
-                    DestroyImmediate(GalaxyController);
-                }
-                else {
-                    Destroy(GalaxyController);
-                }
+                DestroyImmediate(GalaxyController);
             }
-            
+
             GalaxyController = gameObject.AddComponent<GalaxyController>();
             GalaxyController.SetGalaxy(galaxy);
             GalaxyController.DisplayGalaxy();

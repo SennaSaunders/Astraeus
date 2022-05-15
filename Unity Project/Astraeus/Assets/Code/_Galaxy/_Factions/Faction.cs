@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using Code._Galaxy._Factions.FactionTypes;
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
@@ -15,6 +16,7 @@ using Code._Ships.ShipComponents.InternalComponents.Shields;
 using UnityEngine;
 
 namespace Code._Galaxy._Factions {
+    [DataContract]
     public abstract class Faction {
         public enum FactionType {
             Agriculture,
