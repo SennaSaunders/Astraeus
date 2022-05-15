@@ -38,7 +38,7 @@ namespace Code._Galaxy {
             primaryObject.transform.localScale = new Vector3(scale, scale, scale);
             primaryObject.layer = LayerMask.NameToLayer("GalaxyMap");
             primaryObject.transform.localPosition = new Vector3(solarSystem.Coordinate.x, solarSystem.Coordinate.y);
-            primaryObject.name = "System: " + num + " Tier: " + primary.Tier;
+            primaryObject.name = "System: " + solarSystem.SystemName;
             SolarSystemController controller = primaryObject.AddComponent<SolarSystemController>();
             controller.AssignSystem(solarSystem);
             _solarSystemControllers.Add(controller);

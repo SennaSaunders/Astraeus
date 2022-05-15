@@ -43,8 +43,8 @@ namespace Code._Ships.ShipComponents.InternalComponents.Storage {
                         }
                     }
                 }
+                NotifyObservers();
             }
-            NotifyObservers();
         }
 
         public void RemoveCargo(List<Cargo> cargoToRemove) {

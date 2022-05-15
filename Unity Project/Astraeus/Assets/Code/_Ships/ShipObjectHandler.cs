@@ -14,10 +14,10 @@ namespace Code._Ships {
     public class ShipObjectHandler : MonoBehaviour {
         public Ship ManagedShip { get; set; }
 
-        public List<(Transform mountTransform, Transform selectionTransform, string slotName, Weapon weapon)> WeaponComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName, Weapon weapon)>();
-        public List<(Transform mountTransform, Transform selectionTransform, string slotName, MainThruster thruster)> MainThrusterComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName, MainThruster thruster)>();
-        public (List<Transform> mountTransforms, Transform selectionTransform, string slotName, ManoeuvringThruster thruster) ManoeuvringThrusterComponents;
-        public List<(Transform mountTransform, Transform selectionTransform, string slotName, InternalComponent component)> InternalComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName, InternalComponent component)>();
+        public List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, Weapon weapon)> WeaponComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, Weapon weapon)>();
+        public List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, MainThruster thruster)> MainThrusterComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, MainThruster thruster)>();
+        public (List<Transform> mountTransforms, Transform selectionTransform, string slotName, ShipComponentType componentType, ManoeuvringThruster thruster) ManoeuvringThrusterComponents;
+        public List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, InternalComponent component)> InternalComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, InternalComponent component)>();
 
         public GameObject CreateShip(Transform parent, Color markerColour) {
             CreateHull();
@@ -182,11 +182,14 @@ namespace Code._Ships {
             //get object transform
             Transform slotTransform = MapPrefabTransformStringToTransformObject(parentName);
             Transform selectionTransform = GetSelectionTransform(slotTransform);
-            if (MainThrusterComponents.Select(tc => tc.mountTransform).Contains(slotTransform)) {
-                MainThrusterComponents.Remove(MainThrusterComponents.Find(tc => tc.mountTransform == slotTransform));
-            }
 
-            MainThrusterComponents.Add((slotTransform, selectionTransform, "Main Thruster - " + slot.maxSize, mainThruster));
+            if (mainThruster == null || mainThruster.ComponentSize <= slot.maxSize) {
+                if (MainThrusterComponents.Select(tc => tc.mountTransform).Contains(slotTransform)) {
+                    MainThrusterComponents.Remove(MainThrusterComponents.Find(tc => tc.mountTransform == slotTransform));
+                }
+                MainThrusterComponents.Add((slotTransform, selectionTransform, "Main Thruster - " + slot.maxSize, ShipComponentType.MainThruster, mainThruster));
+            }
+            
 
             if (slotTransform != null) {
                 Transform holderTransform = slotTransform.Find("ComponentHolder");
@@ -240,12 +243,13 @@ namespace Code._Ships {
 
             Transform selectionTransform = MapPrefabTransformStringToTransformObject(ManagedShip.ShipHull.ManoeuvringThrusterComponents.selectionTransformName);
             List<Transform> objectTransforms = new List<Transform>();
-            for (int i = 0; i < slot.parentTransformNames.Count; i++) {
-                string thrusterTransformName = ManagedShip.ShipHull.ManoeuvringThrusterComponents.parentTransformNames[i];
-                objectTransforms.Add(MapPrefabTransformStringToTransformObject(thrusterTransformName));
+            if (manoeuvringThruster == null || manoeuvringThruster.ComponentSize <= slot.maxSize) {
+                for (int i = 0; i < slot.parentTransformNames.Count; i++) {
+                    string thrusterTransformName = ManagedShip.ShipHull.ManoeuvringThrusterComponents.parentTransformNames[i];
+                    objectTransforms.Add(MapPrefabTransformStringToTransformObject(thrusterTransformName));
+                }
+                ManoeuvringThrusterComponents = (objectTransforms, selectionTransform, "Manoeuvring Thruster - " + slot.maxSize,ShipComponentType.ManoeuvringThruster, manoeuvringThruster);
             }
-
-            ManoeuvringThrusterComponents = (objectTransforms, selectionTransform, "Manoeuvring Thruster - " + slot.maxSize, manoeuvringThruster);
 
             List<Transform> holderTransforms = new List<Transform>();
             foreach (var manoeuvringThrusterTransform in ManoeuvringThrusterComponents.mountTransforms) {
@@ -288,8 +292,10 @@ namespace Code._Ships {
             //get object transform
             Transform slotTransform = MapPrefabTransformStringToTransformObject(parentName);
             Transform selectionTransform = GetSelectionTransform(slotTransform);
-            if (!WeaponComponents.Select(wc => wc.mountTransform).Contains(slotTransform)) {
-                WeaponComponents.Add((slotTransform, selectionTransform, "Weapon - " + slot.maxSize, weapon));
+            if (weapon == null || weapon.ComponentSize <= slot.maxSize) {
+                if (!WeaponComponents.Select(wc => wc.mountTransform).Contains(slotTransform)) {
+                    WeaponComponents.Add((slotTransform, selectionTransform, "Weapon - " + slot.maxSize, ShipComponentType.Weapon,weapon));
+                }
             }
 
             if (slotTransform != null) {
@@ -312,7 +318,7 @@ namespace Code._Ships {
                     }
                 }
                 else {
-                    CreateExternalShipComponent(holderTransform, slot.concreteComponent, 0);
+                    CreateExternalShipComponent(holderTransform, null, 0);
                 }
             }
 
@@ -327,7 +333,7 @@ namespace Code._Ships {
             Transform selectionTransform = MapPrefabTransformStringToTransformObject(parentName);
 
             if (!InternalComponents.Select(ic => ic.mountTransform).Contains(selectionTransform)) {
-                InternalComponents.Add((selectionTransform, selectionTransform, "Internal - " + slot.maxSize, internalComponent));
+                InternalComponents.Add((selectionTransform, selectionTransform, "Internal - " + slot.maxSize,ShipComponentType.Internal, internalComponent));
             }
 
             if (selectionTransform != null && internalComponent != null) {

@@ -5,6 +5,8 @@ using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
 using Code._GameControllers;
 using Code._Utility;
 using Code.GUI.SpaceStations.Services;
+using Code.GUI.SpaceStations.Services.Missions;
+using Code.GUI.SpaceStations.Services.Outfitting;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -112,6 +114,8 @@ namespace Code.GUI.SpaceStations {
                     buttonMethod = ShipyardBtnClick;
                 }else if (stationService.GetType() == typeof(TradeService)) {
                     buttonMethod = TradeBtnClick;
+                }else if (stationService.GetType() == typeof(MissionService)) {
+                    buttonMethod = MissionBtnClick;
                 }
                 Button btn = buttonPrefab.GetComponent<Button>(); 
                 btn.onClick.AddListener(buttonMethod);
@@ -120,6 +124,8 @@ namespace Code.GUI.SpaceStations {
                 text.text = stationService.ServiceName;
             }
         }
+
+        
 
         public StationService FindStationService<T>() {
             return Station.StationServices.Find(s => s.GetType() == typeof(T));
@@ -153,6 +159,11 @@ namespace Code.GUI.SpaceStations {
             TradeGUIController tradeGUIController = gameObject.AddComponent<TradeGUIController>();
             TradeService tradeService = (TradeService)FindStationService<TradeService>();
             tradeGUIController.StartTradeGUI(tradeService, this);
+        }
+        private void MissionBtnClick() {
+            MissionGUIController missionGUIController = gameObject.AddComponent<MissionGUIController>();
+            MissionService missionService = (MissionService)FindStationService<MissionService>();
+            missionGUIController.SetupGUI(missionService, this);
         }
     }
 }

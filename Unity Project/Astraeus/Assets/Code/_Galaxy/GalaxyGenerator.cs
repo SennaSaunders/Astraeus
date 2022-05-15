@@ -112,7 +112,7 @@ namespace Code._Galaxy {
                     //only refuel and repair should be everywhere
                     //for the moment just instantiate the outfitter with the faction specific parts
 
-                    spaceStation.StationServices = new List<StationService>() { new RefuelService(), new RepairService(), new ShipyardService(), new OutfittingService(faction), new TradeService(faction, solarSystem) };
+                    spaceStation.StationServices = new List<StationService>() { new RefuelService(), new RepairService(), new ShipyardService(), new OutfittingService(faction), new TradeService(faction, solarSystem), new MissionService(faction,spaceStation) };
                     solarSystem.Bodies.Add(spaceStation);
                 }
             }

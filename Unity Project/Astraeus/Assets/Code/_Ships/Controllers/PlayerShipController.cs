@@ -25,6 +25,10 @@ namespace Code._Ships.Controllers {
             SetupFuelGUI();
         }
 
+        public void ResetShields() {
+            ShieldController.ResetShields();
+        }
+
         private void SetupFuelGUI() {
             FuelObserver fuelObserver = GameObjectHelper.FindChild(GameController.GUIController.shipGUIController.guiGameObject, "FuelPanel").AddComponent<FuelObserver>();
             CargoController.AddObserver(fuelObserver);
@@ -83,8 +87,8 @@ namespace Code._Ships.Controllers {
         protected override void ShipDestroyed() {
             base.ShipDestroyed();
             GameObject projectiles = GameObject.Find("ProjectileHolder");
-            for(int i = projectiles.transform.childCount; i >= 0;i--) {
-                Destroy(projectiles.transform.GetChild(0).gameObject);
+            for (int i = projectiles.transform.childCount; i > 0; i--) {
+                Destroy(projectiles.transform.GetChild(i-1).gameObject);
             }
             
             RespawnGUI();

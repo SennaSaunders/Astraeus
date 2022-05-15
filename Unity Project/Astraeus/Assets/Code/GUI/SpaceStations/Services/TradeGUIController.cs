@@ -106,7 +106,7 @@ namespace Code.GUI.SpaceStations.Services {
                     ProductCard productCard = _availableProductCards.Find(apc => product == apc.Product);
                     if (productCard == null) {
                         GameObject productCardObject = GetProductCardObject();
-                        productCardObject.transform.SetParent(_availableContainer.transform);
+                        productCardObject.transform.SetParent(_availableContainer.transform, false);
                         productCard = productCardObject.AddComponent<ProductCard>();
                         productCard.SetupCard(product, this, false);
                         _availableProductCards.Add(productCard);
@@ -126,7 +126,7 @@ namespace Code.GUI.SpaceStations.Services {
             foreach (Type cargoType in cargoTypes) {
                 if (cargoType != typeof(Fuel)) {
                     GameObject productCardObject = GetProductCardObject();
-                    productCardObject.transform.SetParent(_ownedContainer.transform);
+                    productCardObject.transform.SetParent(_ownedContainer.transform, false);
                     ProductCard productCard = productCardObject.AddComponent<ProductCard>();
                     int quantity = _cargoController.GetCargoOfType(cargoType).Count;
                     int price = _availableProducts.Find(product => product.productType == cargoType).price;

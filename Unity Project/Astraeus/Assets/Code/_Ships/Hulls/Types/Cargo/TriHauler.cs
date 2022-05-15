@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Code._Ships.Hulls.Types.Cargo {
     public class TriHauler : Hull {
-        public TriHauler() : base("Icarus",new Vector3(0, 0, 30), 25000, 2, 15,1000, 60000) {
+        public TriHauler() : base("Icarus",new Vector3(0, 0, 30), new Vector3(0,-15,0),25000, 2, 15,1000, 60000) {
             ColourChannelObjectMap = new List<(List<string> objectName, Color colour)>() {
                 (new List<string>() { "Hull" }, new Color(.2f, 0, .6f)),
                 (new List<string>() { "Cockpit" }, new Color(.1f, .1f, .1f))

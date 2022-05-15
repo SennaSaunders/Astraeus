@@ -58,7 +58,7 @@ namespace Code.GUI.SpaceStations.Services {
 
         private void DisplayShip(GameObject ship) {
             _displayedShip = ship;
-            _displayedShip.transform.SetParent(_shipPanel.transform);
+            _displayedShip.transform.SetParent(_shipPanel.transform, false);
             _displayedShip.transform.position = _shipObjectHandler.ManagedShip.ShipHull.OutfittingPosition;
             AddDraggableToShip();
         }

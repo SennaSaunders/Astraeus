@@ -16,35 +16,36 @@ using Code._Utility;
 using Code.Camera;
 using Code.GUI.ShipGUI;
 using TMPro;
-using Unity.VectorGraphics;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Code.GUI.SpaceStations.Services {
+namespace Code.GUI.SpaceStations.Services.Outfitting {
     public class OutfittingGUIController : MonoBehaviour {
         private GameObject _previousGUI;
         private OutfittingService _outfittingService;
-        private GameObject _guiGameObject, _shipObject, _thrusterSubCategories, _weaponSubCategories, _internalSubCategories, _errorMsg, _hoverInfo, _buyGUI;
-        private ShipObjectHandler _shipObjectHandler;
+        private GameObject _guiGameObject, _shipObject, _thrusterSubCategories, _weaponSubCategories, _internalSubCategories, _errorMsg;
+        internal GameObject _hoverInfo;
+        private GameObject _buyGUI;
+        public ShipObjectHandler _shipObjectHandler;
 
-        private SlotSelector _selectedSlot;
+        public SlotSelector _selectedSlot;
         private List<SlotSelector> _mainThrusterSelectionMarkers = new List<SlotSelector>();
         private List<SlotSelector> _manThrusterSelectionMarkers = new List<SlotSelector>();
         private List<SlotSelector> _weaponSelectionMarkers = new List<SlotSelector>();
         private List<SlotSelector> _internalSelectionMarkers = new List<SlotSelector>();
         private List<GameObject> _tempDeactivatedSelectionMarkers = new List<GameObject>();
 
-        private UnityEngine.Camera _camera;
+        internal UnityEngine.Camera _camera;
         private OutfittingCameraController _cameraController;
 
         private const string OutfittingPath = "GUIPrefabs/Station/Services/Outfitting/";
-        private const string ThrusterCardPath = "ThrusterCard";
-        private const string WeaponCardPath = "WeaponCard";
-        private const string PowerPlantCardPath = "PowerPlantCard";
-        private const string ShieldCardPath = "ShieldCard";
-        private const string CargoBayCardPath = "CargoBayCard";
-        private const string JumpDriveCardPath = "JumpDriveCard";
+        internal const string ThrusterCardPath = "ThrusterCard";
+        internal const string WeaponCardPath = "WeaponCard";
+        internal const string PowerPlantCardPath = "PowerPlantCard";
+        internal const string ShieldCardPath = "ShieldCard";
+        internal const string CargoBayCardPath = "CargoBayCard";
+        internal const string JumpDriveCardPath = "JumpDriveCard";
         private const string BuyGUIPath = "BuyGUI";
         private const string BuyComponentCardPath = "BuyComponentCard";
 
@@ -392,7 +393,7 @@ namespace Code.GUI.SpaceStations.Services {
             ClearScrollView();
             DisplayManoeuvringThrusterComponents();
             var manoeuvringThrusterComponents = _shipObjectHandler.ManoeuvringThrusterComponents;
-            List<(Transform, Transform, string, ManoeuvringThruster)> slots = new List<(Transform, Transform, string, ManoeuvringThruster)>() { (manoeuvringThrusterComponents.selectionTransform, manoeuvringThrusterComponents.selectionTransform, manoeuvringThrusterComponents.slotName, manoeuvringThrusterComponents.thruster) };
+            var slots = new List<(Transform, Transform, string, ShipComponentType, ManoeuvringThruster)>() { (manoeuvringThrusterComponents.selectionTransform, manoeuvringThrusterComponents.selectionTransform, manoeuvringThrusterComponents.slotName, manoeuvringThrusterComponents.componentType, manoeuvringThrusterComponents.thruster) };
             _manThrusterSelectionMarkers = GetSelectionMarkers(slots, _manThrusterSelectionMarkers);
             SelectionMarkersSetActive(_mainThrusterSelectionMarkers, false);
             SelectionMarkersSetActive(_manThrusterSelectionMarkers, true);
@@ -426,7 +427,7 @@ namespace Code.GUI.SpaceStations.Services {
             _internalSelectionMarkers = SubCatClick(DisplayCargoBayComponents, _shipObjectHandler.InternalComponents, _internalSelectionMarkers);
         }
 
-        private List<SlotSelector> SubCatClick<T>(Action displayFunction, List<(Transform mountTransform, Transform selectionTransform, string slotName, T component)> slots, List<SlotSelector> selectionMarkers) where T : ShipComponent {
+        private List<SlotSelector> SubCatClick<T>(Action displayFunction, List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, T component)> slots, List<SlotSelector> selectionMarkers) where T : ShipComponent {
             ClearScrollView();
             displayFunction.Invoke();
             return GetSelectionMarkers(slots, selectionMarkers);
@@ -489,7 +490,7 @@ namespace Code.GUI.SpaceStations.Services {
             SetupThrusterCard(cardComponents, thrusterInstance);
         }
 
-        private void SetupThrusterCard(Transform cardComponents, Thruster thrusterInstance) {
+        internal void SetupThrusterCard(Transform cardComponents, Thruster thrusterInstance) {
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "ComponentName", thrusterInstance.ComponentName + " - " + thrusterInstance.ComponentSize);
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Force", thrusterInstance.Force + " N");
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "PowerDraw", thrusterInstance.PowerDraw + " GW/s");
@@ -501,7 +502,7 @@ namespace Code.GUI.SpaceStations.Services {
             SetupWeaponCard(cardComponents, weaponInstance);
         }
 
-        private void SetupWeaponCard(Transform cardComponents, Weapon weaponInstance) {
+        internal void SetupWeaponCard(Transform cardComponents, Weapon weaponInstance) {
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "ComponentName", weaponInstance.ComponentName + " - " + weaponInstance.ComponentSize);
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Damage", weaponInstance.Damage + " DMG");
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "RoF", 60 / weaponInstance.FireDelay + " RPM");
@@ -518,7 +519,7 @@ namespace Code.GUI.SpaceStations.Services {
             SetupJumpDriveCard(cardComponents, jumpDriveInstance);
         }
 
-        private void SetupPowerPlantCard(Transform cardComponents, PowerPlant powerPlantInstance) {
+        internal void SetupPowerPlantCard(Transform cardComponents, PowerPlant powerPlantInstance) {
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "ComponentName", powerPlantInstance.ComponentName + " - " + powerPlantInstance.ComponentSize);
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Capacity", powerPlantInstance.EnergyCapacity + " GW");
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Recharge", powerPlantInstance.RechargeRate * 60 + " GW/s");
@@ -530,7 +531,7 @@ namespace Code.GUI.SpaceStations.Services {
             SetupCargoBayCard(cardComponents, cargoBayInstance);
         }
 
-        private void SetupCargoBayCard(Transform cardComponents, CargoBay cargoBayInstance) {
+        internal void SetupCargoBayCard(Transform cardComponents, CargoBay cargoBayInstance) {
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "ComponentName", cargoBayInstance.ComponentName + " - " + cargoBayInstance.ComponentSize);
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Capacity", cargoBayInstance.CargoVolume + " Units");
         }
@@ -540,7 +541,7 @@ namespace Code.GUI.SpaceStations.Services {
             SetupShieldCard(cardComponents, shieldInstance);
         }
 
-        private void SetupShieldCard(Transform cardComponents, Shield shieldInstance) {
+        internal void SetupShieldCard(Transform cardComponents, Shield shieldInstance) {
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "ComponentName", shieldInstance.ComponentName + " - " + shieldInstance.ComponentSize);
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Strength", shieldInstance.StrengthCapacity + "GW");
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Recharge", shieldInstance.RechargeRate + "GW/s");
@@ -548,7 +549,7 @@ namespace Code.GUI.SpaceStations.Services {
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "DepletionDelay", shieldInstance.DepletionRecoveryTime + "s");
         }
 
-        private void SetupJumpDriveCard(Transform cardComponents, JumpDrive jumpDriveInstance) {
+        internal void SetupJumpDriveCard(Transform cardComponents, JumpDrive jumpDriveInstance) {
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "ComponentName", jumpDriveInstance.ComponentName + " - " + jumpDriveInstance.ComponentSize);
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Range", jumpDriveInstance.JumpRange + "LY");
         }
@@ -559,16 +560,16 @@ namespace Code.GUI.SpaceStations.Services {
             }
         }
 
-        private List<SlotSelector> GetSelectionMarkers<T>(List<(Transform mountTransform, Transform selectionTransform, string slotName, T component)> shipComponents, List<SlotSelector> selectionMarkers) where T : ShipComponent {
+        private List<SlotSelector> GetSelectionMarkers<T>(List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, T component)> shipComponents, List<SlotSelector> selectionMarkers) where T : ShipComponent {
             if (selectionMarkers == null || selectionMarkers.Count == 0) {
                 selectionMarkers = new List<SlotSelector>();
 
-                foreach ((Transform mountTransform, Transform selectionTransform, string slotName, ShipComponent component) selection in shipComponents) {
+                foreach ((Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, T component) selection in shipComponents) {
                     Transform canvas = _guiGameObject.transform.Find("Canvas");
                     GameObject marker = Instantiate((GameObject)Resources.Load(OutfittingPath + "ShipComponentMarker"), canvas.Find("SelectionMarkers"));
 
                     SlotSelector slotSelector = marker.AddComponent<SlotSelector>();
-                    slotSelector.Setup(selection.mountTransform, selection.selectionTransform, selection.slotName, this, selection.component);
+                    slotSelector.Setup(selection.mountTransform, selection.selectionTransform, selection.slotName, selection.componentType,this, selection.component);
                     selectionMarkers.Add(slotSelector);
                     GameObject markerText = Instantiate((GameObject)Resources.Load(OutfittingPath + "ShipComponentMarkerName"), marker.transform);
                     TextMeshProUGUI slotName = markerText.transform.GetComponentInChildren<TextMeshProUGUI>();
@@ -587,7 +588,7 @@ namespace Code.GUI.SpaceStations.Services {
             }
         }
 
-        private GameObject CreateComponentCard(string cardSpecifier, Transform parent) {
+        public GameObject CreateComponentCard(string cardSpecifier, Transform parent) {
             return Instantiate((GameObject)Resources.Load(OutfittingPath + cardSpecifier), parent);
         }
 
@@ -601,7 +602,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void ChangeSelectedSlotComponent(ShipComponent newComponent) {
-            if (_selectedSlot != null) {
+            if (_selectedSlot != null && _selectedSlot._componentType== newComponent.ComponentType) {
                 bool success = _selectedSlot.ChangeComponent(newComponent);
                 if (!success) {
                     SlotSizeError();
@@ -644,175 +645,6 @@ namespace Code.GUI.SpaceStations.Services {
             }
         }
 
-        class SlotSelector : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler {
-            private Transform SelectionMountTransform { get; set; }
-            private Transform ObjectMountTransform { get; set; }
-            private string SlotName { get; set; }
-            private OutfittingGUIController _outfittingGUIController;
-            private bool _selected;
-            private GameObject _hoverInfo;
-            public ShipComponent CurrentShipComponent;
-            public ShipComponent InitialShipComponent;
-
-            public bool ChangeComponent(ShipComponent newComponent) {
-                bool success = false;
-                if (newComponent.GetType().IsSubclassOf(typeof(Weapon))) {
-                    success = ChangeWeapon((Weapon)newComponent);
-                }else if (newComponent.GetType().IsSubclassOf(typeof(MainThruster))) {
-                    success = ChangeMainThruster((MainThruster)newComponent);
-                }
-                else if (newComponent.GetType() == (typeof(ManoeuvringThruster))) {
-                    success = ChangeManThruster((ManoeuvringThruster)newComponent);
-                }
-                else if (newComponent.GetType().IsSubclassOf(typeof(InternalComponent))) {
-                    success = ChangeInternal((InternalComponent)newComponent);
-                }
-
-                return success;
-            }
-
-            private bool ChangeInternal(InternalComponent newComponent) {
-                return _outfittingGUIController._shipObjectHandler.SetInternalComponent(ObjectMountTransform.gameObject.name, newComponent);
-            }
-
-            private bool ChangeWeapon(Weapon newComponent) {
-                return _outfittingGUIController._shipObjectHandler.SetWeaponComponent(ObjectMountTransform.gameObject.name, newComponent);
-            }
-
-            private bool ChangeManThruster(ManoeuvringThruster newComponent) {
-                return _outfittingGUIController._shipObjectHandler.SetManoeuvringThrusterComponent(newComponent);
-            }
-
-            private bool ChangeMainThruster(MainThruster newComponent) {
-                return _outfittingGUIController._shipObjectHandler.SetMainThrusterComponent(ObjectMountTransform.gameObject.name, newComponent);
-            }
-
-            private void Awake() {
-                ChangeColourNotSelected();
-            }
-
-            private void Update() {
-                PositionSelf();
-                CheckSelected();
-            }
-
-            private void CheckSelected() {
-                if (_selected) {
-                    if (_outfittingGUIController._selectedSlot != this) {
-                        _selected = false;
-                        ChangeColourNotSelected();
-                    }
-                }
-            }
-
-            private void ChangeColourNotSelected() {
-                var image = gameObject.GetComponent<SVGImage>();
-                image.color = new Color(255 / 255f, 185 / 255f, 0);
-            }
-
-            private void ChangeColourSelected() {
-                var image = gameObject.GetComponent<SVGImage>();
-                image.color = new Color(53 / 255f, 157 / 255f, 255 / 255f);
-            }
-
-            public void Setup(Transform objectMountTransform, Transform selectionMountTransform, string slotName, OutfittingGUIController outfittingGUIController, ShipComponent shipComponent) {
-                SelectionMountTransform = selectionMountTransform;
-                ObjectMountTransform = objectMountTransform;
-                SlotName = slotName;
-                _outfittingGUIController = outfittingGUIController;
-                CurrentShipComponent = shipComponent;
-                InitialShipComponent = shipComponent;
-            }
-
-            public void OnPointerClick(PointerEventData eventData) {
-                if (eventData.button == PointerEventData.InputButton.Left) { //select slot
-                    _outfittingGUIController._selectedSlot = this;
-                    _selected = true;
-                    ChangeColourSelected();
-                    Debug.Log("Set selected slot to: " + ObjectMountTransform.name);
-                }
-                else if (eventData.button == PointerEventData.InputButton.Right) { //clear slot
-                    RemoveComponent();
-                }
-                else if (eventData.button == PointerEventData.InputButton.Middle) { //reset slot
-                    ResetSlot();
-                }
-            }
-
-            public void ResetSlot() {
-                if (InitialShipComponent == null) {
-                    RemoveComponent();
-                }
-                else {
-                    ChangeComponent(InitialShipComponent);
-                }
-
-                CurrentShipComponent = InitialShipComponent;
-            }
-
-            private void RemoveComponent() {
-                if (CurrentShipComponent != null) {
-                    if (CurrentShipComponent.GetType().IsSubclassOf(typeof(Weapon))) {
-                        _outfittingGUIController._shipObjectHandler.SetWeaponComponent(ObjectMountTransform.gameObject.name, null);
-                    }else if (CurrentShipComponent.GetType().IsSubclassOf(typeof(MainThruster))) {
-                        _outfittingGUIController._shipObjectHandler.SetMainThrusterComponent(ObjectMountTransform.gameObject.name, null);
-                    }
-                    else if (CurrentShipComponent.GetType() == (typeof(ManoeuvringThruster))) {
-                        _outfittingGUIController._shipObjectHandler.SetManoeuvringThrusterComponent(null);
-                    }
-                    else if (CurrentShipComponent.GetType().IsSubclassOf(typeof(InternalComponent))) {
-                        _outfittingGUIController._shipObjectHandler.SetInternalComponent(ObjectMountTransform.gameObject.name, null);
-                    }
-
-                    CurrentShipComponent = null;
-                }
-            }
-
-            private void PositionSelf() {
-                Vector2 screenSpacePos = _outfittingGUIController._camera.WorldToScreenPoint(SelectionMountTransform.position);
-                Transform selectorTransform = transform;
-                selectorTransform.rotation = Quaternion.LookRotation(-_outfittingGUIController._camera.transform.position);
-                selectorTransform.position = screenSpacePos;
-            }
-
-            public void OnPointerEnter(PointerEventData eventData) {
-                if (CurrentShipComponent != null) {
-                    Debug.Log("Hovering: " + CurrentShipComponent.ComponentName);
-
-                    if (CurrentShipComponent.GetType().IsSubclassOf(typeof(Thruster))) {
-                        _hoverInfo = _outfittingGUIController.CreateComponentCard(ThrusterCardPath, _outfittingGUIController._hoverInfo.transform);
-                        _outfittingGUIController.SetupThrusterCard(_hoverInfo.transform, (Thruster)CurrentShipComponent);
-                    }
-                    else if (CurrentShipComponent.GetType().IsSubclassOf(typeof(Weapon))) {
-                        _hoverInfo = _outfittingGUIController.CreateComponentCard(WeaponCardPath, _outfittingGUIController._hoverInfo.transform);
-                        _outfittingGUIController.SetupWeaponCard(_hoverInfo.transform, (Weapon)CurrentShipComponent);
-                    }
-                    else if (CurrentShipComponent.GetType() == typeof(CargoBay)) {
-                        _hoverInfo = _outfittingGUIController.CreateComponentCard(CargoBayCardPath, _outfittingGUIController._hoverInfo.transform);
-                        _outfittingGUIController.SetupCargoBayCard(_hoverInfo.transform, (CargoBay)CurrentShipComponent);
-                    }
-                    else if (CurrentShipComponent.GetType().IsSubclassOf(typeof(PowerPlant))) {
-                        _hoverInfo = _outfittingGUIController.CreateComponentCard(PowerPlantCardPath, _outfittingGUIController._hoverInfo.transform);
-                        _outfittingGUIController.SetupPowerPlantCard(_hoverInfo.transform, (PowerPlant)CurrentShipComponent);
-                    }
-                    else if (CurrentShipComponent.GetType().IsSubclassOf(typeof(Shield))) {
-                        _hoverInfo = _outfittingGUIController.CreateComponentCard(ShieldCardPath, _outfittingGUIController._hoverInfo.transform);
-                        _outfittingGUIController.SetupShieldCard(_hoverInfo.transform, (Shield)CurrentShipComponent);
-                    }
-                    else if (CurrentShipComponent.GetType() == typeof(JumpDrive)) {
-                        _hoverInfo = _outfittingGUIController.CreateComponentCard(JumpDriveCardPath, _outfittingGUIController._hoverInfo.transform);
-                        _outfittingGUIController.SetupJumpDriveCard(_hoverInfo.transform, (JumpDrive)CurrentShipComponent);
-                    }
-
-                    RectTransform rectTransform = _hoverInfo.GetComponent<RectTransform>();
-                    rectTransform.localPosition = new Vector3();
-                    rectTransform.pivot = new Vector2(.5f, 0);
-                }
-            }
-
-            public void OnPointerExit(PointerEventData eventData) {
-                Destroy(_hoverInfo);
-            }
-        }
+        
     }
 }

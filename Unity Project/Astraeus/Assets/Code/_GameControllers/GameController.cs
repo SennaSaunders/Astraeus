@@ -21,6 +21,7 @@ namespace Code._GameControllers {
         public static SolarSystem CurrentSolarSystem;
         public static SpaceStation CurrentStation;
         public static bool IsPaused = true;
+        public static ShipCameraController shipCameraController;
         public static Ship CurrentShip { get; set; }
         private GameObject _playerShipContainer;
         public static PlayerShipController PlayerShipController;
@@ -116,7 +117,7 @@ namespace Code._GameControllers {
         }
 
         private void SetupShipCamera() {
-            ShipCameraController shipCameraController = CurrentShip.ShipObject.AddComponent<ShipCameraController>();
+            shipCameraController = CurrentShip.ShipObject.AddComponent<ShipCameraController>();
             shipCameraController.TakeCameraControl();
         }
 

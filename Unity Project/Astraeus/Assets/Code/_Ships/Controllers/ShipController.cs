@@ -13,6 +13,7 @@ using Code._Ships.ShipComponents.InternalComponents.Storage;
 using Code._Utility;
 using Code.GUI.ShipGUI;
 using Code.GUI.Utility;
+using Unity.VectorGraphics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,12 +23,13 @@ namespace Code._Ships.Controllers {
         public ThrusterController ThrusterController;
         protected List<WeaponController> WeaponControllers;
         protected PowerPlantController _powerPlantController;
-        private ShieldController _shieldController;
+        protected ShieldController ShieldController;
         public CargoController CargoController;
         public JumpDriveController JumpDriveController;
         protected GameObject _shipHealthGUI;
         private GameObject speedIndicator;
         
+
         public List<Ship> hostiles = new List<Ship>();
         public bool beingDestroyed = false;
 
@@ -52,7 +54,7 @@ namespace Code._Ships.Controllers {
                 }
             }
             _powerPlantController = new PowerPlantController(powerPlants);
-            _shieldController = new ShieldController(shields, _powerPlantController);
+            ShieldController = new ShieldController(shields, _powerPlantController);
             CargoController = new CargoController(cargoBays);
             JumpDriveController = new JumpDriveController(jumpDrives, CargoController);
             
@@ -79,13 +81,14 @@ namespace Code._Ships.Controllers {
 
         private void SetupShipHealthGUI() {
             _shipHealthGUI = (GameObject)Instantiate(Resources.Load("GUIPrefabs/Ship/ShipHealthGUI"), _ship.ShipObject.transform, false);
+            _shipHealthGUI.transform.localPosition = _ship.ShipHull.HealthGUIOffset;
             _shipHealthGUI.AddComponent<RotateToPlayer>();
             
-            _shieldController.ClearObservers();
+            ShieldController.ClearObservers();
             GameObject shieldBar = GameObjectHelper.FindChild(_shipHealthGUI, "ShieldBar");
             ShipBarObserver shieldObserver = shieldBar.AddComponent<ShipBarObserver>();
-            _shieldController.AddObserver(shieldObserver);
-            _shieldController.NotifyObservers();
+            ShieldController.AddObserver(shieldObserver);
+            ShieldController.NotifyObservers();
             
             _ship.ShipHull.ClearObservers();
             GameObject healthBar = GameObjectHelper.FindChild(_shipHealthGUI, "HealthBar");
@@ -101,7 +104,15 @@ namespace Code._Ships.Controllers {
                 AimWeapons();
                 FireCheck();
                 ChargePowerPlant();
-                _shieldController.ChargeShields();
+                ShieldController.ChargeShields();
+                ScaleShipGUI();
+            }
+        }
+
+        private void ScaleShipGUI() {
+            if (GameController.shipCameraController != null) {
+                _shipHealthGUI.transform.localScale = GameController.shipCameraController.zoomScaleVec;
+                speedIndicator.transform.localScale = GameController.shipCameraController.zoomScaleVec;
             }
         }
 
@@ -154,7 +165,9 @@ namespace Code._Ships.Controllers {
             GameObject speedBar = GameObjectHelper.FindChild(speedIndicator, "SpeedBar");
             speedBar.GetComponent<RectTransform>().sizeDelta = new Vector2(speedBarMaxSize.x, relativeThrustSize * speedBarMaxSize.y);
 
-            speedBar.GetComponent<Image>().color = new Color(1, 1- relativeThrustSize, 0);
+            Color colour = new Color(1, 1- relativeThrustSize, 0);
+            speedBar.GetComponent<Image>().color = colour;
+            speedBar.GetComponentInChildren<SVGImage>().color = colour;
 
             string speedTxt = ThrusterController.Velocity.magnitude.ToString("0.0") + "m/s";
             GameObjectHelper.SetGUITextValue(speedIndicator, "SpeedTxtValue", speedTxt);
@@ -207,11 +220,11 @@ namespace Code._Ships.Controllers {
         protected abstract float GetTurnDirection();
 
         public void TakeDamage(float damage) {
-            damage = _shieldController.TakeDamage(damage);
+            damage = ShieldController.TakeDamage(damage);
             if (_ship.ShipHull.CurrentHullStrength > 0) {
                 if (damage > 0) {
                     _ship.ShipHull.TakeDamage(damage);
-                    if (_ship.ShipHull.CurrentHullStrength < 0) {
+                    if (_ship.ShipHull.CurrentHullStrength <= 0) {
                         ShipDestroyed();
                     }
                 }
@@ -229,6 +242,8 @@ namespace Code._Ships.Controllers {
         protected virtual void ShipDestroyed() {
             beingDestroyed = true;
             RemoveHostility();
+            ShieldController.ClearObservers();
+            _ship.ShipHull.ClearObservers();
             
             GameObject particleSystemObject = Instantiate((GameObject)Resources.Load("Effects/ExplosionEffect"), transform, true);
             

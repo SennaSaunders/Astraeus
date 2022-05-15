@@ -14,6 +14,16 @@ namespace Code._Ships.ShipComponents.InternalComponents.Shields {
             _powerPlantController = powerPlantController;
         }
 
+        public void ResetShields() {
+            foreach (Shield shield in _shields) {
+                shield.CurrentStrength = shield.StrengthCapacity;
+                shield.Depleted = false;
+                shield.CurrentDepletionTime = 0;
+                shield.CurrentRecoveryTime = 0;
+            }
+            NotifyObservers();
+        }
+
         public void ChargeShields() {
             float time = Time.deltaTime;
             foreach (Shield shield in _shields) {

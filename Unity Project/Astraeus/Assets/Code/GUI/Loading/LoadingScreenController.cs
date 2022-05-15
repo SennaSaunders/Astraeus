@@ -24,6 +24,7 @@ namespace Code.GUI.Loading {
         }
 
         public void StartLoadingScreen(string loadMsg, Action loadedFunction) {
+            GameController.IsPaused = true;
             if (loadedFunction != null) {
                 _loadedFunction = loadedFunction;
             }
@@ -41,6 +42,7 @@ namespace Code.GUI.Loading {
         public void FinishedLoading() {
             CameraUtility.ChangeCullingMask(GameController.DefaultGameMask);
             CameraUtility.NormalSkybox();
+            GameController.IsPaused = false;
             if (_loadedFunction != null) {
                 _loadedFunction.Invoke();
                 _loadedFunction = null;

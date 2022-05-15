@@ -24,6 +24,7 @@ namespace Code.GUI.ShipDestroyed {
             
             Hull hull = GameController.CurrentShip.ShipHull;
             GameController.CurrentShip.ShipHull.CurrentHullStrength = .5f * hull.BaseHullStrength;
+            GameController.PlayerShipController.ResetShields();
             _gameController.RefreshPlayerShip();
             GameController.StartGame();
             Destroy(gameObject);

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Code._Ships.Hulls.Types.Fighter {
     public class SleekFighter : Hull {
-        public SleekFighter() : base("Achilles",new Vector3(0, 0, 30), 2500, 15, 45, 700, 20000) {
+        public SleekFighter() : base("Achilles",new Vector3(0, 0, 30),new Vector3(0,-10,0), 2500, 15, 45, 700, 20000) {
             ColourChannelObjectMap = new List<(List<string> objectName, Color colour)>() {
                 (new List<string>() { "Hull" }, new Color(.2f, 0, .6f)),
                 (new List<string>() { "Cockpit" }, new Color(.1f, .1f, .1f))

@@ -1,4 +1,6 @@
-﻿using Code._Cargo.ProductTypes.Ships;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Code._Cargo.ProductTypes.Ships;
 using Code._Galaxy;
 using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem;
@@ -7,6 +9,8 @@ using Code._Ships.Controllers;
 using Code._Ships.ShipComponents.InternalComponents.JumpDrives;
 using Code._Utility;
 using Code.Camera;
+using Code.Missions;
+using Unity.VectorGraphics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,10 +20,19 @@ namespace Code.GUI.Map {
         private UnityEngine.Camera _camera;
         private SolarSystemController _selectedSystem;
         private GalaxyCameraController _galaxyCameraController;
-        private GameObject _guiGameObject, _jumpInfoCard, _jumpRangeCircle;
+        private GameObject _guiGameObject, _jumpInfoCard, _jumpRangeCircle, _previousGUI,_guiHolder, _circleHolder;
         private JumpDriveController _jumpDriveController;
+        private List<(SolarSystem pickup, List<TradeMission> missions)> _solarSystemTradePickup;
+        private List<(SolarSystem destination, List<TradeMission> missions)> _solarSystemTradeDestination;
+        private List<GameObject> _missionCircles = new List<GameObject>();
 
-        private void Start() {
+        public void Setup(GameObject previousGUI, SolarSystem solarSystem, GameObject holder) {
+            _previousGUI = previousGUI;
+            _guiHolder = holder;
+            _circleHolder = new GameObject("Circle Holder");
+            if (_previousGUI != null) {
+                _previousGUI.SetActive(false);
+            }
             GameController.GUIController.SetShipGUIActive(false);
             _galaxyController = GameController.GalaxyController;
             _jumpDriveController = GameController.CurrentShip.ShipObject.GetComponent<ShipController>().JumpDriveController;
@@ -31,9 +44,11 @@ namespace Code.GUI.Map {
 
             _galaxyCameraController.TakeCameraControl();
             _galaxyCameraController.SetupCamera(GameController.GalaxyWidth, GameController.GalaxyHeight);
-            CenterOnLocation();
+            CenterOnLocation(solarSystem);
             DrawJumpDistanceCircle();
+            DrawMissionCircles();
             SetupGUI();
+            
         }
 
         private void Update() {
@@ -51,26 +66,36 @@ namespace Code.GUI.Map {
         }
 
         private void Exit() {
-            GameController.IsPaused = false;
             GameController.CurrentShip.ShipObject.GetComponent<ShipCameraController>().TakeCameraControl();
             Destroy(_jumpRangeCircle);
+            Destroy(_circleHolder);
             Destroy(_guiGameObject);
+            Destroy(_guiHolder);
+            
             Destroy(this);
         }
 
         private void ExitBtn() {
             _camera.cullingMask = GameController.DefaultGameMask;
-            GameController.GUIController.SetShipGUIActive(true);
+            if (_previousGUI == null) {
+                GameController.GUIController.SetShipGUIActive(true);
+                GameController.IsPaused = false;
+            }
+            else {
+                _previousGUI.SetActive(true);
+            }
+            
             Exit();
         }
 
         private void JumpExit() {
+            GameController.CurrentShip.ShipObject.GetComponent<ShipController>().ThrusterController.Velocity = new Vector2();
             Destroy(GameObject.Find("ProjectileHolder"));
             Exit();
         }
 
-        private void CenterOnLocation() {
-            _galaxyCameraController.SetCamera(_galaxyController.activeSystemController._solarSystem.Coordinate);
+        private void CenterOnLocation(SolarSystem solarSystem) {
+            _galaxyCameraController.SetCamera(solarSystem.Coordinate);
         }
 
         private void SolarSystemRaycast() {
@@ -90,12 +115,53 @@ namespace Code.GUI.Map {
 
         private void DrawJumpDistanceCircle() {
             float diameter = GameController.CurrentShip.ShipObject.GetComponent<ShipController>().JumpDriveController.GetMaxRange() * 2;
-            _jumpRangeCircle = Instantiate((GameObject)Resources.Load("GUIPrefabs/Map/Circle"));
-            _jumpRangeCircle.layer = LayerMask.NameToLayer("GalaxyMap");
             Vector2 currentSystemPosition = _galaxyController.activeSystemController._solarSystem.Coordinate;
-            Vector3 position = new Vector3(currentSystemPosition.x, currentSystemPosition.y, GalaxyController.ZOffset + 1);
-            _jumpRangeCircle.transform.position = position;
-            _jumpRangeCircle.transform.localScale = new Vector3(diameter, diameter, 2);
+            string circlePath = "GUIPrefabs/Map/Circle";
+            DrawCircle(diameter, currentSystemPosition, Color.white, circlePath);
+        }
+        
+        private void DrawMissionCircles() {
+            //trade missions
+            _solarSystemTradePickup = new List<(SolarSystem pickup, List<TradeMission> missions)>();
+            _solarSystemTradeDestination = new List<(SolarSystem pickup, List<TradeMission> missions)>();
+            foreach (TradeMission mission in GameController.PlayerProfile.Missions.FindAll(m => m.GetType()==typeof(TradeMission)).ToList().Cast<TradeMission>()) {
+                (SolarSystem pickup, List<TradeMission> missions) pickupMap = _solarSystemTradePickup.Find(s => s.pickup ==mission.MissionPickupLocation.SolarSystem);
+                (SolarSystem destination, List<TradeMission> missions) destinationMap = _solarSystemTradeDestination.Find(s => s.destination ==mission.Destination.SolarSystem);
+                if (pickupMap.pickup==null) {
+                    _solarSystemTradePickup.Add((mission.MissionPickupLocation.SolarSystem, new List<TradeMission>(){mission}));
+                }
+                else {
+                    pickupMap.missions.Add(mission);
+                }
+
+                if (destinationMap.destination == null) {
+                    _solarSystemTradeDestination.Add((mission.Destination.SolarSystem, new List<TradeMission>(){mission}));
+                }
+                else {
+                    destinationMap.missions.Add(mission);
+                }
+            }
+
+            string circlePath = "GUIPrefabs/Map/ThickCircle";
+
+            foreach ((SolarSystem pickup, List<TradeMission> missions) tradePickups in _solarSystemTradePickup) {
+                float pickupDiameter = 2;
+                DrawCircle(pickupDiameter, tradePickups.pickup.Coordinate, Color.green, circlePath);
+            }
+
+            foreach ((SolarSystem destination, List<TradeMission> missions) tradeDestinations in _solarSystemTradeDestination) {
+                float destinationDiameter = 2.3f;
+                DrawCircle(destinationDiameter, tradeDestinations.destination.Coordinate, Color.blue, circlePath);
+            }
+        }
+
+        private void DrawCircle(float diameter, Vector2 coordinate, Color colour, string circlePath) {
+            GameObject circle = Instantiate((GameObject)Resources.Load(circlePath), _circleHolder.transform);
+            circle.layer = LayerMask.NameToLayer("GalaxyMap");
+            Vector3 position = new Vector3(coordinate.x, coordinate.y, GalaxyController.ZOffset);
+            circle.transform.position = position;
+            circle.transform.localScale = new Vector3(diameter, diameter, 2);
+            circle.GetComponent<SpriteRenderer>().color = colour;
         }
 
         private float GetJumpDistance() {
@@ -141,7 +207,13 @@ namespace Code.GUI.Map {
         }
 
         private void SetupJumpBtn() {
-            GameObjectHelper.FindChild(_jumpInfoCard, "JumpBtn").GetComponent<Button>().onClick.AddListener(JumpBtnClick);
+            GameObject jumpBtn = GameObjectHelper.FindChild(_jumpInfoCard, "JumpBtn");
+            if (_previousGUI == null) {
+                jumpBtn.GetComponent<Button>().onClick.AddListener(JumpBtnClick);
+            }
+            else {
+                jumpBtn.SetActive(false);
+            }
         }
 
         private void JumpBtnClick() {

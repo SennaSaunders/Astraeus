@@ -7,11 +7,12 @@ using Code._Ships;
 using Code._Ships.Hulls;
 using Code._Ships.ShipComponents;
 using Code._Utility;
+using Code.GUI.SpaceStations.Services.Outfitting;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Code.GUI.SpaceStations.Services {
-    public class ShipyardGUIController :MonoBehaviour {
+    public class ShipyardGUIController : MonoBehaviour {
         private ShipyardService _shipyardService;
         private StationGUIController _stationGUIController;
         private GameObject _guiGameObject;
@@ -47,10 +48,11 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void SetupShop() {
-            GameObject shipsContentView = GameObjectHelper.FindChild(_guiGameObject, "BuyShipsView");
+            GameObject shipsContentView = GameObjectHelper.FindChild(_guiGameObject, "BuyShipsContent");
             foreach (Type shipHullType in _shipyardService.GetShipHulls()) {
                 Hull hull = (Hull)Activator.CreateInstance(shipHullType);
-                SetupBuyShipPanel(hull).transform.SetParent(shipsContentView.transform);
+                GameObject hullPanel = SetupBuyShipPanel(hull);
+                hullPanel.transform.SetParent(shipsContentView.transform, false);
             }
         }
 
@@ -71,7 +73,7 @@ namespace Code.GUI.SpaceStations.Services {
                     thrusterTierCount.Add((mainThrusterComponent.maxSize, 1));
                 }
             }
-            
+
             foreach (var weaponComponent in hull.WeaponComponents) {
                 if (weaponTierCount.Select(s => s.tier).Contains(weaponComponent.maxSize)) {
                     int idx = weaponTierCount.FindIndex(ws => ws.tier == weaponComponent.maxSize);
@@ -83,7 +85,7 @@ namespace Code.GUI.SpaceStations.Services {
                     weaponTierCount.Add((weaponComponent.maxSize, 1));
                 }
             }
-            
+
             foreach (var internalComponent in hull.InternalComponents) {
                 if (internalTierCount.Select(s => s.tier).Contains(internalComponent.maxSize)) {
                     int idx = internalTierCount.FindIndex(s => s.tier == internalComponent.maxSize);
@@ -115,8 +117,9 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void AddOwnedShip(Ship ship) {
-            GameObject ownedShipsView = GameObjectHelper.FindChild(_guiGameObject, "OwnedShipsView");
-            SetupOwnedShipPanel(ship).transform.SetParent(ownedShipsView.transform);
+            GameObject ownedShipsView = GameObjectHelper.FindChild(_guiGameObject, "OwnedShipsContent");
+            GameObject shipPanel = SetupOwnedShipPanel(ship);
+            shipPanel.transform.SetParent(ownedShipsView.transform, false);
         }
 
         private GameObject SetupOwnedShipPanel(Ship ship) {
@@ -126,7 +129,7 @@ namespace Code.GUI.SpaceStations.Services {
             GameObjectHelper.FindChild(shipPanel, "SetActiveBtn").GetComponent<Button>().onClick.AddListener(delegate { SetActiveShipBtnClick(ship); });
             return shipPanel;
         }
-        
+
         private void OutfittingBtnClick(Ship ship) {
             OutfittingGUIController outfittingGUIController = gameObject.AddComponent<OutfittingGUIController>();
             OutfittingService outfittingService = (OutfittingService)GameController.GUIController.stationGUIController.FindStationService<OutfittingService>();
@@ -152,7 +155,6 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void NotEnoughMoneyMsg() {
-            
         }
 
         private string GetTierCountString(List<(ShipComponentTier tier, int count)> tierCount) {
@@ -160,7 +162,7 @@ namespace Code.GUI.SpaceStations.Services {
 
             for (int i = 0; i < tierCount.Count; i++) {
                 tierCountString += tierCount[i].count + "x " + tierCount[i].tier;
-                if (i != tierCount.Count-1) {
+                if (i != tierCount.Count - 1) {
                     tierCountString += "    ";
                 }
             }

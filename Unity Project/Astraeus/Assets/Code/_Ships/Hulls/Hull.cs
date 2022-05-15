@@ -10,9 +10,10 @@ using UnityEngine;
 namespace Code._Ships.Hulls {
     //ship blueprint for the components allowed on a particular hull 
     public abstract class Hull : ISubject<IItemObserver<float>> {
-        protected Hull(string name, Vector3 outfittingPosition, float hullMass, float minTurnAccel, float maxTurnAccel, float hullStrength, int hullPrice) {
+        protected Hull(string name, Vector3 outfittingPosition, Vector3 healthGUIOffset, float hullMass, float minTurnAccel, float maxTurnAccel, float hullStrength, int hullPrice) {
             HullName = name;
             OutfittingPosition = new Vector3(outfittingPosition.x, outfittingPosition.y, outfittingPosition.z + OutfittingCameraController.ZOffset);
+            HealthGUIOffset = healthGUIOffset;
             HullMass = hullMass;
             _minTurnAccel = minTurnAccel;
             _maxTurnAccel = maxTurnAccel;
@@ -41,7 +42,8 @@ namespace Code._Ships.Hulls {
         public List<(List<string> objectName, Color colour)> ColourChannelObjectMap;
         private List<IItemObserver<float>> _observers = new List<IItemObserver<float>>();
 
-        public Vector3 OutfittingPosition { get; set; }
+        public Vector3 OutfittingPosition { get; }
+        public Vector3 HealthGUIOffset { get; }
         public Quaternion OutfittingRotation { get; } = Quaternion.Euler(50, 0, -30);
 
         public abstract string GetHullFullPath();

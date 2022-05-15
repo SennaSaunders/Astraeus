@@ -42,7 +42,9 @@ namespace Code._GameControllers {
 
         public void SetupGalaxyMap() {
             GameController.IsPaused = true;
-            gameObject.AddComponent<GalaxyMapGUIController>();
+            GameObject mapHolder = new GameObject("Galaxy Map Holder");
+            GalaxyMapGUIController galaxyMapGUIController = mapHolder.AddComponent<GalaxyMapGUIController>();
+            galaxyMapGUIController.Setup(null, GameController.GalaxyController.activeSystemController._solarSystem, mapHolder);
         }
 
         public void SetShipGUIActive(bool on) {
