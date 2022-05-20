@@ -45,15 +45,15 @@ namespace Code.GUI.SpaceStations.Services {
             _cargoController = GameController.CurrentShip.ShipObject.GetComponent<ShipController>().CargoController;
             _notEnoughCreditsMsg = GameObjectHelper.FindChild(_guiGameObject, "NotEnoughCredits");
             _notEnoughCreditsMsg.SetActive(false);
-            SetupHomeBtn();
+            SetupExitBtn();
             SetupSlider();
             SetupPurchaseBtn();
             UpdateCredits();
         }
 
-        private void SetupHomeBtn() {
-            Button homeBtn = GameObject.Find("HomeBtn").GetComponent<Button>();
-            homeBtn.onClick.AddListener(Exit);
+        private void SetupExitBtn() {
+            Button exitBtn = GameObject.Find("ExitBtn").GetComponent<Button>();
+            exitBtn.onClick.AddListener(Exit);
         }
 
         private void Exit() {
@@ -106,7 +106,7 @@ namespace Code.GUI.SpaceStations.Services {
         private void PurchaseBtnClick() {
             int currentFuelUnits = _cargoController.GetCargoOfType(typeof(Fuel)).Count;
             int fuelChange = (int)_slider.value - currentFuelUnits;
-            if (GameController.PlayerProfile.ChangeCredits(GetChangeInFunds())) {
+            if (GameController.PlayerProfile.AddCredits(GetChangeInFunds())) {
                 if (fuelChange > 0) {
                     List<Cargo> fuel = new List<Cargo>();
                     for (int i = 0; i < fuelChange; i++) {

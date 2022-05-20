@@ -61,27 +61,35 @@ namespace Code._Ships.Controllers {
         }
 
         protected override void FireCheck() {
-            if (Input.GetMouseButton(0)) {
-                BaseInputModule baseInputModule = FindObjectOfType<BaseInputModule>();
-                if (!baseInputModule.IsPointerOverGameObject(-1)) {
-                    FireWeapons();
+            if (!GameController.InLocalMap) {
+                if (Input.GetMouseButton(0)) {
+                    BaseInputModule baseInputModule = FindObjectOfType<BaseInputModule>();
+                    if (!baseInputModule.IsPointerOverGameObject(-1)) {
+                        FireWeapons();
+                    }
                 }
-                
             }
         }
 
         protected override Vector2 GetThrustVector() {
-            Vector2 forwards = Input.GetKey(KeyCode.W) ? Vector2.up : new Vector2();
-            Vector2 back = Input.GetKey(KeyCode.S) ? Vector2.down : new Vector2();
-            Vector2 left = Input.GetKey(KeyCode.A) ? Vector2.left : new Vector2();
-            Vector2 right = Input.GetKey(KeyCode.D) ? Vector2.right : new Vector2();
-            return forwards + back + left + right;
+            if (!GameController.InLocalMap) {
+                Vector2 forwards = Input.GetKey(KeyCode.W) ? Vector2.up : new Vector2();
+                Vector2 back = Input.GetKey(KeyCode.S) ? Vector2.down : new Vector2();
+                Vector2 left = Input.GetKey(KeyCode.A) ? Vector2.left : new Vector2();
+                Vector2 right = Input.GetKey(KeyCode.D) ? Vector2.right : new Vector2();
+                return forwards + back + left + right;
+            }
+            return new Vector2();
         }
 
         protected override float GetTurnDirection() {
-            float left = Input.GetKey(KeyCode.Q) ? 1 : 0;
-            float right = Input.GetKey(KeyCode.E) ? -1 : 0;
-            return left + right;
+            if (!GameController.InLocalMap) {
+                float left = Input.GetKey(KeyCode.Q) ? 1 : 0;
+                float right = Input.GetKey(KeyCode.E) ? -1 : 0;
+                return left + right;
+            }
+
+            return 0;
         }
 
         protected override void ShipDestroyed() {

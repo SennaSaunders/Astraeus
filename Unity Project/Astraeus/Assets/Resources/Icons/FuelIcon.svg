@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="FuelIcon.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="97.757513"
+     inkscape:cy="86.443804"
+     inkscape:window-width="2498"
+     inkscape:window-height="1417"
+     inkscape:window-x="1254"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:2.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1"
+       d="M 29.863453,40.612571 H 0.1365473 V 7.2793753 0.1365473 l 16.3117147,0 13.41519,12.8975157 z"
+       id="path961-8"
+       sodipodi:nodetypes="ccccccc" />
+    <g
+       id="g1594"
+       transform="matrix(1.2063201,0,0,1.2050729,-69.598778,-70.423518)"
+       style="stroke-width:1.99055096;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1;fill:#ffffff">
+      <path
+         style="fill:#ffffff;stroke:#000000;stroke-width:1.99055096;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1"
+         d="M 64.005915,70.980142 76.253337,83.227565"
+         id="path1488" />
+      <path
+         style="fill:#ffffff;stroke:#000000;stroke-width:1.99055096;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1"
+         d="M 64.005915,83.227565 76.253337,70.980142"
+         id="path1488-5" />
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
+       d="M 19.850698,2.2475755 21.755535,0.34273913 29.157763,7.7449669 27.252926,9.6498033"
+       id="path2187-5"
+       sodipodi:nodetypes="cccc" />
+  </g>
+</svg>

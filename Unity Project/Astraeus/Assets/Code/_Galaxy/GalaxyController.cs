@@ -42,10 +42,10 @@ namespace Code._Galaxy {
             GameObject systemName = Instantiate((GameObject)Resources.Load("GUIPrefabs/Map/SystemName"), primaryObject.transform, true);
             systemName.layer = LayerMask.NameToLayer("GalaxyMap");
             if (solarSystem.OwnerFaction != null) {
-                GameObjectHelper.SetGUITextValue(systemName, "SystemNameValue", controller._solarSystem.SystemName, solarSystem.OwnerFaction.factionType.MapColor());
+                GameObjectHelper.SetGUITextValue(systemName, "SystemNameValue", controller.SolarSystem.SystemName, solarSystem.OwnerFaction.factionType.MapColor());
             }
             else {
-                GameObjectHelper.SetGUITextValue(systemName, "SystemNameValue", controller._solarSystem.SystemName);
+                GameObjectHelper.SetGUITextValue(systemName, "SystemNameValue", controller.SolarSystem.SystemName);
             }
 
             systemName.transform.localPosition = new Vector3(0, -1, 0);
@@ -58,7 +58,7 @@ namespace Code._Galaxy {
         }
 
         public SolarSystemController GetSolarSystemController(SolarSystem solarSystem) {
-            return _solarSystemControllers.Find(ssc => ssc._solarSystem == solarSystem);
+            return _solarSystemControllers.Find(ssc => ssc.SolarSystem == solarSystem);
         }
 
         public void DisplayGalaxy() {

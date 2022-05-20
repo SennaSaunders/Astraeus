@@ -8,7 +8,7 @@ namespace Code._PlayerProfile {
         public List<Ship> Ships = new List<Ship>();
         public List<Mission> Missions = new List<Mission>();
 
-        public bool ChangeCredits(int changeAmount) {
+        public bool AddCredits(int changeAmount) {
             long creditsAfterChange = _credits + changeAmount;
             if (creditsAfterChange < 0) {//can't have negative credits
                 return false;

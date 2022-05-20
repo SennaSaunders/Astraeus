@@ -10,7 +10,6 @@ using Code._Ships.ShipComponents.InternalComponents.JumpDrives;
 using Code._Utility;
 using Code.Camera;
 using Code.Missions;
-using Unity.VectorGraphics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -115,7 +114,7 @@ namespace Code.GUI.Map {
 
         private void DrawJumpDistanceCircle() {
             float diameter = GameController.CurrentShip.ShipObject.GetComponent<ShipController>().JumpDriveController.GetMaxRange() * 2;
-            Vector2 currentSystemPosition = _galaxyController.activeSystemController._solarSystem.Coordinate;
+            Vector2 currentSystemPosition = _galaxyController.activeSystemController.SolarSystem.Coordinate;
             string circlePath = "GUIPrefabs/Map/Circle";
             DrawCircle(diameter, currentSystemPosition, Color.white, circlePath);
         }
@@ -165,7 +164,7 @@ namespace Code.GUI.Map {
         }
 
         private float GetJumpDistance() {
-            return (_galaxyController.activeSystemController._solarSystem.Coordinate - _selectedSystem._solarSystem.Coordinate).magnitude;
+            return (_galaxyController.activeSystemController.SolarSystem.Coordinate - _selectedSystem.SolarSystem.Coordinate).magnitude;
         }
 
         private void SelectSystem(SolarSystemController selectedSystem) {
@@ -179,15 +178,15 @@ namespace Code.GUI.Map {
             }
 
             _jumpInfoCard = Instantiate((GameObject)Resources.Load("GUIPrefabs/Map/JumpInfoCard"), GameObjectHelper.FindChild(_guiGameObject, "Info").transform);
-            GameObjectHelper.SetGUITextValue(_jumpInfoCard, "SystemName", _selectedSystem._solarSystem.SystemName + " System");
+            GameObjectHelper.SetGUITextValue(_jumpInfoCard, "SystemName", _selectedSystem.SolarSystem.SystemName + " System");
             float jumpDistance = GetJumpDistance();
             GameObjectHelper.SetGUITextValue(_jumpInfoCard, "JumpDistanceValue", jumpDistance.ToString());
             GameObjectHelper.SetGUITextValue(_jumpInfoCard, "FuelConsumedValue", (_jumpDriveController.CalculateFuelEnergyUse(jumpDistance) / Fuel.MaxEnergy).ToString());
 
             string factionName = "None";
             string factionType = "None";
-            if (_selectedSystem._solarSystem.OwnerFaction != null) {
-                Faction faction = _selectedSystem._solarSystem.OwnerFaction;
+            if (_selectedSystem.SolarSystem.OwnerFaction != null) {
+                Faction faction = _selectedSystem.SolarSystem.OwnerFaction;
                 factionName = faction.GetFactionName();
                 factionType = faction.factionType.ToString();
             }
@@ -217,7 +216,7 @@ namespace Code.GUI.Map {
         }
 
         private void JumpBtnClick() {
-            JumpDriveController.JumpStatus jumpStatus = _jumpDriveController.CanJump(_selectedSystem._solarSystem);
+            JumpDriveController.JumpStatus jumpStatus = _jumpDriveController.CanJump(_selectedSystem.SolarSystem);
 
             if (jumpStatus == JumpDriveController.JumpStatus.InsufficientFuel) {
                 GameObjectHelper.SetGUITextValue(_jumpInfoCard, "ErrorMsg", "Insufficient fuel");

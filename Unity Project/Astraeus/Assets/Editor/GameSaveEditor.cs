@@ -11,6 +11,9 @@ namespace Editor {
             if (GUILayout.Button("Save")) {
                 _gameSave.SaveGame();
             }
+            if (GUILayout.Button("Load")) {
+                _gameSave.LoadGame();
+            }
             base.OnInspectorGUI();
         }
     }

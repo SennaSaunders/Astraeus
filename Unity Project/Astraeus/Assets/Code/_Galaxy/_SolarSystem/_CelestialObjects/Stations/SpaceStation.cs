@@ -24,7 +24,7 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations {
         }
 
         public override GameObject GetMiniMapObject() {
-            return GameObject.CreatePrimitive(PrimitiveType.Cube);
+            return (GameObject)Resources.Load("Icons/SpaceStationMapIcon");
         }
 
         public SpaceStation(Body primary, SolarSystem solarSystem) : base(primary, BodyTier.T0, new Color(.7f,.7f,.7f)) {

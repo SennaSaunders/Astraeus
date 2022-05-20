@@ -4,12 +4,12 @@ using UnityEngine;
 namespace Code._Ships.ShipComponents.ExternalComponents.Weapons.Types {
     public class Laser : Weapon {
         private static float minTierFireDelay = .3f;
-        private static float maxTierFireDelay = 1f;
-        private static float baseDamage = 30;
+        private static float maxTierFireDelay = .6f;
+        private static float baseDamage = 35;
         private static float basePowerDraw = 30;
         private static float projectileSpeed = 500;
         private static float travelTime = 2;
-        private static int baseMass = 100;
+        private static int baseMass = 200;
         private static float minTierRotationSpeed = 5;
         private static float maxTierRotationSpeed = 3;
 

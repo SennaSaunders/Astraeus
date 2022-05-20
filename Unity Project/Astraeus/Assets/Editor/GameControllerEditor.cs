@@ -119,19 +119,5 @@ namespace Editor {
             
             DrawDefaultInspector();
         }
-
-        // [InitializeOnLoadMethod]
-        // public static void InitUpdate() {
-        //     EditorApplication.update += Update;
-        // }
-
-        // static void Update() {
-        //     if (gameController != null) {
-        //         if (gameController.npcShips.Count > 0) {
-        //             NPCShipController npcShipController = gameController.npcShips[selectedNPCShip].ShipObject.GetComponent<NPCShipController>();
-        //             npcShipController.SetDestination(destinationObject.transform.position);
-        //         }
-        //     }
-        // }
     }
 }

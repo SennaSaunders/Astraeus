@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
 using Code._GameControllers;
 using Code._Utility;
@@ -23,17 +24,17 @@ namespace Code.GUI.SpaceStations.Services.Missions {
             guiGameObject = (GameObject)Instantiate(Resources.Load(_missionService.GUIPath));
             availableContentView = GameObjectHelper.FindChild(guiGameObject, "AvailableMissionsContent");
             acceptedContentView = GameObjectHelper.FindChild(guiGameObject, "AcceptedMissionsContent");
-            SetupHomeBtn();
+            SetupExitBtn();
             GenerateAvailableMissions();
             DisplayAcceptedMissions();
         }
 
-        private void SetupHomeBtn() {
-            Button button = GameObjectHelper.FindChild(guiGameObject, "HomeBtn").GetComponent<Button>();
-            button.onClick.AddListener(ExitBtn);
+        private void SetupExitBtn() {
+            Button button = GameObjectHelper.FindChild(guiGameObject, "ExitBtn").GetComponent<Button>();
+            button.onClick.AddListener(Exit);
         }
 
-        private void ExitBtn() {
+        private void Exit() {
             _stationGUIController.stationGUI.SetActive(true);
             Destroy(guiGameObject);
             Destroy(this);

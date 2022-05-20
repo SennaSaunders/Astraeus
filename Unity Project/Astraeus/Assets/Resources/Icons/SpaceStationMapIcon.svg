@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="SpaceStationIcon.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.5499273"
+     inkscape:cx="173.65932"
+     inkscape:cy="362.77522"
+     inkscape:window-width="2498"
+     inkscape:window-height="1417"
+     inkscape:window-x="1254"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <ellipse
+       style="fill:#ffffff;stroke:#ffffff;stroke-width:10.9687;stroke-linecap:round"
+       id="path846"
+       cx="39.999985"
+       cy="40"
+       rx="9.5156364"
+       ry="9.5156488" />
+    <ellipse
+       style="fill:none;stroke:#ffffff;stroke-width:10.2167;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path846-7"
+       cx="40.000004"
+       cy="40.000011"
+       rx="34.891655"
+       ry="34.891663" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:7.59902;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect1096"
+       width="62.400955"
+       height="2.4009778"
+       x="8.79951"
+       y="38.799511" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:7.59902;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect1096-3"
+       width="62.400955"
+       height="2.4009778"
+       x="-71.200478"
+       y="38.7995"
+       transform="rotate(-90)" />
+  </g>
+</svg>

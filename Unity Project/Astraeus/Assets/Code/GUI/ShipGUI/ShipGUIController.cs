@@ -29,7 +29,7 @@ namespace Code.GUI.ShipGUI {
         }
         
         private void LocalMapBtnClick() {
-            GameController.IsPaused = true;
+            GameController.InLocalMap = true;
             GameController.GUIController.SetupLocalMapGUI();
         }
 

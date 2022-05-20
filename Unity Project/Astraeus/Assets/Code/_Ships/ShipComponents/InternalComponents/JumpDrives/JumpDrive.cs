@@ -8,6 +8,6 @@ namespace Code._Ships.ShipComponents.InternalComponents.JumpDrives {
         
         private const int ExclusionRangeScale = 5;
         public float JumpRange;
-        public const float EnergyPerLY = 1000;
+        public const float EnergyPerLY = 1500;
     }
 }

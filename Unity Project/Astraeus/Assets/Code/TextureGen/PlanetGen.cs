@@ -10,8 +10,8 @@ namespace Code.TextureGen {
         public Color MapColour;
         private int _seed;
         private int _size;
-        int width;
-        int height;
+        private int width;
+        private int height;
         private List<LandColourMapping> _landColourMappings;
         internal float SeaLevel;
         private Color _lowSeaColour;
@@ -68,7 +68,7 @@ namespace Code.TextureGen {
             return 0.2126f * colourCode.r + 0.7152f * colourCode.g + 0.0722f * colourCode.b;
         }
 
-        private Color RGBToColour((int r, int g, int b) colourCode) {
+        public Color RGBToColour((int r, int g, int b) colourCode) {
             return new Color((float)colourCode.r / 255, (float)colourCode.g / 255, (float)colourCode.b / 255);
         }
 

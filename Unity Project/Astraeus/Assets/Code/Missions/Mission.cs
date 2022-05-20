@@ -16,7 +16,7 @@ namespace Code.Missions {
         }
 
         public void GiveReward() {
-            GameController.PlayerProfile.ChangeCredits(RewardCredits);
+            GameController.PlayerProfile.AddCredits(RewardCredits);
         }
     }
 }

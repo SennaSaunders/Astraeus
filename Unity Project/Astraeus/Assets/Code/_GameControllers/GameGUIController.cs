@@ -24,7 +24,6 @@ namespace Code._GameControllers {
         }
 
         public void SetupLocalMapGUI() {
-            GameController.IsPaused = true;
             _localMapGUIController = gameObject.AddComponent<LocalMapGUIController>();
             _localMapGUIController.SetupGUI();
         }
@@ -44,7 +43,7 @@ namespace Code._GameControllers {
             GameController.IsPaused = true;
             GameObject mapHolder = new GameObject("Galaxy Map Holder");
             GalaxyMapGUIController galaxyMapGUIController = mapHolder.AddComponent<GalaxyMapGUIController>();
-            galaxyMapGUIController.Setup(null, GameController.GalaxyController.activeSystemController._solarSystem, mapHolder);
+            galaxyMapGUIController.Setup(null, GameController.GalaxyController.activeSystemController.SolarSystem, mapHolder);
         }
 
         public void SetShipGUIActive(bool on) {

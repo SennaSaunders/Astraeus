@@ -23,7 +23,7 @@ namespace Code._Ships.Controllers {
         public ThrusterController ThrusterController;
         protected List<WeaponController> WeaponControllers;
         protected PowerPlantController _powerPlantController;
-        protected ShieldController ShieldController;
+        public ShieldController ShieldController;
         public CargoController CargoController;
         public JumpDriveController JumpDriveController;
         protected GameObject _shipHealthGUI;

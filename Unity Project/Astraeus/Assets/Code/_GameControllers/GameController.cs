@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
 using Code._Galaxy;
 using Code._Galaxy._Factions;
 using Code._Galaxy._SolarSystem;
@@ -24,6 +23,8 @@ namespace Code._GameControllers {
         public static bool IsPaused = true;
         public static ShipCameraController shipCameraController;
         public static Ship CurrentShip { get; set; }
+        public static bool InLocalMap { get; set; } = false;
+
         private GameObject _playerShipContainer;
         public static PlayerShipController PlayerShipController;
         public List<Ship> npcShips = new List<Ship>();
@@ -57,7 +58,7 @@ namespace Code._GameControllers {
             }
 
             GalaxyController.activeSystemController = solarSystemController;
-            CurrentSolarSystem = solarSystemController._solarSystem;
+            CurrentSolarSystem = solarSystemController.SolarSystem;
             solarSystemController.DisplaySolarSystem(shipGUI);
             GUIController.shipGUIController.SetSystemDetails();
         }

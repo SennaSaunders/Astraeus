@@ -3,15 +3,15 @@ using UnityEngine;
 
 namespace Code._Ships.ShipComponents.ExternalComponents.Weapons.Types {
     public class BallisticCannon : Weapon {
-        private static float minTierFireDelay = .75f;
-        private static float maxTierFireDelay = 1.5f;
+        private static float minTierFireDelay = .6f;
+        private static float maxTierFireDelay = 1.2f;
         private static float baseDamage = 50;
-        private static float basePowerDraw = 20;
+        private static float basePowerDraw = 15;
         private static float projectileSpeed = 300;
         private static float travelTime = 3;
-        private static int baseMass = 100;
-        private static float minTierRotationSpeed = 5;
-        private static float maxTierRotationSpeed = 3;
+        private static int baseMass = 250;
+        private static float minTierRotationSpeed = 4;
+        private static float maxTierRotationSpeed = 2;
 
         public BallisticCannon(ShipComponentTier componentSize) : base("Ballistic Cannon", componentSize, minTierFireDelay, maxTierFireDelay, baseDamage, projectileSpeed, travelTime, basePowerDraw, minTierRotationSpeed, maxTierRotationSpeed,baseMass,1000) {
             ColourChannelObjectMap = new List<(List<string> objectName, Color colour)>() {

@@ -44,6 +44,7 @@ namespace Code.GUI.SpaceStations.Services {
             DisplayShip(displayedShip);
         }
 
+
         private void SetupColourPickers() {
             ColourPicker colourPicker = GameObjectHelper.FindChild(_shipColourGUI, "ColourPanel1").GetComponentInChildren<ColourPicker>();
             colourPicker.Setup(this, 1, true);

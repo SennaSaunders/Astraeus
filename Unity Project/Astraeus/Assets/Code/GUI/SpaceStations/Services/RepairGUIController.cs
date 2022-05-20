@@ -32,7 +32,7 @@ namespace Code.GUI.SpaceStations.Services {
         private void SetupGUI() {
             _stationGUIController.stationGUI.SetActive(false);
             _guiGameObject = Instantiate((GameObject)Resources.Load(_repairService.GUIPath));
-            SetupBtn("HomeBtn", Exit);
+            SetupBtn("ExitBtn", Exit);
             SetupBtn("RepairBtn", RepairBtn);
             SetPricePerUnitText();
             Refresh();
@@ -62,6 +62,11 @@ namespace Code.GUI.SpaceStations.Services {
         private void Refresh() {
             SetHealthText();
             SetRepairCostValueText();
+            SetCredits();
+        }
+
+        private void SetCredits() {
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsValue", GameController.PlayerProfile._credits + "Cr");
         }
 
         private void SetHealthText() {
@@ -75,14 +80,14 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void SetRepairCostValueText() {
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "PriceValue", GetRepairCost().ToString() + "Cr");
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "PriceValue", GetRepairCost() + "Cr");
         }
 
 
         private void RepairBtn() {
             (float current, float max) health = GetHealthValues();
             if (health.current < health.max) {
-                if (GameController.PlayerProfile.ChangeCredits(GetRepairCost())) {
+                if (GameController.PlayerProfile.AddCredits(GetRepairCost())) {
                     GameController.CurrentShip.ShipHull.CurrentHullStrength = GameController.CurrentShip.ShipHull.BaseHullStrength;
                     GameController.CurrentShip.ShipHull.NotifyObservers();
                     SetFeedbackMsg("Ship Repaired", Color.green);

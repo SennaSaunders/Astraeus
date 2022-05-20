@@ -7,8 +7,8 @@ using UnityEngine;
 
 namespace Code._Ships.Hulls.Types.Fighter {
     public class HeavyFighter :Hull {
-        public HeavyFighter() : base("Daedalus",new Vector3(0, 0, 30),new Vector3(0,-13,0), 12000, 10, 30, 1500, 50000) {
-            ColourChannelObjectMap = new List<(List<string> objectName, Color colour)>() {
+        public HeavyFighter() : base("Daedalus",new Vector3(0, 0, 30), 6,new Vector3(0,-13,0), 12000, 10, 30, 1500, 50000) {
+             ColourChannelObjectMap = new List<(List<string> objectName, Color colour)>() {
                 (new List<string>() { "Hull" }, new Color(.2f, 0, .6f)),
                 (new List<string>() { "Cockpit" }, new Color(.1f, .1f, .1f)),
                 (new List<string>() { "Vent" }, new Color(.3f, .3f, .2f))

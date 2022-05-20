@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Code._Cargo.ProductTypes.Ships;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
 using Code._GameControllers;
 using Code._Ships;
@@ -15,7 +17,6 @@ using Code._Ships.ShipComponents.InternalComponents.Storage;
 using Code._Utility;
 using Code.Camera;
 using Code.GUI.ShipGUI;
-using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -24,19 +25,26 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
     public class OutfittingGUIController : MonoBehaviour {
         private GameObject _previousGUI;
         private OutfittingService _outfittingService;
-        private GameObject _guiGameObject, _shipObject, _thrusterSubCategories, _weaponSubCategories, _internalSubCategories, _errorMsg;
-        internal GameObject _hoverInfo;
-        private GameObject _buyGUI;
-        public ShipObjectHandler _shipObjectHandler;
+        private GameObject _guiGameObject, _shipObject, _thrusterSubCategories, _weaponSubCategories, _internalSubCategories, _feedbackMsg,_buyGUI;
+        internal GameObject HoverInfo;
+        public ShipObjectHandler shipObjectHandler;
 
-        public SlotSelector _selectedSlot;
+        internal SlotSelector SelectedSlot;
         private List<SlotSelector> _mainThrusterSelectionMarkers = new List<SlotSelector>();
         private List<SlotSelector> _manThrusterSelectionMarkers = new List<SlotSelector>();
         private List<SlotSelector> _weaponSelectionMarkers = new List<SlotSelector>();
         private List<SlotSelector> _internalSelectionMarkers = new List<SlotSelector>();
         private List<GameObject> _tempDeactivatedSelectionMarkers = new List<GameObject>();
+        private List<Button> _mainCategoryButtons = new List<Button>();
+        private List<Button> _subCategoryButtons = new List<Button>();
+        private Button _defaultThrusterButton, _defaultWeaponButton, _defaultInternalButton;
+        
+        public static Color BrightYellow = new Color(255 / 255f, 185 / 255f, 0);
+        public static Color DarkYellow = new Color(150 / 255f, 100 / 255f, 0);
+        public static Color BrightBlue = new Color(53 / 255f, 157 / 255f, 255 / 255f);
+        public static Color MidBlue = new Color(20 / 255f, 100 / 255f, 150 / 255f);
 
-        internal UnityEngine.Camera _camera;
+        internal UnityEngine.Camera Camera;
         private OutfittingCameraController _cameraController;
 
         private const string OutfittingPath = "GUIPrefabs/Station/Services/Outfitting/";
@@ -50,40 +58,148 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
         private const string BuyComponentCardPath = "BuyComponentCard";
 
 
-        private const float ErrorTimeout = 3;
-        private float _currentErrorTime;
-
-        private GameController _gameController;
+        private const float MsgTimeout = 3;
+        private float _currentFeedbackTime;
         private Ship _ship;
 
-
         private void SetShipObjectHandler() {
-            _shipObjectHandler = _guiGameObject.AddComponent<ShipObjectHandler>();
+            shipObjectHandler = _guiGameObject.AddComponent<ShipObjectHandler>();
         }
 
-        public void StartOutfitting(OutfittingService outfittingService, GameObject previousGUI, GameController gameController, Ship ship) {
+        public void StartOutfitting(OutfittingService outfittingService, GameObject previousGUI, Ship ship) {
             CameraUtility.SolidSkybox(); //makes skybox black so the GUI looks cleaner 
             _outfittingService = outfittingService;
             _previousGUI = previousGUI;
             _previousGUI.SetActive(false);
-            _gameController = gameController;
             _ship = ship;
 
             SetupCamera();
             SetupGUI();
+            SetCredits();
+            SetCreditsChange();
+            SetShipStats();
+            SetComponentWarnings();
 
             DisplayShip();
             SetupBtns();
         }
 
-        private int SetupBuyComponentCard(ShipComponent oldComponent, ShipComponent newComponent, GameObject contentView) {
-            GameObject buyCard = (GameObject)Instantiate(Resources.Load(OutfittingPath + BuyComponentCardPath), contentView.transform);
-            GameObjectHelper.SetGUITextValue(buyCard, "OldComponentName", oldComponent == null ? "Empty" : oldComponent.ComponentName + " - " + oldComponent.ComponentSize);
-            GameObjectHelper.SetGUITextValue(buyCard, "OldComponentPrice", oldComponent == null ? "N/A" : oldComponent.ComponentPrice + "Cr");
-            GameObjectHelper.SetGUITextValue(buyCard, "NewComponentName", newComponent == null ? "Empty" : newComponent.ComponentName + " - " + newComponent.ComponentSize);
-            GameObjectHelper.SetGUITextValue(buyCard, "NewComponentPrice", newComponent == null ? "N/A" : newComponent.ComponentPrice + "Cr");
+        public void SetComponentWarnings() {
+            GameObject warningsHolder = GameObjectHelper.FindChild(_guiGameObject, "Warnings");
+            for (int i = warningsHolder.transform.childCount; i > 0; i--) {
+                DestroyImmediate(warningsHolder.transform.GetChild(i - 1).gameObject);
+            }
+            //power plant
+            if (_ship.ShipHull.InternalComponents.Select(mt => mt.concreteComponent).Where(mt => mt != null && mt.GetType().IsSubclassOf(typeof(PowerPlant))).ToList().Count == 0) {
+                CreateWarningMsg("No Power Plant");
+            }
+            //cargo
+            if (_ship.ShipHull.InternalComponents.Select(mt => mt.concreteComponent).Where(mt => mt != null && mt.GetType()==typeof(CargoBay)).ToList().Count == 0) {
+                CreateWarningMsg("No Cargo Bay");
+            }
+            //main thrusters
+            if (_ship.ShipHull.MainThrusterComponents.Select(mt => mt.concreteComponent).Where(mt => mt != null).ToList().Count == 0) {
+                CreateWarningMsg("No Main Thruster");
+            }
+            //manoeuvring thrusters
+            if (_ship.ShipHull.ManoeuvringThrusterComponents.concreteComponent==null) {
+                CreateWarningMsg("No Manoeuvring Thruster");
+            }
+            //jump drive
+            if (_ship.ShipHull.InternalComponents.Select(mt => mt.concreteComponent).Where(mt => mt != null && mt.GetType()==typeof(JumpDrive)).ToList().Count == 0) {
+                CreateWarningMsg("No Jump Drive");
+            }
+        }
 
-            int priceChange = 0;
+        private void CreateWarningMsg(string msg) {
+            GameObject warningsHolder = GameObjectHelper.FindChild(_guiGameObject, "Warnings");
+            GameObject newWarning = Instantiate((GameObject)Resources.Load(OutfittingPath + "Warning"), warningsHolder.transform);
+            GameObjectHelper.SetGUITextValue(newWarning, "WarningMsg", msg);
+            var warningsRectTransform = newWarning.GetComponent<RectTransform>(); 
+            float height = warningsRectTransform.rect.height;
+            float offset = -warningsHolder.transform.childCount * height;
+            warningsRectTransform.localPosition = new Vector3(0, offset, 0);
+        }
+
+        public void SetShipStats() {
+            SetThrusterStats();
+            SetPowerStats();
+            SetWeaponStats();
+            SetShieldStats();
+            SetJumpStats();
+            SetCargoStats();
+        }
+
+        private void SetThrusterStats() {
+            float mass = ShipStats.GetShipMass(_ship, false);
+            //main
+            //accel
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "MainAccelValue", (ShipStats.GetMainThrusterForce(_ship) / mass).ToString("0.0") + "m/s²");
+            //power
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "MainPowerValue", ShipStats.GetMainThrusterPowerPerSecond(_ship).ToString("0.0") + "/s");
+            
+            //manoeuvring
+            //accel
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "ManAccelValue", (ShipStats.GetManoeuvringThrusterForce(_ship) / mass).ToString("0.0") + "m/s²");
+            //power
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "ManPowerValue", ShipStats.GetManoeuvringThrusterPowerPerSecond(_ship).ToString("0.0") + "/s");
+        }
+
+        private void SetPowerStats() {
+            //capacity
+            float powerCapacity = ShipStats.GetPowerCapacity(_ship);
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "PowerCapacityValue", powerCapacity.ToString("0.0"));
+            //recharge
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "PowerRechargeValue", ShipStats.GetPowerRecharge(_ship).ToString("0.0"));
+            //min drain time
+            float powerPerSecond = ShipStats.GetMainThrusterPowerPerSecond(_ship);
+            powerPerSecond += ShipStats.GetManoeuvringThrusterPowerPerSecond(_ship);
+            powerPerSecond += ShipStats.GetShieldPowerPerSecond(_ship);
+            powerPerSecond += ShipStats.GetWeaponPowerPerSecond(_ship);
+
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "PowerDrainMinTimeValue", powerPerSecond<=0? "N/A":(powerCapacity / powerPerSecond).ToString("0.0") + "s");
+        }
+
+        private void SetWeaponStats() {
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "DPSValue", ShipStats.GetDPS(_ship).ToString("0.0"));
+        }
+
+        private void SetShieldStats() {
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "ShieldCapacityValue", ShipStats.GetShieldCapacity(_ship).ToString("0.0"));
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "ShieldRechargeValue", ShipStats.GetShieldRechargeRate(_ship).ToString("0.0"));
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "ShieldRechargeEnergyValue", ShipStats.GetShieldPowerPerSecond(_ship).ToString("0.0"));
+        }
+
+        private void SetJumpStats() {
+            float jumpRange = ShipStats.GetJumpRange(_ship);
+            float maxEnergy = (JumpDrive.EnergyPerLY * jumpRange) / Fuel.MaxEnergy;
+            //range
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "JumpRangeValue", jumpRange.ToString("0.0"));
+            //max fuel consumption
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "JumpFuelValue", maxEnergy.ToString("0.0"));
+        }
+
+        private void SetCargoStats() {
+            //cargo
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CapacityValue", ShipStats.GetMaxCargoSpace(_ship).ToString());
+        }
+
+
+        private void SetCredits() {
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsValue", GameController.PlayerProfile._credits.ToString());
+        }
+
+        public void SetCreditsChange() {
+            int cost = 0;
+            cost += GetComponentCosts(_weaponSelectionMarkers);
+            cost += GetComponentCosts(_mainThrusterSelectionMarkers);
+            cost += GetComponentCosts(_manThrusterSelectionMarkers);
+            cost += GetComponentCosts(_internalSelectionMarkers);
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditChangeValue", cost.ToString());
+        }
+
+        private int GetPriceChange(ShipComponent oldComponent, ShipComponent newComponent) {
+            int priceChange;
             if (oldComponent == null) {
                 priceChange = newComponent.ComponentPrice;
             }
@@ -94,6 +210,17 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
                 priceChange = newComponent.ComponentPrice - oldComponent.ComponentPrice;
             }
 
+            return priceChange;
+        }
+
+        private int SetupBuyComponentCard(ShipComponent oldComponent, ShipComponent newComponent, GameObject contentView) {
+            GameObject buyCard = (GameObject)Instantiate(Resources.Load(OutfittingPath + BuyComponentCardPath), contentView.transform);
+            GameObjectHelper.SetGUITextValue(buyCard, "OldComponentName", oldComponent == null ? "Empty" : oldComponent.ComponentName + " - " + oldComponent.ComponentSize);
+            GameObjectHelper.SetGUITextValue(buyCard, "OldComponentPrice", oldComponent == null ? "N/A" : oldComponent.ComponentPrice + "Cr");
+            GameObjectHelper.SetGUITextValue(buyCard, "NewComponentName", newComponent == null ? "Empty" : newComponent.ComponentName + " - " + newComponent.ComponentSize);
+            GameObjectHelper.SetGUITextValue(buyCard, "NewComponentPrice", newComponent == null ? "N/A" : newComponent.ComponentPrice + "Cr");
+
+            int priceChange = GetPriceChange(oldComponent, newComponent);
             GameObjectHelper.SetGUITextValue(buyCard, "PriceChangeValue", priceChange > 0 ? "+" + priceChange : priceChange.ToString());
             return priceChange;
         }
@@ -130,7 +257,7 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
                 selectionMarker.SetActive(true);
             }
         }
-        
+
         private void CloseBuyGUI() {
             ShowSelectionMarkers();
             Destroy(_buyGUI);
@@ -153,13 +280,16 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
         }
 
         private void ConfirmPurchase(int price) {
-            if (GameController.PlayerProfile.ChangeCredits(-price)) {
-                ErrorMsgActive("Purchase confirmed");
+            if (GameController.PlayerProfile.AddCredits(-price)) {
+                MsgActive("Purchase confirmed",Color.green);
                 Purchased();
                 CloseBuyGUI();
+                SetCredits();
+                SetCreditsChange();
+                SetComponentWarnings();
             }
             else {
-                ErrorMsgActive("Insufficient credits");
+                MsgActive("Insufficient credits",Color.red);
             }
         }
 
@@ -176,6 +306,22 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
             }
         }
 
+        private int GetComponentCosts(List<SlotSelector> selectionMarkers) {
+            int priceChange = 0;
+            foreach (SlotSelector selectionMarker in selectionMarkers) {
+                if (selectionMarker.InitialShipComponent != null && selectionMarker.CurrentShipComponent != null) {
+                    if (selectionMarker.InitialShipComponent.GetType() != selectionMarker.CurrentShipComponent.GetType() || selectionMarker.InitialShipComponent.ComponentSize != selectionMarker.CurrentShipComponent.ComponentSize) {
+                        priceChange += GetPriceChange(selectionMarker.InitialShipComponent, selectionMarker.CurrentShipComponent);
+                    }
+                }
+                else if (selectionMarker.InitialShipComponent != null || selectionMarker.CurrentShipComponent != null) {
+                    priceChange += GetPriceChange(selectionMarker.InitialShipComponent, selectionMarker.CurrentShipComponent);
+                }
+            }
+
+            return priceChange;
+        }
+
         private int SetComponentBuyCards(List<SlotSelector> selectionMarkers, GameObject contentView) {
             int priceChange = 0;
             foreach (SlotSelector selectionMarker in selectionMarkers) {
@@ -183,56 +329,63 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
                     if (selectionMarker.InitialShipComponent.GetType() != selectionMarker.CurrentShipComponent.GetType() || selectionMarker.InitialShipComponent.ComponentSize != selectionMarker.CurrentShipComponent.ComponentSize) {
                         priceChange += SetupBuyComponentCard(selectionMarker.InitialShipComponent, selectionMarker.CurrentShipComponent, contentView);
                     }
-                } else if(selectionMarker.InitialShipComponent != null || selectionMarker.CurrentShipComponent != null) {
+                }
+                else if (selectionMarker.InitialShipComponent != null || selectionMarker.CurrentShipComponent != null) {
                     priceChange += SetupBuyComponentCard(selectionMarker.InitialShipComponent, selectionMarker.CurrentShipComponent, contentView);
                 }
-                
             }
 
             return priceChange;
         }
 
-
         private void Update() {
-            ErrorMsgCheck();
+            FeedbackMsgCheck();
         }
 
-        private void ErrorMsgCheck() {
-            if (_errorMsg.activeSelf == true) {
-                _currentErrorTime -= Time.deltaTime;
-                if (_currentErrorTime <= 0) {
-                    _errorMsg.SetActive(false);
+        private void FeedbackMsgCheck() {
+            if (_feedbackMsg.activeSelf) {
+                _currentFeedbackTime -= Time.deltaTime;
+                if (_currentFeedbackTime <= 0) {
+                    _feedbackMsg.SetActive(false);
                 }
             }
         }
 
-        private void ErrorMsgActive(string errorMsg) {
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "ErrorMsg", errorMsg);
-            _currentErrorTime = ErrorTimeout;
-            _errorMsg.SetActive(true);
+        private void MsgActive(string msg, Color colour) {
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "ErrorMsg", msg, colour);
+            _currentFeedbackTime = MsgTimeout;
+            _feedbackMsg.SetActive(true);
+        }
+
+        private void SuccessMsg() {
+            MsgActive("Component assigned successfully", Color.green);
         }
 
         private void UnselectedSlotError() {
-            ErrorMsgActive("Select a slot on the ship first");
+            MsgActive("Select a slot on the ship first", Color.red);
         }
 
         private void SlotSizeError() {
-            ErrorMsgActive("Component is too big for the selected slot");
+            MsgActive("Component is too big for the selected slot",Color.red);
+        }
+
+        public void CargoBayFilledError() {
+            MsgActive("Remove fuel/cargo before changing",Color.red);
         }
 
         private void SetupCamera() {
-            _camera = UnityEngine.Camera.main;
-            if (_camera != null) {
-                _cameraController = _camera.gameObject.AddComponent<OutfittingCameraController>();
+            Camera = UnityEngine.Camera.main;
+            if (Camera != null) {
+                _cameraController = Camera.gameObject.AddComponent<OutfittingCameraController>();
                 _cameraController.TakeCameraControl();
                 _cameraController.SetCameraPos();
-                _camera.farClipPlane = 2500;
+                Camera.farClipPlane = 2500;
             }
         }
 
-        private void SetupHomeBtn() {
-            Button homeBtn = GameObject.Find("HomeBtn").GetComponent<Button>();
-            homeBtn.onClick.AddListener(ExitOutfitting);
+        private void SetupExitBtn() {
+            Button exitBtn = GameObject.Find("ExitBtn").GetComponent<Button>();
+            exitBtn.onClick.AddListener(Exit);
         }
 
         private void SetupColourBtn() {
@@ -242,64 +395,62 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
 
         private void ColourBtnClick() {
             ShipColourGUIController shipColourGUIController = gameObject.AddComponent<ShipColourGUIController>();
-            shipColourGUIController.SetupGUI(_shipObjectHandler, _guiGameObject, _shipObject);
+            shipColourGUIController.SetupGUI(shipObjectHandler, _guiGameObject, _shipObject);
         }
 
         private bool ShipLoadoutConfirmed() {
             List<SlotSelector> selectionMarkers = GetAllSlotSelectors();
             foreach (SlotSelector selectionMarker in selectionMarkers) {
-                if ((selectionMarker.InitialShipComponent == null && selectionMarker.CurrentShipComponent == null)) {//if both unset then true
+                if ((selectionMarker.InitialShipComponent == null && selectionMarker.CurrentShipComponent == null)) { //if both unset then true
                     return true;
                 }
-                if (selectionMarker.InitialShipComponent == null || selectionMarker.CurrentShipComponent == null) {//if one unset return false
+
+                if (selectionMarker.InitialShipComponent == null || selectionMarker.CurrentShipComponent == null) { //if one unset return false
                     return false;
-                }//otherwise check component & if not the same type and size return false
+                } //otherwise check component & if not the same type and size return false
+
                 if (selectionMarker.InitialShipComponent.GetType() != selectionMarker.CurrentShipComponent.GetType() || selectionMarker.InitialShipComponent.ComponentSize != selectionMarker.CurrentShipComponent.ComponentSize) {
                     return false;
                 }
             }
+
             return true;
         }
 
-        private void ExitOutfitting() {
+        private void Exit() {
             if (ShipLoadoutConfirmed()) {
-                CameraUtility.NormalSkybox();
-                _camera.farClipPlane = 3000;
-                _gameController.RefreshPlayerShip();
                 _previousGUI.SetActive(true);
-                FindObjectOfType<ShipCameraController>().enabled = true;
                 Destroy(_cameraController);
                 Destroy(_guiGameObject);
                 Destroy(this);
             }
             else {
-                ErrorMsgActive("Need to confirm loadout");
+                MsgActive("Need to confirm loadout",Color.red);
                 if (_buyGUI == null) {
                     SetupBuyGUI();
                 }
             }
-            
         }
 
         private void DisplayShip() {
-            _shipObjectHandler.ManagedShip = _ship;
-            _shipObject = _shipObjectHandler.CreateShip(GameObject.Find("ShipPanel").transform, Color.black);
-            _shipObject.transform.position = _shipObjectHandler.ManagedShip.ShipHull.OutfittingPosition;
-            _shipObject.transform.rotation = _shipObjectHandler.ManagedShip.ShipHull.OutfittingRotation;
+            shipObjectHandler.ManagedShip = _ship;
+            _shipObject = shipObjectHandler.CreateShip(GameObject.Find("ShipPanel").transform, Color.black);
+            _shipObject.transform.position = shipObjectHandler.ManagedShip.ShipHull.OutfittingPosition;
+            _shipObject.transform.rotation = shipObjectHandler.ManagedShip.ShipHull.OutfittingRotation;
             AddDraggableToShipPanel();
         }
 
         private void AddDraggableToShipPanel() {
             GameObject shipPanel = GameObject.Find("ShipPanel");
             ShipRotatable shipRotatable = shipPanel.AddComponent<ShipRotatable>();
-            shipRotatable.RotatableObject = _shipObjectHandler.ManagedShip.ShipObject;
+            shipRotatable.RotatableObject = shipObjectHandler.ManagedShip.ShipObject;
         }
 
         private void SetupGUI() {
             _guiGameObject = Instantiate((GameObject)Resources.Load(_outfittingService.GUIPath));
             SetShipObjectHandler();
-            _errorMsg = GameObjectHelper.FindChild(_guiGameObject, "ErrorMsg");
-            _hoverInfo = GameObjectHelper.FindChild(_guiGameObject, "HoverInfo");
+            _feedbackMsg = GameObjectHelper.FindChild(_guiGameObject, "ErrorMsg");
+            HoverInfo = GameObjectHelper.FindChild(_guiGameObject, "HoverInfo");
         }
 
         private Transform GetScrollViewContentContainer() {
@@ -308,7 +459,7 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
 
         private void SetupBtns() {
             SetupComponentBtns();
-            SetupHomeBtn();
+            SetupExitBtn();
             SetupColourBtn();
             SetupBuyBtn();
             SetupResetBtn();
@@ -323,111 +474,175 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
         }
 
         private void SetupComponentBtns() {
+            //sub categories
             _thrusterSubCategories = GameObjectHelper.FindChild(_guiGameObject, "ThrusterSubCategories");
-            GameObjectHelper.FindChild(_thrusterSubCategories, "MainThrustersBtn").GetComponent<Button>().onClick.AddListener(MainThrusterBtnClick);
-            GameObjectHelper.FindChild(_thrusterSubCategories, "ManoeuvringThrustersBtn").GetComponent<Button>().onClick.AddListener(ManoeuvringThrusterBtnClick);
+
+            Button mainThrusterBtn = GameObjectHelper.FindChild(_thrusterSubCategories, "MainThrustersBtn").GetComponent<Button>();
+            _defaultThrusterButton = mainThrusterBtn;
+            mainThrusterBtn.onClick.AddListener(delegate { MainThrusterBtnClick(mainThrusterBtn); });
+            _subCategoryButtons.Add(mainThrusterBtn);
+
+            Button manoeuvringBtn = GameObjectHelper.FindChild(_thrusterSubCategories, "ManoeuvringThrustersBtn").GetComponent<Button>();
+            manoeuvringBtn.onClick.AddListener(delegate { ManoeuvringThrusterBtnClick(manoeuvringBtn); });
+            _subCategoryButtons.Add(manoeuvringBtn);
 
             _weaponSubCategories = GameObjectHelper.FindChild(_guiGameObject, "WeaponSubCategories");
-            GameObjectHelper.FindChild(_weaponSubCategories, "BallisticBtn").GetComponent<Button>().onClick.AddListener(BallisticBtnClick);
-            GameObjectHelper.FindChild(_weaponSubCategories, "LaserBtn").GetComponent<Button>().onClick.AddListener(LaserBtnClick);
-            GameObjectHelper.FindChild(_weaponSubCategories, "RailgunBtn").GetComponent<Button>().onClick.AddListener(RailgunBtnClick);
+            Button ballisticBtn = GameObjectHelper.FindChild(_weaponSubCategories, "BallisticBtn").GetComponent<Button>();
+            _defaultWeaponButton = ballisticBtn;
+            ballisticBtn.onClick.AddListener(delegate { BallisticBtnClick(ballisticBtn); });
+            _subCategoryButtons.Add(ballisticBtn);
+            
+            Button laserBtn = GameObjectHelper.FindChild(_weaponSubCategories, "LaserBtn").GetComponent<Button>();
+            laserBtn.onClick.AddListener(delegate { LaserBtnClick(laserBtn); });
+            _subCategoryButtons.Add(laserBtn);
+
+            Button railgunBtn = GameObjectHelper.FindChild(_weaponSubCategories, "RailgunBtn").GetComponent<Button>();
+            railgunBtn.onClick.AddListener(delegate { RailgunBtnClick(railgunBtn); });
+            _subCategoryButtons.Add(railgunBtn);
 
             _internalSubCategories = GameObjectHelper.FindChild(_guiGameObject, "InternalSubCategories");
-            GameObjectHelper.FindChild(_internalSubCategories, "PowerPlantBtn").GetComponent<Button>().onClick.AddListener(PowerPlantBtnClick);
-            GameObjectHelper.FindChild(_internalSubCategories, "ShieldsBtn").GetComponent<Button>().onClick.AddListener(ShieldsBtnClick);
-            GameObjectHelper.FindChild(_internalSubCategories, "CargoBtn").GetComponent<Button>().onClick.AddListener(CargoBayBtnClick);
-            GameObjectHelper.FindChild(_internalSubCategories, "JumpDriveBtn").GetComponent<Button>().onClick.AddListener(JumpDriveBtnCLick);
+            Button powerPlantButton = GameObjectHelper.FindChild(_internalSubCategories, "PowerPlantBtn").GetComponent<Button>();
+            _defaultInternalButton = powerPlantButton;
+            powerPlantButton.onClick.AddListener(delegate { PowerPlantBtnClick(powerPlantButton); });
+            _subCategoryButtons.Add(powerPlantButton);
 
+            Button shieldsBtn = GameObjectHelper.FindChild(_internalSubCategories, "ShieldsBtn").GetComponent<Button>();
+            shieldsBtn.onClick.AddListener(delegate { ShieldsBtnClick(shieldsBtn); });
+            _subCategoryButtons.Add(shieldsBtn);
+
+            Button cargoBtn = GameObjectHelper.FindChild(_internalSubCategories, "CargoBtn").GetComponent<Button>();
+            cargoBtn.onClick.AddListener(delegate { CargoBayBtnClick(cargoBtn); });
+            _subCategoryButtons.Add(cargoBtn);
+
+            Button jumpDriveBtn = GameObjectHelper.FindChild(_internalSubCategories, "JumpDriveBtn").GetComponent<Button>();
+            jumpDriveBtn.onClick.AddListener(delegate { JumpDriveBtnCLick(jumpDriveBtn); });
+            _subCategoryButtons.Add(jumpDriveBtn);
+            
+            
+            // main categories
             Button thrustersBtn = GameObjectHelper.FindChild(_guiGameObject, "ThrustersBtn").GetComponentInChildren<Button>();
-            thrustersBtn.onClick.AddListener(ThrustersBtnClick);
-            thrustersBtn.Select(); //defaults to thruster upon opening outfitting
-            ThrustersBtnClick();
+            thrustersBtn.onClick.AddListener(delegate { ThrustersBtnClick(thrustersBtn); });
+            _mainCategoryButtons.Add(thrustersBtn);
 
             Button weaponsBtn = GameObjectHelper.FindChild(_guiGameObject, "WeaponsBtn").GetComponentInChildren<Button>();
-            weaponsBtn.onClick.AddListener(WeaponBtnClick);
+            weaponsBtn.onClick.AddListener(delegate { WeaponBtnClick(weaponsBtn); });
+            _mainCategoryButtons.Add(weaponsBtn);
+
             Button internalBtn = GameObjectHelper.FindChild(_guiGameObject, "InternalBtn").GetComponentInChildren<Button>();
-            internalBtn.onClick.AddListener(InternalBtnClick);
+            internalBtn.onClick.AddListener(delegate { InternalBtnClick(internalBtn); });
+            _mainCategoryButtons.Add(internalBtn);
+            ThrustersBtnClick(thrustersBtn);
+        }
+
+        private void SetBtnColours(List<Button> buttons, Button clickedButton) {
+            foreach (Button button in buttons) {
+                ColorBlock buttonColors = button.colors;
+                buttonColors.normalColor = BrightYellow;
+                buttonColors.selectedColor = BrightYellow;
+                buttonColors.highlightedColor = DarkYellow;
+                buttonColors.pressedColor = DarkYellow;
+                button.colors = buttonColors;
+            }
+
+            ColorBlock clickedButtonColors = clickedButton.colors;
+            clickedButtonColors.normalColor = BrightBlue;
+            clickedButtonColors.selectedColor = BrightBlue;
+            clickedButtonColors.highlightedColor = MidBlue;
+            clickedButtonColors.pressedColor = MidBlue;
+            clickedButton.colors = clickedButtonColors;
         }
 
         // main categories
-        private void ThrustersBtnClick() {
+        private void ThrustersBtnClick(Button button) {
             _thrusterSubCategories.SetActive(true);
             _weaponSubCategories.SetActive(false);
             _internalSubCategories.SetActive(false);
-            MainThrusterBtnClick();
+            MainThrusterBtnClick(_defaultThrusterButton);
             SelectionMarkersSetActive(_internalSelectionMarkers, false);
             SelectionMarkersSetActive(_weaponSelectionMarkers, false);
+            SetBtnColours(_mainCategoryButtons, button);
         }
 
-        private void WeaponBtnClick() {
+        private void WeaponBtnClick(Button button) {
             _thrusterSubCategories.SetActive(false);
             _weaponSubCategories.SetActive(true);
             _internalSubCategories.SetActive(false);
-            BallisticBtnClick();
+            BallisticBtnClick(_defaultWeaponButton);
             SelectionMarkersSetActive(_internalSelectionMarkers, false);
             SelectionMarkersSetActive(_weaponSelectionMarkers, true);
             SelectionMarkersSetActive(_mainThrusterSelectionMarkers, false);
             SelectionMarkersSetActive(_manThrusterSelectionMarkers, false);
+            SetBtnColours(_mainCategoryButtons, button);
         }
 
-        private void InternalBtnClick() {
+        private void InternalBtnClick(Button button) {
             _thrusterSubCategories.SetActive(false);
             _weaponSubCategories.SetActive(false);
             _internalSubCategories.SetActive(true);
-            PowerPlantBtnClick();
+            PowerPlantBtnClick(_defaultInternalButton);
             SelectionMarkersSetActive(_internalSelectionMarkers, true);
             SelectionMarkersSetActive(_weaponSelectionMarkers, false);
             SelectionMarkersSetActive(_mainThrusterSelectionMarkers, false);
             SelectionMarkersSetActive(_manThrusterSelectionMarkers, false);
+            SetBtnColours(_mainCategoryButtons, button);
         }
 
         //sub categories
-        private void MainThrusterBtnClick() {
-            _mainThrusterSelectionMarkers = SubCatClick(DisplayMainThrusterComponents, _shipObjectHandler.MainThrusterComponents, _mainThrusterSelectionMarkers);
+        private void MainThrusterBtnClick(Button button) {
+            _mainThrusterSelectionMarkers = SubCatClick(DisplayMainThrusterComponents, shipObjectHandler.MainThrusterComponents, _mainThrusterSelectionMarkers);
             SelectionMarkersSetActive(_mainThrusterSelectionMarkers, true);
             SelectionMarkersSetActive(_manThrusterSelectionMarkers, false);
+            SetBtnColours(_subCategoryButtons, button);
         }
 
-        private void ManoeuvringThrusterBtnClick() {
+        private void ManoeuvringThrusterBtnClick(Button button) {
             // Manoeuvring thrusters have a different type slot tuple so this method can't use sub cat click 
             ClearScrollView();
             DisplayManoeuvringThrusterComponents();
-            var manoeuvringThrusterComponents = _shipObjectHandler.ManoeuvringThrusterComponents;
-            var slots = new List<(Transform, Transform, string, ShipComponentType, ManoeuvringThruster)>() { (manoeuvringThrusterComponents.selectionTransform, manoeuvringThrusterComponents.selectionTransform, manoeuvringThrusterComponents.slotName, manoeuvringThrusterComponents.componentType, manoeuvringThrusterComponents.thruster) };
+            var manoeuvringThrusterComponents = shipObjectHandler.ManoeuvringThrusterComponents;
+            var slots = new List<(Transform, Transform, ShipComponentTier, ShipComponentType, ManoeuvringThruster)>() { (manoeuvringThrusterComponents.selectionTransform, manoeuvringThrusterComponents.selectionTransform, manoeuvringThrusterComponents.maxSize, manoeuvringThrusterComponents.componentType, manoeuvringThrusterComponents.thruster) };
             _manThrusterSelectionMarkers = GetSelectionMarkers(slots, _manThrusterSelectionMarkers);
             SelectionMarkersSetActive(_mainThrusterSelectionMarkers, false);
             SelectionMarkersSetActive(_manThrusterSelectionMarkers, true);
+            SetBtnColours(_subCategoryButtons, button);
         }
 
-        private void BallisticBtnClick() {
-            _weaponSelectionMarkers = SubCatClick(DisplayBallisticComponents, _shipObjectHandler.WeaponComponents, _weaponSelectionMarkers);
+        private void BallisticBtnClick(Button button) {
+            _weaponSelectionMarkers = SubCatClick(DisplayBallisticComponents, shipObjectHandler.WeaponComponents, _weaponSelectionMarkers);
+            SetBtnColours(_subCategoryButtons, button);
         }
 
-        private void LaserBtnClick() {
-            _weaponSelectionMarkers = SubCatClick(DisplayLaserComponents, _shipObjectHandler.WeaponComponents, _weaponSelectionMarkers);
+        private void LaserBtnClick(Button button) {
+            _weaponSelectionMarkers = SubCatClick(DisplayLaserComponents, shipObjectHandler.WeaponComponents, _weaponSelectionMarkers);
+            SetBtnColours(_subCategoryButtons, button);
         }
 
-        private void RailgunBtnClick() {
-            _weaponSelectionMarkers = SubCatClick(DisplayRailgunComponents, _shipObjectHandler.WeaponComponents, _weaponSelectionMarkers);
+        private void RailgunBtnClick(Button button) {
+            _weaponSelectionMarkers = SubCatClick(DisplayRailgunComponents, shipObjectHandler.WeaponComponents, _weaponSelectionMarkers);
+            SetBtnColours(_subCategoryButtons, button);
         }
 
-        private void PowerPlantBtnClick() {
-            _internalSelectionMarkers = SubCatClick(DisplayPowerPlantComponents, _shipObjectHandler.InternalComponents, _internalSelectionMarkers);
+        private void PowerPlantBtnClick(Button button) {
+            _internalSelectionMarkers = SubCatClick(DisplayPowerPlantComponents, shipObjectHandler.InternalComponents, _internalSelectionMarkers);
+            SetBtnColours(_subCategoryButtons, button);
         }
 
-        private void ShieldsBtnClick() {
-            _internalSelectionMarkers = SubCatClick(DisplayShieldsComponents, _shipObjectHandler.InternalComponents, _internalSelectionMarkers);
+        private void ShieldsBtnClick(Button button) {
+            _internalSelectionMarkers = SubCatClick(DisplayShieldsComponents, shipObjectHandler.InternalComponents, _internalSelectionMarkers);
+            SetBtnColours(_subCategoryButtons, button);
         }
 
-        private void JumpDriveBtnCLick() {
-            _internalSelectionMarkers = SubCatClick(DisplayJumpDriveComponents, _shipObjectHandler.InternalComponents, _internalSelectionMarkers);
+        private void JumpDriveBtnCLick(Button button) {
+            _internalSelectionMarkers = SubCatClick(DisplayJumpDriveComponents, shipObjectHandler.InternalComponents, _internalSelectionMarkers);
+            SetBtnColours(_subCategoryButtons, button);
         }
 
-        private void CargoBayBtnClick() {
-            _internalSelectionMarkers = SubCatClick(DisplayCargoBayComponents, _shipObjectHandler.InternalComponents, _internalSelectionMarkers);
+        private void CargoBayBtnClick(Button button) {
+            _internalSelectionMarkers = SubCatClick(DisplayCargoBayComponents, shipObjectHandler.InternalComponents, _internalSelectionMarkers);
+            SetBtnColours(_subCategoryButtons, button);
         }
 
-        private List<SlotSelector> SubCatClick<T>(Action displayFunction, List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, T component)> slots, List<SlotSelector> selectionMarkers) where T : ShipComponent {
+        private List<SlotSelector> SubCatClick<T>(Action displayFunction, List<(Transform mountTransform, Transform selectionTransform, ShipComponentTier slotSize, ShipComponentType componentType, T component)> slots, List<SlotSelector> selectionMarkers) where T : ShipComponent {
             ClearScrollView();
             displayFunction.Invoke();
             return GetSelectionMarkers(slots, selectionMarkers);
@@ -505,7 +720,7 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
         internal void SetupWeaponCard(Transform cardComponents, Weapon weaponInstance) {
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "ComponentName", weaponInstance.ComponentName + " - " + weaponInstance.ComponentSize);
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Damage", weaponInstance.Damage + " DMG");
-            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "RoF", 60 / weaponInstance.FireDelay + " RPM");
+            GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "RoF", (60 / weaponInstance.FireDelay).ToString("0.0") + " RPM");
             GameObjectHelper.SetGUITextValue(cardComponents.gameObject, "Mass", weaponInstance.ComponentMass / 1000 + " T");
         }
 
@@ -560,20 +775,18 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
             }
         }
 
-        private List<SlotSelector> GetSelectionMarkers<T>(List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, T component)> shipComponents, List<SlotSelector> selectionMarkers) where T : ShipComponent {
+        private List<SlotSelector> GetSelectionMarkers<T>(List<(Transform mountTransform, Transform selectionTransform, ShipComponentTier slotSize, ShipComponentType componentType, T component)> shipComponents, List<SlotSelector> selectionMarkers) where T : ShipComponent {
             if (selectionMarkers == null || selectionMarkers.Count == 0) {
                 selectionMarkers = new List<SlotSelector>();
 
-                foreach ((Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, T component) selection in shipComponents) {
+                foreach ((Transform mountTransform, Transform selectionTransform, ShipComponentTier slotSize, ShipComponentType componentType, T component) selection in shipComponents) {
                     Transform canvas = _guiGameObject.transform.Find("Canvas");
                     GameObject marker = Instantiate((GameObject)Resources.Load(OutfittingPath + "ShipComponentMarker"), canvas.Find("SelectionMarkers"));
-
+                    // GameObject markerText = Instantiate((GameObject)Resources.Load(OutfittingPath + "ShipComponentMarkerName"), marker.transform);
+                    GameObjectHelper.SetGUITextValue(marker, "SlotTier", selection.slotSize.ToString());
                     SlotSelector slotSelector = marker.AddComponent<SlotSelector>();
-                    slotSelector.Setup(selection.mountTransform, selection.selectionTransform, selection.slotName, selection.componentType,this, selection.component);
+                    slotSelector.Setup(selection.mountTransform, selection.selectionTransform, selection.componentType, this, selection.component);
                     selectionMarkers.Add(slotSelector);
-                    GameObject markerText = Instantiate((GameObject)Resources.Load(OutfittingPath + "ShipComponentMarkerName"), marker.transform);
-                    TextMeshProUGUI slotName = markerText.transform.GetComponentInChildren<TextMeshProUGUI>();
-                    slotName.text = selection.slotName;
                 }
             }
 
@@ -602,13 +815,21 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
         }
 
         private void ChangeSelectedSlotComponent(ShipComponent newComponent) {
-            if (_selectedSlot != null && _selectedSlot._componentType== newComponent.ComponentType) {
-                bool success = _selectedSlot.ChangeComponent(newComponent);
-                if (!success) {
+            if (SelectedSlot != null && SelectedSlot._componentType == newComponent.ComponentType) {
+                SlotSelector.AssignmentStatus success = SelectedSlot.ChangeComponent(newComponent);
+                if (success == SlotSelector.AssignmentStatus.SlotSizeError) {
                     SlotSizeError();
                 }
+                else if (success == SlotSelector.AssignmentStatus.CargoFilledError) {
+                    CargoBayFilledError();
+                }
                 else {
-                    _selectedSlot.CurrentShipComponent = newComponent;
+                    SuccessMsg();
+                    SelectedSlot.CurrentShipComponent = newComponent;
+                    SelectedSlot.ChangeSlotText();
+                    SetCreditsChange();
+                    SetComponentWarnings();
+                    SetShipStats();
                 }
             }
             else {
@@ -644,7 +865,5 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
                 }
             }
         }
-
-        
     }
 }

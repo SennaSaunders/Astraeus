@@ -26,7 +26,7 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
         //fire
         public void Fire(Vector2 velocityOffset) {
             //fire timings
-            if (_fireCooldownTime == 0) {
+            if (_fireCooldownTime <= 0) {
                 float powerDrawEffectiveness = _powerPlantController.DrainPower(ControlledWeapon.PowerDraw);
                 if (powerDrawEffectiveness > 0) { //only fires if there is power to expend
                     float damage = ControlledWeapon.Damage * powerDrawEffectiveness;

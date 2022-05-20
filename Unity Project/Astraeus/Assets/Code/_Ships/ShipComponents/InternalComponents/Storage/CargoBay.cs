@@ -13,7 +13,11 @@ namespace Code._Ships.ShipComponents.InternalComponents.Storage {
         public List<Cargo> StoredCargo;
 
         public float GetCargoMass() {
-            return 0;
+            float mass = 0;
+            foreach (Cargo cargo in StoredCargo) {
+                mass += cargo.GetMass();
+            }
+            return mass;
         }
     }
 }

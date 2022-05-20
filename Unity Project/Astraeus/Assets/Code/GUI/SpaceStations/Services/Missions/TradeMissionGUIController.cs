@@ -35,6 +35,7 @@ namespace Code.GUI.SpaceStations.Services.Missions {
         private void SetupBaseGUI(GameObject parent, TradeMission mission) {
             _tradeMission = mission;
             _guiGameObject = (GameObject)Instantiate(Resources.Load(path), parent.transform);
+            GameObjectHelper.FindChild(_guiGameObject, "MissionCompletePanel").SetActive(false);
             SetBaseGUIValues(false);
         }
 
@@ -47,7 +48,7 @@ namespace Code.GUI.SpaceStations.Services.Missions {
                 GameObjectHelper.SetGUITextValue(_guiGameObject, "PickupValue", _tradeMission.MissionPickupLocation.SolarSystem.SystemName + " Station");
                 GameObjectHelper.SetGUITextValue(_guiGameObject, "DestinationValue", _tradeMission.Destination.SolarSystem.SystemName + " Station");
                 
-                Vector2 currentSystemPos = GameController.GalaxyController.activeSystemController._solarSystem.Coordinate;
+                Vector2 currentSystemPos = GameController.GalaxyController.activeSystemController.SolarSystem.Coordinate;
                 string pickupDistString = (currentSystemPos - _tradeMission.MissionPickupLocation.SolarSystem.Coordinate).magnitude.ToString("0.0"); 
                 GameObjectHelper.SetGUITextValue(_guiGameObject, "PickupDistanceValue", pickupDistString + " LY");
                 string destDistString = (currentSystemPos - _tradeMission.Destination.SolarSystem.Coordinate).magnitude.ToString("0.0");
@@ -126,14 +127,22 @@ namespace Code.GUI.SpaceStations.Services.Missions {
         private void DeliverBtn() {
             bool delivered = _tradeMission.AttemptDelivery((int)_slider.value);
             if (_tradeMission.CargoQuota == _tradeMission.CargoDelivered) {
-                _tradeMission.GiveReward();
-                Debug.Log("Mission complete");
-                GameController.PlayerProfile.Missions.Remove(_tradeMission);
-                _missionGUIController.RemoveTradeMission(this);
-                Destroy(_guiGameObject);
-                Destroy(this);
+                MissionComplete();
             }
             _missionGUIController.RefreshAcceptedMissions();
+        }
+
+        private void MissionComplete() {
+            GameObjectHelper.FindChild(_guiGameObject, "MissionCompletePanel").SetActive(true);
+            GameObjectHelper.FindChild(_guiGameObject, "MainPanel").SetActive(false);
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CompleteRewardMsg", "Earned - "+ _tradeMission.RewardCredits+"Cr");
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditBalanceMsg", "Credits - "+ GameController.PlayerProfile._credits+"Cr");
+            _tradeMission.GiveReward();
+            Debug.Log("Mission complete");
+            GameController.PlayerProfile.Missions.Remove(_tradeMission);
+            _missionGUIController.RemoveTradeMission(this);
+            Destroy(_guiGameObject, 3);
+            Destroy(this,3);
         }
         
         private void SetupPickupElements() {

@@ -47,7 +47,7 @@ namespace Code._Ships.ShipComponents.InternalComponents.Shields {
                             float potentialCharge = shield.RechargeRate * time;
                             potentialCharge = potentialCharge < chargeTillFull ? potentialCharge : chargeTillFull;
 
-                            float maxEnergyUsed = (potentialCharge / shield.RechargeRate) * shield.RechargeEnergy;
+                            float maxEnergyUsed = (potentialCharge / shield.RechargeRate) * shield.RechargePower;
                             float effectiveness = _powerPlantController.DrainPower(maxEnergyUsed);
                             float actualCharge = potentialCharge * effectiveness;
                             shield.CurrentStrength += actualCharge;

@@ -51,7 +51,7 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects {
         public abstract GameObject GetSystemObject();
 
         public virtual GameObject GetMiniMapObject() {
-            return GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            return (GameObject)Resources.Load("Icons/BodyMapIcon");
         }
 
         public void RotateBody(float timeDelta) { //do i need this? i dont think so i think the controller should do it
@@ -87,7 +87,7 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects {
             if (tier == Body.BodyTier.T3) return 1.2f;
             if (tier == Body.BodyTier.T2) return 1.1f;
             if (tier == Body.BodyTier.T1) return 1;
-            else return 1;
+            else return 600;
         }
 
         public static int TextureSize(this Body.BodyTier tier) {

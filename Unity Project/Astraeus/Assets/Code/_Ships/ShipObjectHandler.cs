@@ -13,10 +13,10 @@ namespace Code._Ships {
     public class ShipObjectHandler : MonoBehaviour {
         public Ship ManagedShip { get; set; }
 
-        public List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, Weapon weapon)> WeaponComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, Weapon weapon)>();
-        public List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, MainThruster thruster)> MainThrusterComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, MainThruster thruster)>();
-        public (List<Transform> mountTransforms, Transform selectionTransform, string slotName, ShipComponentType componentType, ManoeuvringThruster thruster) ManoeuvringThrusterComponents;
-        public List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, InternalComponent component)> InternalComponents = new List<(Transform mountTransform, Transform selectionTransform, string slotName, ShipComponentType componentType, InternalComponent component)>();
+        public List<(Transform mountTransform, Transform selectionTransform, ShipComponentTier maxSize, ShipComponentType componentType, Weapon weapon)> WeaponComponents = new List<(Transform mountTransform, Transform selectionTransform, ShipComponentTier maxSize, ShipComponentType componentType, Weapon weapon)>();
+        public List<(Transform mountTransform, Transform selectionTransform, ShipComponentTier maxSize, ShipComponentType componentType, MainThruster thruster)> MainThrusterComponents = new List<(Transform mountTransform, Transform selectionTransform, ShipComponentTier maxSize, ShipComponentType componentType, MainThruster thruster)>();
+        public (List<Transform> mountTransforms, Transform selectionTransform, ShipComponentTier maxSize, ShipComponentType componentType, ManoeuvringThruster thruster) ManoeuvringThrusterComponents;
+        public List<(Transform mountTransform, Transform selectionTransform, ShipComponentTier maxSize, ShipComponentType Internal, InternalComponent internalComponent)> InternalComponents = new List<(Transform mountTransform, Transform selectionTransform, ShipComponentTier maxSize, ShipComponentType componentType, InternalComponent component)>();
 
         public GameObject CreateShip(Transform parent, Color markerColour) {
             CreateHull();
@@ -30,14 +30,24 @@ namespace Code._Ships {
             return ManagedShip.ShipObject;
         }
 
+        public GameObject CreateShip(Transform parent) {
+            CreateHull();
+            CreateMainThrusterComponents();
+            CreateManoeuvringThrusterComponents();
+            CreateWeaponComponents();
+            CreateInternalComponents();
+            SetDefaultShipRotation();
+            ManagedShip.ShipObject.transform.SetParent(parent);
+            return ManagedShip.ShipObject;
+        }
+
         private void AddShipMarker(Color colour) {
-            GameObject shipMarker = Instantiate((GameObject)Resources.Load("Misc/ShipMarker"));
-            shipMarker.GetComponent<Renderer>().material.color = colour;
+            GameObject shipMarker = Instantiate((GameObject)Resources.Load("Icons/ShipMarkerIcon"), ManagedShip.ShipObject.transform, true);
+            shipMarker.GetComponent<SpriteRenderer>().color = colour;
             shipMarker.name = "ShipMarker";
             shipMarker.layer = LayerMask.NameToLayer("LocalMap");
-            shipMarker.transform.localScale = new Vector3(150, 150, 150);
+            shipMarker.transform.localScale = new Vector3(Ship.ShipMarkerSize, Ship.ShipMarkerSize, Ship.ShipMarkerSize);
             shipMarker.transform.localPosition = new Vector3(0, 0, -400); //places ship marker above other map objects
-            shipMarker.transform.SetParent(ManagedShip.ShipObject.transform);
         }
 
         public void SetMappedMaterials(List<(GameObject mesh, int channelIdx)> meshObjects, List<(List<string> objectName, Color colour)> colourChannelObjectMap) {
@@ -187,7 +197,7 @@ namespace Code._Ships {
                     MainThrusterComponents.Remove(MainThrusterComponents.Find(tc => tc.mountTransform == slotTransform));//remove the slot
                 }
 
-                MainThrusterComponents.Add((slotTransform, selectionTransform, "Main Thruster - " + slot.maxSize, ShipComponentType.MainThruster, mainThruster));//recreate the slot with the new component
+                MainThrusterComponents.Add((slotTransform, selectionTransform, slot.maxSize, ShipComponentType.MainThruster, mainThruster));//recreate the slot with the new component
                 if (slotTransform != null) {
                     Transform holderTransform = slotTransform.Find("ComponentHolder");
                     if (holderTransform == null) {
@@ -250,7 +260,7 @@ namespace Code._Ships {
                     objectTransforms.Add(MapPrefabTransformStringToTransformObject(thrusterTransformName));
                 }
 
-                ManoeuvringThrusterComponents = (objectTransforms, selectionTransform, "Manoeuvring Thruster - " + slot.maxSize, ShipComponentType.ManoeuvringThruster, manoeuvringThruster);
+                ManoeuvringThrusterComponents = (objectTransforms, selectionTransform, slot.maxSize, ShipComponentType.ManoeuvringThruster, manoeuvringThruster);
                 List<Transform> holderTransforms = new List<Transform>();
                 foreach (var manoeuvringThrusterTransform in ManoeuvringThrusterComponents.mountTransforms) {
                     Transform holderTransform = manoeuvringThrusterTransform.Find("Component Holder");
@@ -298,7 +308,7 @@ namespace Code._Ships {
             Transform selectionTransform = GetSelectionTransform(slotTransform);
             if (weapon == null || weapon.ComponentSize <= slot.maxSize) {
                 if (!WeaponComponents.Select(wc => wc.mountTransform).Contains(slotTransform)) {
-                    WeaponComponents.Add((slotTransform, selectionTransform, "Weapon - " + slot.maxSize, ShipComponentType.Weapon, weapon));
+                    WeaponComponents.Add((slotTransform, selectionTransform, slot.maxSize, ShipComponentType.Weapon, weapon));
                 }
                 if (slotTransform != null) {
                     Transform holderTransform = slotTransform.Find("ComponentHolder");
@@ -337,7 +347,7 @@ namespace Code._Ships {
             Transform selectionTransform = MapPrefabTransformStringToTransformObject(parentName);
 
             if (!InternalComponents.Select(ic => ic.mountTransform).Contains(selectionTransform)) {
-                InternalComponents.Add((selectionTransform, selectionTransform, "Internal - " + slot.maxSize, ShipComponentType.Internal, internalComponent));
+                InternalComponents.Add((selectionTransform, selectionTransform, slot.maxSize, ShipComponentType.Internal, internalComponent));
             }
 
             if (selectionTransform != null && internalComponent != null) {

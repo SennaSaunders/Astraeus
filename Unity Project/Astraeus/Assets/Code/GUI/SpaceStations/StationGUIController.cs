@@ -4,6 +4,7 @@ using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices;
 using Code._GameControllers;
 using Code._Utility;
+using Code.Camera;
 using Code.GUI.SpaceStations.Services;
 using Code.GUI.SpaceStations.Services.Missions;
 using Code.GUI.SpaceStations.Services.Outfitting;
@@ -18,7 +19,7 @@ namespace Code.GUI.SpaceStations {
         private GameController _gameController;
 
         private readonly string _stationGUIBasePath = "GUIPrefabs/Station/";
-        private readonly string _serviceButtonPathSpecifier = "ServiceButton"; 
+        private readonly string _serviceButtonPathSpecifier = "ServiceButton";
         private readonly string _stationGUIPathSpecifier = "StationGUI";
         public GameObject stationGUI;
 
@@ -29,11 +30,22 @@ namespace Code.GUI.SpaceStations {
         }
 
         private void LoadGUI() {
-            stationGUI = Instantiate((GameObject)Resources.Load(_stationGUIBasePath+_stationGUIPathSpecifier));
-            GameController.IsPaused = true;
+            stationGUI = Instantiate((GameObject)Resources.Load(_stationGUIBasePath + _stationGUIPathSpecifier));
+            WakeUp wakeUp = stationGUI.AddComponent<WakeUp>();
+            wakeUp.wakeFunction = WakeUpFunc;
             GameController.GUIController.SetShipGUIActive(false);
+
+            GameController.IsPaused = true;
             SetupStationInfo();
             SetupButtons();
+        }
+
+        private void WakeUpFunc() {
+            CameraUtility.NormalSkybox();
+            UnityEngine.Camera.main.farClipPlane = 3000;
+            ShipCameraController cameraController = FindObjectOfType<ShipCameraController>();
+            cameraController.TakeCameraControl();
+            _gameController.RefreshPlayerShip();
         }
 
         private void SetupStationInfo() {
@@ -44,20 +56,11 @@ namespace Code.GUI.SpaceStations {
             GameObjectHelper.SetGUITextValue(stationGUI, "FactionHomeSystemValue", solarSystem.OwnerFaction.HomeSystem.SystemName);
             GameObjectHelper.SetGUITextValue(stationGUI, "FactionStandingValue", "Implement Faction standing");
             GameObjectHelper.SetGUITextValue(stationGUI, "SystemStatusValue", "Implement System Status");
-            GameObjectHelper.SetGUITextValue(stationGUI, "BodyCountValue", solarSystem.SystemStats.celestialBodyCount.ToString());
-            
+
             string summaryText = "";
-            List<(string bodyType, int count)> bodyCountMapping = new List<(string bodyType, int count)>() {
-                ("Black Holes", solarSystem.SystemStats.blackHoleCount),
-                ("Stars", solarSystem.SystemStats.starCount),
-                ("Planets", solarSystem.SystemStats.planetCount)
-            };
-            
-            List<(string bodyType, int count)> planetCountMapping = new List<(string bodyType, int count)>() {
-                ("Earth-like", solarSystem.SystemStats.earthWorldCount),
-                ("Water Worlds", solarSystem.SystemStats.waterWorldCount),
-                ("Rocky", solarSystem.SystemStats.rockyWorldCount)
-            };
+            List<(string bodyType, int count)> bodyCountMapping = new List<(string bodyType, int count)>() { ("Black Holes", solarSystem.SystemStats.blackHoleCount), ("Stars", solarSystem.SystemStats.starCount), ("Planets", solarSystem.SystemStats.planetCount) };
+
+            List<(string bodyType, int count)> planetCountMapping = new List<(string bodyType, int count)>() { ("Earth-like", solarSystem.SystemStats.earthWorldCount), ("Water Worlds", solarSystem.SystemStats.waterWorldCount), ("Rocky", solarSystem.SystemStats.rockyWorldCount) };
 
             foreach ((string bodyType, int count) bodyCount in bodyCountMapping) {
                 if (bodyCount.count > 0) {
@@ -71,11 +74,10 @@ namespace Code.GUI.SpaceStations {
                     summaryText += bodyCount.bodyType + ": " + bodyCount.count + "\n";
                 }
             }
-            
+
             GameObjectHelper.SetGUITextValue(stationGUI, "CelestialBodiesSummary", summaryText);
         }
 
-        
 
         private Transform GetScrollContainer() {
             return stationGUI.transform.Find("MainContainer/Menu/Scroll View/Viewport/Content");
@@ -85,7 +87,7 @@ namespace Code.GUI.SpaceStations {
             CreateServiceButtons();
             SetupExitBtn();
         }
-        
+
         private void SetupExitBtn() {
             Button btn = GameObjectHelper.FindChild(stationGUI, "ExitBtn").GetComponent<Button>();
             btn.onClick.AddListener(Exit);
@@ -97,27 +99,33 @@ namespace Code.GUI.SpaceStations {
             Destroy(stationGUI);
             Destroy(this);
         }
-        
+
         private void CreateServiceButtons() {
             foreach (StationService stationService in Station.StationServices) {
                 //instantiate button
                 GameObject buttonPrefab = Instantiate((GameObject)Resources.Load(_stationGUIBasePath + _serviceButtonPathSpecifier), GetScrollContainer());
 
                 UnityAction buttonMethod = null;
-                if(stationService.GetType()==typeof(OutfittingService)) {
+                if (stationService.GetType() == typeof(OutfittingService)) {
                     buttonMethod = OutfittingBtnClick;
-                } else if (stationService.GetType() == typeof(RefuelService)) {
+                }
+                else if (stationService.GetType() == typeof(RefuelService)) {
                     buttonMethod = RefuelBtnClick;
-                }else if (stationService.GetType() == typeof(RepairService)) {
+                }
+                else if (stationService.GetType() == typeof(RepairService)) {
                     buttonMethod = RepairBtnClick;
-                }else if (stationService.GetType() == typeof(ShipyardService)) {
+                }
+                else if (stationService.GetType() == typeof(ShipyardService)) {
                     buttonMethod = ShipyardBtnClick;
-                }else if (stationService.GetType() == typeof(TradeService)) {
+                }
+                else if (stationService.GetType() == typeof(TradeService)) {
                     buttonMethod = TradeBtnClick;
-                }else if (stationService.GetType() == typeof(MissionService)) {
+                }
+                else if (stationService.GetType() == typeof(MissionService)) {
                     buttonMethod = MissionBtnClick;
                 }
-                Button btn = buttonPrefab.GetComponent<Button>(); 
+
+                Button btn = buttonPrefab.GetComponent<Button>();
                 btn.onClick.AddListener(buttonMethod);
 
                 TextMeshProUGUI text = buttonPrefab.transform.Find("Text").GetComponent<TextMeshProUGUI>();
@@ -125,16 +133,15 @@ namespace Code.GUI.SpaceStations {
             }
         }
 
-        
 
         public StationService FindStationService<T>() {
             return Station.StationServices.Find(s => s.GetType() == typeof(T));
         }
-        
+
         private void OutfittingBtnClick() {
             OutfittingGUIController outfittingGUIController = gameObject.AddComponent<OutfittingGUIController>();
             OutfittingService outfittingService = (OutfittingService)FindStationService<OutfittingService>();
-            outfittingGUIController.StartOutfitting(outfittingService, stationGUI, _gameController, GameController.CurrentShip);
+            outfittingGUIController.StartOutfitting(outfittingService, stationGUI, GameController.CurrentShip);
         }
 
         private void RefuelBtnClick() {
@@ -160,6 +167,7 @@ namespace Code.GUI.SpaceStations {
             TradeService tradeService = (TradeService)FindStationService<TradeService>();
             tradeGUIController.StartTradeGUI(tradeService, this);
         }
+
         private void MissionBtnClick() {
             MissionGUIController missionGUIController = gameObject.AddComponent<MissionGUIController>();
             MissionService missionService = (MissionService)FindStationService<MissionService>();

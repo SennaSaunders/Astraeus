@@ -141,8 +141,8 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void SetupButtons() {
-            Button homeBtn = GameObjectHelper.FindChild(_guiGameObject, "HomeBtn").GetComponent<Button>();
-            homeBtn.onClick.AddListener(ExitBtn);
+            Button exitBtn = GameObjectHelper.FindChild(_guiGameObject, "ExitBtn").GetComponent<Button>();
+            exitBtn.onClick.AddListener(Exit);
 
             Button resetBtn = GameObjectHelper.FindChild(_guiGameObject, "ResetButton").GetComponent<Button>();
             resetBtn.onClick.AddListener(ResetTrade);
@@ -155,7 +155,7 @@ namespace Code.GUI.SpaceStations.Services {
             RecreateCards();
         }
 
-        private void ExitBtn() {
+        private void Exit() {
             _stationGUIController.stationGUI.SetActive(true);
             Destroy(_guiGameObject);
             Destroy(this);
@@ -197,7 +197,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void PurchaseBtnClick() {
-            if (GameController.PlayerProfile.ChangeCredits(GetChangeInFunds())) {
+            if (GameController.PlayerProfile.AddCredits(GetChangeInFunds())) {
                 List<Cargo> newCargo = new List<Cargo>();
                 List<Cargo> cargoToSell = new List<Cargo>();
 
