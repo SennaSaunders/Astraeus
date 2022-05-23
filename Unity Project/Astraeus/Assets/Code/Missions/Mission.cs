@@ -5,7 +5,6 @@ using Code._GameControllers;
 
 namespace Code.Missions {
     public abstract class Mission {
-        protected static Random r = new Random();
         public SpaceStation MissionPickupLocation { get; }
         public Faction MissionGiver { get; }
         public int RewardCredits { get; protected set; }

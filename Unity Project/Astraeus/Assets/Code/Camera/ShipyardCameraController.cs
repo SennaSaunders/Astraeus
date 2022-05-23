@@ -3,8 +3,6 @@ using UnityEngine;
 
 namespace Code.Camera {
     public class ShipyardCameraController : CameraController {
-        private float zOffset = 0;
-
         public void SetCameraPos(RectTransform guiRect) {
             //calculate the camera depth
             //if width is of gui rect

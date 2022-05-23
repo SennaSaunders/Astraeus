@@ -30,9 +30,9 @@ namespace Code._Galaxy {
         private List<string> potentialSystemNames;
 
         public GalaxyStats stats;
-        
 
-        private bool IsRareRoll(int rarePercentageChance) {
+
+        private bool IsRare(int rarePercentageChance) {
             int maxRoll = 100;
             int rareRoll = maxRoll - rarePercentageChance;
             return Rng.Next(maxRoll) > rareRoll;
@@ -40,7 +40,7 @@ namespace Code._Galaxy {
 
         //has to be called before galaxy generation as getting Application.dataPath has to be on the main thread
         public void SetPotentialSystemNames() {
-            TextAsset namesTxt= (TextAsset)Resources.Load("SystemNames/System Names");
+            TextAsset namesTxt = (TextAsset)Resources.Load("SystemNames/System Names");
             var lines = namesTxt.text.Split('\n');
             potentialSystemNames = new List<string>();
             foreach (string line in lines) {
@@ -61,7 +61,7 @@ namespace Code._Galaxy {
                 CelestialBody systemPrimary;
                 Vector2 systemCoordinate = systemCoordinates[i];
                 int blackHoleChance = 2;
-                if (IsRareRoll(blackHoleChance)) {
+                if (IsRare(blackHoleChance)) {
                     //black hole
                     systemPrimary = new BlackHole(null, new Vector2(0, 0));
                     stats.blackHole += 1;
@@ -112,7 +112,14 @@ namespace Code._Galaxy {
                     //only refuel and repair should be everywhere
                     //for the moment just instantiate the outfitter with the faction specific parts
 
-                    spaceStation.StationServices = new List<StationService>() { new RefuelService(), new RepairService(), new ShipyardService(), new OutfittingService(faction), new TradeService(faction, solarSystem), new MissionService(faction,spaceStation) };
+                    spaceStation.StationServices = new List<StationService>() {
+                        new RefuelService(),
+                        new RepairService(),
+                        new ShipyardService(),
+                        new OutfittingService(faction),
+                        new TradeService(faction, solarSystem),
+                        new MissionService(faction, spaceStation)
+                    };
                     solarSystem.Bodies.Add(spaceStation);
                 }
             }
@@ -124,19 +131,19 @@ namespace Code._Galaxy {
 
             //find the ratio of factions to sectors
             int numFactionTypes = Enum.GetValues(typeof(Faction.FactionType)).Length;
-            int maxFactionSprawl = 0;
-            int maxTotalFactionSprawl = 0;
+            int highestFactionSprawl = 0;
+            int totalFactionSprawl = 0;
 
             for (int i = 0; i < numFactionTypes; i++) {
                 Faction.FactionType factionType = (Faction.FactionType)i;
                 int factionSprawl = factionType.GetFactionSprawlRatio();
-                maxFactionSprawl = factionSprawl > maxFactionSprawl ? factionSprawl : maxFactionSprawl;
-                maxTotalFactionSprawl += factionType.GetFactionRatio() * factionSprawl;
+                highestFactionSprawl = factionSprawl > highestFactionSprawl ? factionSprawl : highestFactionSprawl;
+                totalFactionSprawl += factionType.GetFactionRatio() * factionSprawl;
             }
 
             //then set the max number of factions for each
-            float maxPopulationDensity = .7f;
-            float factionRatioMultiplier = (sectorsWithBodies.Count * maxPopulationDensity) / maxTotalFactionSprawl;
+            float maxPopulationDensity = .9f;
+            float factionRatioMultiplier = (sectorsWithBodies.Count * maxPopulationDensity) / totalFactionSprawl;
 
             List<(Faction.FactionType type, int maxFactionsOfType)> maxFactionAmounts = new List<(Faction.FactionType type, int maxFactionsOfType)>();
             for (int i = 0; i < numFactionTypes; i++) {
@@ -160,7 +167,7 @@ namespace Code._Galaxy {
                     if (factionNum < maxFactionsOfType) {
                         Faction.FactionType factionType = (Faction.FactionType)factionTypeIndex;
                         //section of the top results and pick from those - so that all the best sectors aren't always chosen
-                        float percentile = .05f; //get the top 5%
+                        float percentile = .1f; //get the top 10%
                         List<(int desire, Sector sector)> topSectors = factionType.GetPercentileFactionSectorPreferencesList(percentile).FindAll(s => !pickedSectors.Contains(s.sector)); //gets all top sectors for a faction other than those already picked
 
                         if (topSectors.Count > 0) { //only creates a faction if there are valid sectors to choose from
@@ -180,13 +187,14 @@ namespace Code._Galaxy {
             galaxy.Factions = factions;
 
             // Grow factions
-            for (int sprawlRoll = 0; sprawlRoll < maxFactionSprawl; sprawlRoll++) {
+            for (int sprawlNum = 0; sprawlNum < highestFactionSprawl; sprawlNum++) {
                 for (int factionIndex = 0; factionIndex < factions.Count; factionIndex++) {
                     Faction faction = factions[factionIndex];
 
-                    if (sprawlRoll < faction.factionType.GetFactionSprawlRatio()) { //if this faction is still allowed to grow
-                        if (Rng.NextDouble() < faction.factionType.GetFactionGrowthChance()) { //if this factions successfully rolls for a chance to grow
-                            bool factionGrew = faction.GrowFaction(galaxy, false);
+                    if (sprawlNum < faction.factionType.GetFactionSprawlRatio()) { //if this faction is still allowed to grow
+                        bool factionGrew = faction.GrowFaction(galaxy, false);
+                        if (!factionGrew) {
+                            Debug.Log("Faction failed to expand");
                         }
                     }
                 }
@@ -238,14 +246,14 @@ namespace Code._Galaxy {
         }
 
         private Planet GenPlanet(Body primary, BodyTier tier) {
-            int notRockyChance = 10;
+            int notRockyChance = 20;
             int earthChance = 30;
 
             PlanetGen planetGen;
             int size = tier.TextureSize();
             int planetTextureSeed = Rng.Next();
-            if (IsRareRoll(notRockyChance)) {
-                if (IsRareRoll(earthChance)) { //earth-like
+            if (IsRare(notRockyChance)) {
+                if (IsRare(earthChance)) { //earth-like
                     planetGen = new EarthWorldGen(planetTextureSeed, size);
                 }
                 else { //water world
@@ -272,7 +280,7 @@ namespace Code._Galaxy {
                 int extraStarChance = 4;
                 CelestialBody newBody;
                 //stars - extraStarChance % chance
-                if (currentPrimary.Primary == null && IsRareRoll(extraStarChance)) {
+                if (currentPrimary.Primary == null && IsRare(extraStarChance)) {
                     newBody = currentPrimary.GetType() == typeof(Star) ? new Star(currentPrimary, PickRandomStarType(((Star)currentPrimary).StarClass)) : new Star(currentPrimary, PickRandomStarType());
                     stats.starCount += 1;
                 }
@@ -294,7 +302,7 @@ namespace Code._Galaxy {
             if (systemSize < stats.smallestSystem) {
                 stats.smallestSystem = systemSize;
             }
-            
+
             string systemName = potentialSystemNames[Rng.Next(potentialSystemNames.Count)];
             potentialSystemNames.Remove(systemName);
 

@@ -104,6 +104,7 @@ namespace Code._Ships.Controllers {
 
         private void RespawnGUI() {
             GameController.GUIController.SetShipGUIActive(false);
+            GameController.IsPaused = true;
             Instantiate((GameObject)Resources.Load("GUIPrefabs/Ship/ShipDestroyedGUI"));
         }
     }

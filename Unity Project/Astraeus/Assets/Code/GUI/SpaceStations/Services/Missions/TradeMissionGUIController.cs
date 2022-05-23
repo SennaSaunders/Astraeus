@@ -133,12 +133,12 @@ namespace Code.GUI.SpaceStations.Services.Missions {
         }
 
         private void MissionComplete() {
+            _tradeMission.GiveReward();
             GameObjectHelper.FindChild(_guiGameObject, "MissionCompletePanel").SetActive(true);
             GameObjectHelper.FindChild(_guiGameObject, "MainPanel").SetActive(false);
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "CompleteRewardMsg", "Earned - "+ _tradeMission.RewardCredits+"Cr");
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditBalanceMsg", "Credits - "+ GameController.PlayerProfile._credits+"Cr");
-            _tradeMission.GiveReward();
-            Debug.Log("Mission complete");
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CompleteRewardMsg", "Earned: "+ _tradeMission.RewardCredits+"Cr");
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditBalanceMsg", "Credits: "+ GameController.PlayerProfile._credits+"Cr");
+            _missionGUIController.SetCreditsValue();
             GameController.PlayerProfile.Missions.Remove(_tradeMission);
             _missionGUIController.RemoveTradeMission(this);
             Destroy(_guiGameObject, 3);

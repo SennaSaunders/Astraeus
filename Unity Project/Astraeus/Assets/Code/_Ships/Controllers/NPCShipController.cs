@@ -1,4 +1,5 @@
 ﻿using System;
+using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.ExternalComponents.Weapons;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
@@ -14,9 +15,12 @@ namespace Code._Ships.Controllers {
         private Transform _shipTransform;
         public ShipController currentTarget;
         private NPCItineraryController _npcItineraryController;
+        public const float CruisingSpeed = ThrusterController.MaxSpeed/2;
+        public float SpeedLimit { get; set; }
 
         public override void Setup(Ship ship) {
             base.Setup(ship);
+            SpeedLimit = CruisingSpeed;
             _shipTransform = transform;
             _npcItineraryController = gameObject.AddComponent<NPCItineraryController>();
         }
@@ -85,20 +89,28 @@ namespace Code._Ships.Controllers {
             Quaternion shipRotation = Quaternion.Euler(0, 0, -_shipTransform.rotation.eulerAngles.z);
 
             Vector2 shipRelV = shipRotation * velocity;
-            Vector2 slowDownVec = shipRelV / 2 * ThrusterController.GetAcceleration();
-            
+            Vector2 thrustVec;
             Vector2 currentPosition = transform.position;
             Vector2 distanceToDest = destination - currentPosition;
-            Vector2 shipRotatedDistToDest = shipRotation * distanceToDest;
-            Vector2 distVDelta = shipRotatedDistToDest - slowDownVec;
             float epsilon = .5f;
-            Vector2 thrustVec = new Vector2(Math.Abs(distVDelta.x) < epsilon ? 0 : distVDelta.x / Math.Abs(distVDelta.x), Math.Abs(distVDelta.y) < epsilon ? 0 : distVDelta.y / Math.Abs(distVDelta.y));
-
+            if (shipRelV.magnitude > SpeedLimit) {
+                //slow down ship to the correct speed
+                var scale = shipRelV.magnitude / SpeedLimit;
+                var correctedSpeed = shipRelV / scale;
+                var correctionVec = correctedSpeed - shipRelV;
+                thrustVec = new Vector2(Math.Abs(correctionVec.x) > 0 ? correctionVec.x / Math.Abs(correctionVec.x):0, Math.Abs(correctionVec.y) > 0?correctionVec.y / Math.Abs(correctionVec.y):0);
+            }
+            else {
+                Vector2 slowDownVec = shipRelV / 2 * ThrusterController.GetAcceleration();
+                Vector2 shipRotatedDistToDest = shipRotation * distanceToDest;
+                Vector2 distVDelta = shipRotatedDistToDest - slowDownVec;
+                
+                thrustVec = new Vector2(Math.Abs(distVDelta.x) < epsilon ? 0 : distVDelta.x / Math.Abs(distVDelta.x), Math.Abs(distVDelta.y) < epsilon ? 0 : distVDelta.y / Math.Abs(distVDelta.y));
+            }
+            
             _facingVector = distanceToDest;
-
             Debug.DrawLine(currentPosition, currentPosition + distanceToDest, Color.yellow);
             Debug.DrawLine(currentPosition, currentPosition + velocity, Color.red);
-
             return thrustVec;
         }
 

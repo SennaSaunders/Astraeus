@@ -21,10 +21,10 @@ namespace Code._Galaxy._Factions.FactionTypes {
         
         public static int GetTechnologyFactionCelestialBodyDesire(CelestialBody celestialBody) {
             List<(Type type, Body.BodyTier tier, int desire)> desiredTypes = new List<(Type type, Body.BodyTier tier, int desire)>() {
-                (typeof(BlackHole), 0, 30),
-                (typeof(Star),Body.BodyTier.T9, 20),
-                (typeof(Star), Body.BodyTier.T8, 15),
-                (typeof(Star),Body.BodyTier.T7, 10),
+                (typeof(BlackHole), 0, 50),
+                (typeof(Star),Body.BodyTier.T9, 40),
+                (typeof(Star), Body.BodyTier.T8, 30),
+                (typeof(Star),Body.BodyTier.T7, 20),
                 (typeof(EarthWorldGen), 0, 30),
                 (typeof(WaterWorldGen), 0,30)
             };

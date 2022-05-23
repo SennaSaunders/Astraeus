@@ -27,5 +27,13 @@
             }
             return noise;
         }
+
+        public static float[] GetNoise2D(int width, int height, int seed) {
+            FastNoise fastNoise = GetFastNoise();
+            float[] noise = new float[width * height];
+            float freq = 0.01f;
+            FastNoise.OutputMinMax minMax = fastNoise.GenUniformGrid2D(noise, 0,0,width, height, freq, seed);
+            return noise;
+        }
     }
 }

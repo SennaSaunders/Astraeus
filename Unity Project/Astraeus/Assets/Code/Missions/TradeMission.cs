@@ -11,27 +11,18 @@ using Code._GameControllers;
 
 namespace Code.Missions {
     public class TradeMission : Mission {
-        public TradeMission(SpaceStation missionPickupLocation, Faction missionGiver) : base(missionPickupLocation, missionGiver) {
-            SetMissionCargo();
-            SetDeliveryDestination(missionGiver);
-            CargoQuota = GetQuota();
-            RewardCredits = GetRewardCredits(Cargo);
+        public TradeMission(SpaceStation missionPickupLocation, Faction missionGiver, SpaceStation deliveryDestination, Commodity missionCargo, int cargoQuota, int rewardCredits) : base(missionPickupLocation, missionGiver) {
+            Destination = deliveryDestination;
+            Cargo = missionCargo;
+            CargoQuota = cargoQuota;
+            RewardCredits = rewardCredits;
         }
-
 
         public int CargoQuota { get; }
         public int SuppliedCargo { get; private set; }
         public int CargoDelivered { get; private set; }
-        public Commodity Cargo { get; private set; }
-        public SpaceStation Destination { get; private set; }
-
-
-        private void SetMissionCargo() {
-            TradeService tradeService = (TradeService)MissionPickupLocation.StationServices.Find(service => service.GetType() == typeof(TradeService));
-            List<(Type productType, int quantity, int price)> potentialProducts = tradeService.Products.Where(p => p.quantity > 0).ToList(); 
-            Type productType = potentialProducts[r.Next(potentialProducts.Count)].productType;
-            Cargo = (Commodity)Activator.CreateInstance(productType);
-        }
+        public Commodity Cargo { get; }
+        public SpaceStation Destination { get; }
 
         public bool PickupCargo(int qty) {
             if (qty <= GameController.PlayerShipController.CargoController.GetFreeCargoSpace()) {
@@ -65,63 +56,6 @@ namespace Code.Missions {
 
         private void DeliverCargo(int qty) {
             CargoDelivered += qty;
-        }
-
-        private int GetQuota() {
-            int playerCargoSpace = GameController.PlayerShipController.CargoController.GetMaxCargoSpace();
-            float maxMult = 1.5f;
-            int multiplesOf = 20;
-            int min = multiplesOf;
-            int quota = r.Next(min, (int)(playerCargoSpace * maxMult));
-            quota -= quota % multiplesOf;
-            return quota;
-        }
-
-        private int GetRewardCredits(Cargo cargo) {
-            TradeService tradeService = (TradeService)Destination.StationServices.Find(service => service.GetType() == typeof(TradeService));
-            var tradeProduct = tradeService.Products.Find(product => product.productType == cargo.GetType());
-            int cargoPrice = tradeProduct.price;
-            
-            return (CargoQuota) * (cargoPrice / 15 + 50);
-        }
-
-        private void SetDeliveryDestination(Faction faction) {
-            bool internalTrade = false;
-            float internalTradeChance = .5f;
-            //deliver within faction
-            if (faction.Systems.Count > 1) {
-                internalTrade = r.NextDouble() < internalTradeChance;
-            }
-
-            SolarSystem destinationSystem;
-
-            if (internalTrade) { //choose a destination that doesnt contain the mission giver location
-                List<SolarSystem> solarSystems = faction.Systems.Where(s => !s.Bodies.Contains(MissionPickupLocation)).ToList();
-                destinationSystem = solarSystems[r.Next(solarSystems.Count)];
-            }
-            else {
-                Faction.FactionType factionType = faction.factionType;
-                List<Faction> deliveryFactions = GameController.GalaxyController.GetFactions();
-                deliveryFactions.Remove(faction);
-                if (factionType == Faction.FactionType.Military) { //deliver to all types except military & pirate
-                    deliveryFactions = deliveryFactions.Where(f => f.factionType != Faction.FactionType.Military && f.factionType != Faction.FactionType.Pirate).ToList();
-                }
-                else if (faction.factionType == Faction.FactionType.Pirate) { //only deliver to other pirate factions
-                    deliveryFactions = deliveryFactions.Where(f => f.factionType == Faction.FactionType.Pirate).ToList();
-                }
-                else { //deliver to all except pirate
-                    deliveryFactions = deliveryFactions.Where(f => f.factionType != Faction.FactionType.Pirate).ToList();
-                }
-
-                Faction chosenFaction = deliveryFactions[r.Next(deliveryFactions.Count)]; //choose a random faction from the possible factions
-                destinationSystem = chosenFaction.Systems[r.Next(chosenFaction.Systems.Count)];
-            }
-
-            Destination = GetSystemSpaceStation(destinationSystem);
-        }
-
-        private SpaceStation GetSystemSpaceStation(SolarSystem solarSystem) {
-            return (SpaceStation)solarSystem.Bodies.Find(b => b.GetType() == typeof(SpaceStation));
         }
     }
 }

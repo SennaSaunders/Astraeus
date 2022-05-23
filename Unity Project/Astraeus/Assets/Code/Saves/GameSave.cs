@@ -9,15 +9,26 @@ namespace Code.Saves {
     public class GameSave :MonoBehaviour {
         //Galaxy Gen Params
         private string string1;
-        private string string2;
+        
         
         public void SaveGame() {
-            string1 = JsonConvert.SerializeObject(new Laser(ShipComponentTier.T1));
-            // string2 = JsonConvert.SerializeObject(typeof(ShieldHighCapacity));
+            Laser weapon = new Laser(ShipComponentTier.T1);
+            Debug.Log(weapon.FireDelay+"\n"+weapon.Damage+"\n"+weapon.ProjectileSpeed+"\n"+weapon.MaxTravelTime+"\n"+weapon.PowerDraw+"\n"+weapon.RotationSpeed+"\n"+weapon.ComponentName+"\n"+weapon.ComponentType+"\n"+weapon.ComponentSize+"\n"+weapon.ComponentMass+"\n"+weapon.ComponentPrice);
+            string1 = JsonConvert.SerializeObject(weapon,Formatting.Indented);
+            Debug.Log(string1);
         }
 
         public void LoadGame() {
-            Debug.Log((Laser)JsonConvert.DeserializeObject<Weapon>(string1));
+            var weapon = JsonConvert.DeserializeObject(string1);
+            if (weapon != null) {
+                
+                Debug.Log(weapon.GetType());
+                // Debug.Log(weapon.FireDelay+"\n"+weapon.Damage+"\n"+weapon.ProjectileSpeed+"\n"+weapon.MaxTravelTime+"\n"+weapon.PowerDraw+"\n"+weapon.RotationSpeed+"\n"+weapon.ComponentName+"\n"+weapon.ComponentType+"\n"+weapon.ComponentSize+"\n"+weapon.ComponentMass+"\n"+weapon.ComponentPrice);
+            }
+            else {
+                Debug.Log("failed");
+            }
+            
         }
 
         private void SavePlayerProfile() {

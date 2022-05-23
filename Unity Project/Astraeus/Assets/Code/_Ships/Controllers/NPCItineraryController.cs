@@ -2,6 +2,7 @@
 using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._GameControllers;
+using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using UnityEngine;
 using Random = System.Random;
 
@@ -24,7 +25,9 @@ namespace Code._Ships.Controllers {
         }
 
         private void Update() {
-            SetScheduleDestination();
+            if (!GameController.IsPaused) {
+                SetScheduleDestination();
+            }
         }
 
         private void SetScheduleDestination() {
@@ -44,7 +47,7 @@ namespace Code._Ships.Controllers {
         }
 
         private void ReachedDestination() {
-            float closeEnough = 5;
+            float closeEnough = 30;
             if (((Vector2)_npcShipController.transform.position - _npcShipController.destination).magnitude < closeEnough) {
                 _schedule.RemoveAt(0);
                 if (_schedule.Count > 0) {
@@ -54,16 +57,19 @@ namespace Code._Ships.Controllers {
         }
 
         private bool SetHostilesDestination() {
-            //check if hostiles still exist
-            for (int i = _npcShipController.hostiles.Count-1; i >= 0; i--) {
+            //check if hostiles still exist - remove if not
+            for (int i = _npcShipController.hostiles.Count - 1; i >= 0; i--) {
                 if (_npcShipController.hostiles[i].ShipObject == null) {
                     _npcShipController.hostiles.Remove(_npcShipController.hostiles[i]);
                 }
             }
+
             //check hostiles for which is closest
             if (_npcShipController.hostiles.Count > 0) {
+                _npcShipController.SpeedLimit = ThrusterController.MaxSpeed;//let npcs move full speed if hostiles are present
+
                 Ship closestHostile = _npcShipController.hostiles[0];
-                for (int i =1;i < _npcShipController.hostiles.Count;i++) {
+                for (int i = 1; i < _npcShipController.hostiles.Count; i++) {
                     var currentClosestDistance = (closestHostile.ShipObject.transform.position - transform.position).magnitude;
                     var currentDistance = (_npcShipController.hostiles[i].ShipObject.transform.position - transform.position).magnitude;
                     if (currentDistance < currentClosestDistance) {
@@ -71,10 +77,15 @@ namespace Code._Ships.Controllers {
                     }
                 }
 
+
                 //should change to be slightly away from the 
                 _npcShipController.destination = closestHostile.ShipObject.transform.position;
                 _npcShipController.currentTarget = closestHostile.ShipObject.GetComponent<ShipController>();
             }
+            else {
+                _npcShipController.SpeedLimit =NPCShipController.CruisingSpeed;//if no hostiles cruise at a slower speed
+            }
+
             return false;
         }
 
@@ -94,20 +105,20 @@ namespace Code._Ships.Controllers {
 
             Vector2 playerPos = GameController.CurrentShip.ShipObject.transform.position;
             Vector2 delta = playerPos - (Vector2)gameObject.transform.position;
-            _npcShipController.destination = Quaternion.Euler(0, 0, 180)*delta;
+            _npcShipController.destination = Quaternion.Euler(0, 0, 180) * delta;
         }
 
         private void SetSchedule() {
             Random r = new Random();
             int maxRoll = _solarSystem.Bodies.Count;
-            
+
             List<Body> bodySchedule = new List<Body>();
             if (maxRoll > 2) {
                 int scheduleLength = (int)(r.NextDouble() * _scheduleModifier * _baseScheduleLength + _baseScheduleLength);
                 bool hasFrequentStop = r.NextDouble() < _frequentStopChance;
                 if (hasFrequentStop) {
                     _frequentStop = _solarSystem.Bodies[r.Next(maxRoll)];
-                    
+
                     int stopsTillFrequent = 0;
                     while (bodySchedule.Count < scheduleLength) {
                         if (stopsTillFrequent == 0) {
@@ -116,7 +127,7 @@ namespace Code._Ships.Controllers {
                         }
                         else {
                             Body nextStop = _solarSystem.Bodies[r.Next(maxRoll)];
-                            if (nextStop != _frequentStop && nextStop!= bodySchedule[bodySchedule.Count-1]) {
+                            if (nextStop != _frequentStop && nextStop != bodySchedule[bodySchedule.Count - 1]) {
                                 bodySchedule.Add(nextStop);
                                 stopsTillFrequent--;
                             }

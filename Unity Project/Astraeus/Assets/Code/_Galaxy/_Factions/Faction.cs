@@ -457,12 +457,12 @@ namespace Code._Galaxy._Factions {
         }
 
         public static float GetFactionGrowthChance(this Faction.FactionType factionType) {
-            if (factionType == Faction.FactionType.Agriculture) return 0.5f;
-            if (factionType == Faction.FactionType.Commerce) return 0.6f;
-            if (factionType == Faction.FactionType.Industrial) return 0.5f;
-            if (factionType == Faction.FactionType.Military) return 0.75f;
-            if (factionType == Faction.FactionType.Pirate) return 0.3f;
-            if (factionType == Faction.FactionType.Technology) return 0.4f;
+            if (factionType == Faction.FactionType.Agriculture) return 0.7f;
+            if (factionType == Faction.FactionType.Commerce) return 0.8f;
+            if (factionType == Faction.FactionType.Industrial) return 0.7f;
+            if (factionType == Faction.FactionType.Military) return 0.7f;
+            if (factionType == Faction.FactionType.Pirate) return 0.4f;
+            if (factionType == Faction.FactionType.Technology) return 0.6f;
             return 0;
         }
 

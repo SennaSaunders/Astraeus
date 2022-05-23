@@ -90,7 +90,7 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
 
         private void ChangeShipMarkerHostile(GameObject shipObject) {
             GameObject shipMarker = GameObjectHelper.FindChild(shipObject, "ShipMarker");
-            shipMarker.GetComponent<Renderer>().material.color = Color.red;
+            shipMarker.GetComponent<SpriteRenderer>().color = Color.red;
         }
 
         private void OnCollisionEnter(Collision collision) {

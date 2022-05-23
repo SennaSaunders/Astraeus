@@ -155,8 +155,7 @@ namespace Code._Ships.Controllers {
                 GameObjectHelper.FindChild(speedIndicator, "SpeedTxtValue").AddComponent<RotateToPlayer>();;
             }
 
-            
-            var speedArea = GameObjectHelper.FindChild(speedIndicator, "SpeedArea");
+            GameObject speedArea = GameObjectHelper.FindChild(speedIndicator, "SpeedArea");
             float velocityRotation = Vector2.SignedAngle(Vector2.up, ThrusterController.Velocity);
             speedArea.transform.rotation = Quaternion.Euler(0,0,velocityRotation);
             Vector2 speedBarMaxSize = speedArea.GetComponent<RectTransform>().sizeDelta;

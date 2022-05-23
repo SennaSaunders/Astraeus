@@ -38,7 +38,6 @@ namespace Code._GameControllers {
         private void Awake() {
             Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Projectile"), LayerMask.NameToLayer("LocalMap"));
             Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Projectile"), LayerMask.NameToLayer("Projectile"));
-            gameObject.AddComponent<StandaloneInputModule>();
             _playerShipContainer = new GameObject("Player Ship Container");
             SetupGameGUIController();
             ShipCreator = gameObject.AddComponent<ShipCreator>();

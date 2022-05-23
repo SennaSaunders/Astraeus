@@ -147,7 +147,7 @@ namespace Code.GUI.GalaxyGeneration {
         }
 
         private void InitialiseGameController() {
-            Destroy(GameObject.Find("EventSystem"));
+            // Destroy(GameObject.Find("EventSystem"));
             string gameControllerObjName = "GameController";
             GameObject gameControllerObj = new GameObject(gameControllerObjName) { tag = "GameController" };
             _gameController = gameControllerObj.AddComponent<GameController>();

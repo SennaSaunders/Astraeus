@@ -52,7 +52,7 @@ namespace Code._Galaxy._SolarSystem {
             for (int i = 0; i < SolarSystem.Bodies.Count; i++) {
                 if (SolarSystem.Bodies[i].GetType() == typeof(Planet)) {
                     Planet planet = (Planet)SolarSystem.Bodies[i];
-                    if (planet.PlanetGen.colors == null) {
+                    if (planet.PlanetGen.Colors == null) {
                         coloursGenerated = false;
                     }
 
@@ -223,7 +223,7 @@ namespace Code._Galaxy._SolarSystem {
                 if (body.GetType() == typeof(Star)) {
                     PlayerBodyProximity playerBodyProximity = bodyObject.AddComponent<PlayerBodyProximity>();
                     playerBodyProximity.Setup(KeyCode.Space, proximityGUIBase + "FuelScoopGUI");
-                    playerBodyProximity.SetProximityFunction(GetFuelScoopFunc(), (Star)body);
+                    playerBodyProximity.SetProximityFunction<Star>(delegate { GameController.PlayerShipController.CargoController.FuelScoop((Star)body);},(Star)body );
                 }
 
                 bodyHolders.Add(bodyHolder);
@@ -253,10 +253,6 @@ namespace Code._Galaxy._SolarSystem {
             }
 
             GameObject projectileHolder = new GameObject("ProjectileHolder");
-        }
-
-        private Action<Star> GetFuelScoopFunc() {
-            return GameController.PlayerShipController.CargoController.FuelScoop;
         }
     }
 }

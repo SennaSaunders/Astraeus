@@ -11,10 +11,10 @@ namespace Code.GUI.SpaceStations.Services.Missions {
     public class MissionGUIController : MonoBehaviour {
         private MissionService _missionService;
         public GameObject guiGameObject;
-        private static int numTradeMissions = 10;
+        private static readonly int NumTradeMissions = 10;
         private StationGUIController _stationGUIController;
-        GameObject availableContentView;
-        GameObject acceptedContentView;
+        private GameObject _availableContentView;
+        private GameObject _acceptedContentView;
         private List<TradeMissionGUIController> _acceptedTradeMissions = new List<TradeMissionGUIController>();
 
         public void SetupGUI(MissionService missionService, StationGUIController stationGUIController) {
@@ -22,11 +22,16 @@ namespace Code.GUI.SpaceStations.Services.Missions {
             _stationGUIController = stationGUIController;
             _stationGUIController.stationGUI.SetActive(false);
             guiGameObject = (GameObject)Instantiate(Resources.Load(_missionService.GUIPath));
-            availableContentView = GameObjectHelper.FindChild(guiGameObject, "AvailableMissionsContent");
-            acceptedContentView = GameObjectHelper.FindChild(guiGameObject, "AcceptedMissionsContent");
+            _availableContentView = GameObjectHelper.FindChild(guiGameObject, "AvailableMissionsContent");
+            _acceptedContentView = GameObjectHelper.FindChild(guiGameObject, "AcceptedMissionsContent");
             SetupExitBtn();
             GenerateAvailableMissions();
             DisplayAcceptedMissions();
+            SetCreditsValue();
+        }
+
+        public void SetCreditsValue() {
+            GameObjectHelper.SetGUITextValue(guiGameObject,"CreditsValue", GameController.PlayerProfile._credits + "Cr");
         }
 
         private void SetupExitBtn() {
@@ -41,11 +46,10 @@ namespace Code.GUI.SpaceStations.Services.Missions {
         }
 
         private void GenerateAvailableMissions() {
-            for (int i = 0; i < numTradeMissions; i++) {
+            for (int i = 0; i < NumTradeMissions; i++) {
                 TradeMission mission = _missionService.GenTradeMission();
-                GameObject contentView = GameObjectHelper.FindChild(guiGameObject, "AvailableMissionsContent");
-                TradeMissionGUIController tradeMissionGUIController = contentView.AddComponent<TradeMissionGUIController>();
-                tradeMissionGUIController.SetupAvailableGUI(contentView, mission, this);
+                TradeMissionGUIController tradeMissionGUIController = _availableContentView.AddComponent<TradeMissionGUIController>();
+                tradeMissionGUIController.SetupAvailableGUI(_availableContentView, mission, this);
             }
         }
 
@@ -57,9 +61,9 @@ namespace Code.GUI.SpaceStations.Services.Missions {
 
         public void AddAcceptedMission(Mission mission) {
             if (mission.GetType() == typeof(TradeMission)) {
-                TradeMissionGUIController tradeMissionGUIController = acceptedContentView.AddComponent<TradeMissionGUIController>();
+                TradeMissionGUIController tradeMissionGUIController = _acceptedContentView.AddComponent<TradeMissionGUIController>();
                 _acceptedTradeMissions.Add(tradeMissionGUIController);
-                tradeMissionGUIController.SetupAcceptedGUI(acceptedContentView, (TradeMission)mission, this);
+                tradeMissionGUIController.SetupAcceptedGUI(_acceptedContentView, (TradeMission)mission, this);
             }
         }
 
