@@ -61,12 +61,14 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
         private const float MsgTimeout = 3;
         private float _currentFeedbackTime;
         private Ship _ship;
+        private GameController _gameController;
 
         private void SetShipObjectHandler() {
             shipObjectHandler = _guiGameObject.AddComponent<ShipObjectHandler>();
         }
 
         public void StartOutfitting(OutfittingService outfittingService, GameObject previousGUI, Ship ship) {
+            _gameController = GameObjectHelper.GetGameController();
             CameraUtility.SolidSkybox(); //makes skybox black so the GUI looks cleaner 
             _outfittingService = outfittingService;
             _previousGUI = previousGUI;
@@ -186,7 +188,7 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
 
 
         private void SetCredits() {
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsValue", GameController.PlayerProfile._credits.ToString());
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsValue", _gameController.PlayerProfile._credits.ToString());
         }
 
         public void SetCreditsChange() {
@@ -274,13 +276,13 @@ namespace Code.GUI.SpaceStations.Services.Outfitting {
             priceChange += SetComponentBuyCards(_manThrusterSelectionMarkers, contentView);
             priceChange += SetComponentBuyCards(_internalSelectionMarkers, contentView);
 
-            GameObjectHelper.SetGUITextValue(_buyGUI, "CreditsValue", GameController.PlayerProfile._credits + "Cr");
+            GameObjectHelper.SetGUITextValue(_buyGUI, "CreditsValue", _gameController.PlayerProfile._credits + "Cr");
             GameObjectHelper.SetGUITextValue(_buyGUI, "PriceValue", priceChange + "Cr");
             GameObjectHelper.FindChild(_buyGUI, "BuyBtn").GetComponent<Button>().onClick.AddListener(delegate { ConfirmPurchase(priceChange); });
         }
 
         private void ConfirmPurchase(int price) {
-            if (GameController.PlayerProfile.AddCredits(-price)) {
+            if (_gameController.PlayerProfile.AddCredits(-price)) {
                 MsgActive("Purchase confirmed",Color.green);
                 Purchased();
                 CloseBuyGUI();

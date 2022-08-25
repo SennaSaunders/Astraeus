@@ -3,6 +3,7 @@ using Code._Galaxy._SolarSystem;
 using Code._Galaxy._SolarSystem._CelestialObjects;
 using Code._GameControllers;
 using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
+using Code._Utility;
 using UnityEngine;
 using Random = System.Random;
 
@@ -16,16 +17,18 @@ namespace Code._Ships.Controllers {
         private int _baseScheduleLength = 10;
         private float _scheduleModifier = .5f;
         public int _maxStopsBeforeFrequent = 3;
+        private GameController _gameController;
 
         private void Awake() {
-            _solarSystem = GameController.CurrentSolarSystem;
+            _gameController = GameObjectHelper.GetGameController();
+            _solarSystem = _gameController.CurrentSolarSystem;
             SetSchedule();
             _npcShipController = gameObject.GetComponent<NPCShipController>();
             _npcShipController.destination = _schedule[0];
         }
 
         private void Update() {
-            if (!GameController.IsPaused) {
+            if (!_gameController.IsPaused) {
                 SetScheduleDestination();
             }
         }
@@ -103,7 +106,7 @@ namespace Code._Ships.Controllers {
                 Destroy(gameObject);
             }
 
-            Vector2 playerPos = GameController.CurrentShip.ShipObject.transform.position;
+            Vector2 playerPos = _gameController.CurrentShip.ShipObject.transform.position;
             Vector2 delta = playerPos - (Vector2)gameObject.transform.position;
             _npcShipController.destination = Quaternion.Euler(0, 0, 180) * delta;
         }
@@ -166,7 +169,7 @@ namespace Code._Ships.Controllers {
             }
 
             foreach (Body body in bodySchedule) {
-                _schedule.Add(GameController.GalaxyController.activeSystemController.GetBodyGameObject(body).transform.position);
+                _schedule.Add(_gameController.GalaxyController.activeSystemController.GetBodyGameObject(body).transform.position);
             }
         }
     }

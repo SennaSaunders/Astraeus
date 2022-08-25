@@ -15,22 +15,22 @@ using UnityEngine.EventSystems;
 
 namespace Code._GameControllers {
     public class GameController : MonoBehaviour {
-        public static GalaxyController GalaxyController;
-        public static GameGUIController GUIController;
-        public static PlayerProfile PlayerProfile = new PlayerProfile();
-        public static SolarSystem CurrentSolarSystem;
-        public static SpaceStation CurrentStation;
-        public static bool IsPaused = true;
-        public static ShipCameraController shipCameraController;
-        public static Ship CurrentShip { get; set; }
-        public static bool InLocalMap { get; set; } = false;
+        public GalaxyController GalaxyController;
+        public GameGUIController GUIController;
+        public PlayerProfile PlayerProfile = new PlayerProfile();
+        public SolarSystem CurrentSolarSystem;
+        public SpaceStation CurrentStation;
+        public bool IsPaused = true;
+        public ShipCameraController shipCameraController;
+        public Ship CurrentShip { get; set; }
+        public bool InLocalMap { get; set; } = false;
 
         private GameObject _playerShipContainer;
-        public static PlayerShipController PlayerShipController;
+        public PlayerShipController PlayerShipController;
         public List<Ship> npcShips = new List<Ship>();
-        public static ShipCreator ShipCreator;
+        public ShipCreator ShipCreator;
 
-        public static int MinExclusionDistance, GalaxyWidth, GalaxyHeight;
+        public int MinExclusionDistance, GalaxyWidth, GalaxyHeight;
         public const int ShipZ = SolarSystemController.ZOffset - 100;
         public static LayerMask DefaultGameMask;
 
@@ -51,7 +51,7 @@ namespace Code._GameControllers {
             return mask;
         }
 
-        public static void ChangeSolarSystem(SolarSystemController solarSystemController, bool shipGUI) {
+        public void ChangeSolarSystem(SolarSystemController solarSystemController, bool shipGUI) {
             if (GalaxyController.activeSystemController != null) {
                 GalaxyController.activeSystemController.Active = false;
             }
@@ -62,7 +62,7 @@ namespace Code._GameControllers {
             GUIController.shipGUIController.SetSystemDetails();
         }
 
-        private static void SetShipToStation() {
+        private void SetShipToStation() {
             if (CurrentStation != null) {
                 Vector3 stationPos = GalaxyController.activeSystemController.GetBodyGameObject(CurrentStation).transform.position;
                 CurrentShip.ShipObject.transform.position = new Vector3(stationPos.x, stationPos.y, ShipZ);
@@ -70,7 +70,7 @@ namespace Code._GameControllers {
             }
         }
 
-        public static void SetShipToSystemOrigin() {
+        public void SetShipToSystemOrigin() {
             CurrentShip.ShipObject.transform.position = new Vector3(0, 0, ShipZ);
         }
 
@@ -104,7 +104,7 @@ namespace Code._GameControllers {
             SetupShipCamera();
         }
 
-        public static void StartGame() {
+        public void StartGame() {
             GUIController.SetupStationGUI(CurrentStation);
             SetShipToStation();
         }

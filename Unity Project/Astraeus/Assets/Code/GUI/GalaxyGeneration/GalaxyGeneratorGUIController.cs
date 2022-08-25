@@ -2,6 +2,7 @@
 using System.Threading;
 using Code._Galaxy;
 using Code._GameControllers;
+using Code._Utility;
 using Code.GUI.Loading;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,6 +22,7 @@ namespace Code.GUI.GalaxyGeneration {
         private bool _startedTextureGen;
 
         public void Start() {
+            InitialiseGameController();
             SetGUIGameObject();
             _generator = gameObject.AddComponent<GalaxyGenerator>();
             // if (!LoadPreviousGeneratorConfig()) LoadDefaultGeneratorConfig();
@@ -142,15 +144,17 @@ namespace Code.GUI.GalaxyGeneration {
 
         private void StartLoadingScreen() {
             _loadingScreenController = Instantiate((GameObject)Resources.Load("GUIPrefabs/LoadingGUI")).GetComponent<LoadingScreenController>();
-            _loadingScreenController.StartLoadingScreen("Generating Galaxy", GameController.StartGame);
+            _loadingScreenController.StartLoadingScreen("Generating Galaxy", GameObjectHelper.GetGameController().StartGame);
             Destroy(GameObject.Find("GUIHolder")); //removes visual elements of the GUI so that it doesn't cover the loading screen
         }
 
         private void InitialiseGameController() {
-            // Destroy(GameObject.Find("EventSystem"));
             string gameControllerObjName = "GameController";
             GameObject gameControllerObj = new GameObject(gameControllerObjName) { tag = "GameController" };
             _gameController = gameControllerObj.AddComponent<GameController>();
+        }
+
+        private void SetupGameController() {
             _gameController.Setup(_galaxy, _generator.systemExclusionDistance.Value, _generator.width.Value, _generator.height.Value, _loadingScreenController.GetComponent<LoadingScreenController>());
         }
 
@@ -170,7 +174,7 @@ namespace Code.GUI.GalaxyGeneration {
 
             if (_finishedGalaxyGen) {
                 Debug.Log("Initialising Game Controller");
-                InitialiseGameController();
+                SetupGameController();
                 Destroy(_guiGameObject);
             }
         }

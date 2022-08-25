@@ -22,9 +22,11 @@ namespace Code._Galaxy._SolarSystem {
         public int scrollRate = 500;
         public LayerMask tempMask;
         public float tempFarClip;
+        private GameController _gameController;
+
 
         private void SetupCamera() {
-            _shipCameraController = GameController.CurrentShip.ShipObject.GetComponent<ShipCameraController>();
+            _shipCameraController = _gameController.CurrentShip.ShipObject.GetComponent<ShipCameraController>();
             _shipCameraController.enabled = false;
 
             _camera = GameObject.FindWithTag("MainCamera").GetComponent<UnityEngine.Camera>();
@@ -34,7 +36,7 @@ namespace Code._Galaxy._SolarSystem {
             _camera.farClipPlane = 40000;
             tempMask = _camera.cullingMask;
             _camera.cullingMask = 64; //local map mask only
-            Vector3 shipPos = GameController.CurrentShip.ShipObject.transform.position;
+            Vector3 shipPos = _gameController.CurrentShip.ShipObject.transform.position;
             _camTransform.position = new Vector3(shipPos.x, shipPos.y, maxZoomIn);
         }
 
@@ -43,12 +45,13 @@ namespace Code._Galaxy._SolarSystem {
         }
 
         public void SetupGUI() {
+            _gameController = GameObjectHelper.GetGameController();
             _guiGameObject = Instantiate((GameObject)Resources.Load("GUIPrefabs/Map/LocalMapGUI"));
             SetupCamera();
             SetBounds();
             SetupKey();
             SetupExitButton();
-            GameController.GUIController.SetShipGUIActive(false);
+            _gameController.GUIController.SetShipGUIActive(false);
         }
 
         private void SetupKey() {
@@ -112,8 +115,8 @@ namespace Code._Galaxy._SolarSystem {
             _shipCameraController.enabled = true;
             _camera.farClipPlane = tempFarClip;
             _camera.cullingMask = tempMask;
-            GameController.GUIController.SetShipGUIActive(true);
-            GameController.InLocalMap = false;
+            _gameController.GUIController.SetShipGUIActive(true);
+            _gameController.InLocalMap = false;
             //destroy gui
             Destroy(_guiGameObject);
             Destroy(this);
@@ -125,8 +128,8 @@ namespace Code._Galaxy._SolarSystem {
             x2 = float.MinValue;
             y1 = float.MaxValue;
             y2 = float.MinValue;
-            foreach (Body body in GameController.GalaxyController.activeSystemController.SolarSystem.Bodies) {
-                var bodyPos = GameController.GalaxyController.activeSystemController.GetBodyGameObject(body).transform.position;
+            foreach (Body body in _gameController.GalaxyController.activeSystemController.SolarSystem.Bodies) {
+                var bodyPos = _gameController.GalaxyController.activeSystemController.GetBodyGameObject(body).transform.position;
                 float x = bodyPos.x;
                 float y = bodyPos.y;
                 x1 = x1 > x ? x : x1;

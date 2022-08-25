@@ -30,8 +30,10 @@ namespace Code.GUI.SpaceStations.Services {
         private TMP_Dropdown.OptionData thrusterGroup = new TMP_Dropdown.OptionData("Thrusters");
         private TMP_Dropdown.OptionData weaponGroup = new TMP_Dropdown.OptionData("Weapons");
         private TMP_Dropdown.OptionData _selectedGroup, _selectedType, _selectedChannel;
+        private GameController _gameController;
 
         public void SetupGUI(ShipObjectHandler shipObjectHandler, GameObject outfittingGUIGameObject, GameObject displayedShip) {
+            _gameController = GameObjectHelper.GetGameController();
             _shipObjectHandler = shipObjectHandler;
             _outfittingGUIGameObject = outfittingGUIGameObject;
             outfittingGUIGameObject.SetActive(false);
@@ -248,10 +250,10 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void GroupAllComponents() {
-            Hull hull = GameController.CurrentShip.ShipHull;
-            _hullMeshChannelMap = (GroupHullChannels(hull), GameController.CurrentShip.ShipHull);
-            _weaponsMeshChannelMap = GroupExternalChannels(GameController.CurrentShip.ShipHull.WeaponComponents.Select(wc => wc.concreteComponent).ToList());
-            _mainThrustersMeshChannelMap = GroupExternalChannels(GameController.CurrentShip.ShipHull.MainThrusterComponents.Select(c => c.concreteComponent).ToList());
+            Hull hull = _gameController.CurrentShip.ShipHull;
+            _hullMeshChannelMap = (GroupHullChannels(hull), _gameController.CurrentShip.ShipHull);
+            _weaponsMeshChannelMap = GroupExternalChannels(_gameController.CurrentShip.ShipHull.WeaponComponents.Select(wc => wc.concreteComponent).ToList());
+            _mainThrustersMeshChannelMap = GroupExternalChannels(_gameController.CurrentShip.ShipHull.MainThrusterComponents.Select(c => c.concreteComponent).ToList());
         }
 
         private List<(List<GameObject>, int channelIdx)> GroupMeshChannels(List<(GameObject mesh, int channelIdx)> meshObjects, List<Color> channelColours) {

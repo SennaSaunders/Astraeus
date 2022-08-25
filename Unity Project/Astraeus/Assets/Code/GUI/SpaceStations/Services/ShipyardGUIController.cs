@@ -26,7 +26,7 @@ namespace Code.GUI.SpaceStations.Services {
         private const float MsgTime = 3;
 
         private void Awake() {
-            _gameController = GameObject.Find("GameController").GetComponent<GameController>();
+            _gameController = GameObjectHelper.GetGameController();
         }
 
         private void Update() {
@@ -108,8 +108,8 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void SetupShipModelDisplay(Transform parent, Ship ship) {
-            GameController.ShipCreator.shipObjectHandler.ManagedShip = ship;
-            GameObject shipObject = GameController.ShipCreator.shipObjectHandler.CreateShip(parent);
+            _gameController.ShipCreator.shipObjectHandler.ManagedShip = ship;
+            GameObject shipObject = _gameController.ShipCreator.shipObjectHandler.CreateShip(parent);
             shipObject.transform.rotation = Quaternion.Euler(0, 0, -45);
             float scale = ship.ShipHull.ShipyardScale;
             shipObject.transform.localScale = new Vector3(scale, scale, scale);
@@ -182,7 +182,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void SetupOwnedShips() {
-            foreach (Ship ship in GameController.PlayerProfile.Ships) {
+            foreach (Ship ship in _gameController.PlayerProfile.Ships) {
                 AddOwnedShip(ship);
             }
         }
@@ -215,20 +215,20 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void SetCreditsValue() {
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsValue", GameController.PlayerProfile._credits + "Cr");
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsValue", _gameController.PlayerProfile._credits + "Cr");
         }
 
         private void SellShipBtnClick(Ship ship, GameObject shipPanel) {
-            if (GameController.CurrentShip == ship) {
+            if (_gameController.CurrentShip == ship) {
                 SetFeedbackMsg("Cannot sell active ship", Color.red);
             } else if (ShipStats.GetUsedCargoSpace(ship)>0) {
                 SetFeedbackMsg("Remove cargo from ship before sale", Color.red);
             }
             else {
                 int salePrice = ShipStats.GetShipValue(ship);
-                GameController.PlayerProfile.AddCredits(salePrice);
+                _gameController.PlayerProfile.AddCredits(salePrice);
                 SetCreditsValue();
-                GameController.PlayerProfile.Ships.Remove(ship);
+                _gameController.PlayerProfile.Ships.Remove(ship);
                 SetFeedbackMsg("Ship sold", Color.green);
                 Destroy(shipPanel);
             }
@@ -252,16 +252,16 @@ namespace Code.GUI.SpaceStations.Services {
         private void OutfittingBtnClick(Ship ship) {
             CameraUtility.ChangeCullingMask(GameController.DefaultGameMask);
             OutfittingGUIController outfittingGUIController = gameObject.AddComponent<OutfittingGUIController>();
-            OutfittingService outfittingService = (OutfittingService)GameController.GUIController.stationGUIController.FindStationService<OutfittingService>();
+            OutfittingService outfittingService = (OutfittingService)_gameController.GUIController.stationGUIController.FindStationService<OutfittingService>();
             outfittingGUIController.StartOutfitting(outfittingService, _guiGameObject, ship);
         }
 
         private void BuyBtnClick(Hull hull) {
             //check if there is enough money
-            if (GameController.PlayerProfile.AddCredits(-hull.HullPrice)) {
+            if (_gameController.PlayerProfile.AddCredits(-hull.HullPrice)) {
                 SetCreditsValue();
-                Ship ship = GameController.ShipCreator.CreateShipFromHull(hull);
-                GameController.PlayerProfile.Ships.Add(ship);
+                Ship ship = _gameController.ShipCreator.CreateShipFromHull(hull);
+                _gameController.PlayerProfile.Ships.Add(ship);
                 AddOwnedShip(ship);
                 SetFeedbackMsg("Ship purchased", Color.green);
             }
@@ -271,7 +271,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void SetActiveShipBtnClick(Ship ship) {
-            GameController.CurrentShip = ship;
+            _gameController.CurrentShip = ship;
         }
 
         private string GetTierCountString(List<(ShipComponentTier tier, int count)> tierCount) {

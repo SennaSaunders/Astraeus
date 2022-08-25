@@ -5,13 +5,17 @@ using Code._Cargo.ProductTypes.Ships;
 using Code._Galaxy._SolarSystem;
 using Code._GameControllers;
 using Code._Ships.ShipComponents.InternalComponents.Storage;
+using Code._Utility;
 
 namespace Code._Ships.ShipComponents.InternalComponents.JumpDrives {
     public class JumpDriveController {
         private List<JumpDrive> _jumpDrives;
         private CargoController _cargoController;
+        private GameController _gameController;
+
 
         public JumpDriveController(List<JumpDrive> jumpDrives, CargoController cargoController) {
+            _gameController = GameObjectHelper.GetGameController();
             _jumpDrives = jumpDrives;
             _cargoController = cargoController;
         }
@@ -27,7 +31,7 @@ namespace Code._Ships.ShipComponents.InternalComponents.JumpDrives {
         }
 
         private float GetJumpDistance(SolarSystem destination) {
-            return (GameController.GalaxyController.activeSystemController.SolarSystem.Coordinate - destination.Coordinate).magnitude;
+            return (_gameController.GalaxyController.activeSystemController.SolarSystem.Coordinate - destination.Coordinate).magnitude;
         }
 
         public float CalculateFuelEnergyUse(float distance) {

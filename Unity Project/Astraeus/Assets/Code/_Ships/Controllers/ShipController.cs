@@ -32,8 +32,10 @@ namespace Code._Ships.Controllers {
 
         public List<Ship> hostiles = new List<Ship>();
         public bool beingDestroyed = false;
+        private GameController _gameController;
 
         public virtual void Setup(Ship ship) {
+            _gameController = GameObjectHelper.GetGameController();
             _ship = ship;
             List<PowerPlant> powerPlants = new List<PowerPlant>();
             List<CargoBay> cargoBays = new List<CargoBay>();
@@ -98,7 +100,7 @@ namespace Code._Ships.Controllers {
         }
 
         private void Update() {
-            if (!GameController.IsPaused) {
+            if (!_gameController.IsPaused) {
                 Thrust();
                 Turn();
                 AimWeapons();
@@ -110,9 +112,9 @@ namespace Code._Ships.Controllers {
         }
 
         private void ScaleShipGUI() {
-            if (GameController.shipCameraController != null) {
-                _shipHealthGUI.transform.localScale = GameController.shipCameraController.zoomScaleVec;
-                speedIndicator.transform.localScale = GameController.shipCameraController.zoomScaleVec;
+            if (_gameController.shipCameraController != null) {
+                _shipHealthGUI.transform.localScale = _gameController.shipCameraController.zoomScaleVec;
+                speedIndicator.transform.localScale = _gameController.shipCameraController.zoomScaleVec;
             }
         }
 

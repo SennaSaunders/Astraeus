@@ -13,6 +13,7 @@ namespace Code.GUI.SpaceStations.Services {
         private const float ErrorTime = 3;
         private const int PricePerUnit = 5;
         private float _currentErrorTime;
+        private GameController _gameController;
 
         private void Update() {
             if (_currentErrorTime > 0) {
@@ -24,6 +25,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         public void StartRepairGUI(RepairService repairService, StationGUIController stationGUIController) {
+            _gameController = GameObjectHelper.GetGameController();
             _repairService = repairService;
             _stationGUIController = stationGUIController;
             SetupGUI();
@@ -54,8 +56,8 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private (float current, float max) GetHealthValues() {
-            float currentHealth = GameController.CurrentShip.ShipHull.CurrentHullStrength;
-            float maxHealth = GameController.CurrentShip.ShipHull.BaseHullStrength;
+            float currentHealth = _gameController.CurrentShip.ShipHull.CurrentHullStrength;
+            float maxHealth = _gameController.CurrentShip.ShipHull.BaseHullStrength;
             return (currentHealth, maxHealth);
         }
 
@@ -66,7 +68,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void SetCredits() {
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsValue", GameController.PlayerProfile._credits + "Cr");
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsValue", _gameController.PlayerProfile._credits + "Cr");
         }
 
         private void SetHealthText() {
@@ -87,9 +89,9 @@ namespace Code.GUI.SpaceStations.Services {
         private void RepairBtn() {
             (float current, float max) health = GetHealthValues();
             if (health.current < health.max) {
-                if (GameController.PlayerProfile.AddCredits(GetRepairCost())) {
-                    GameController.CurrentShip.ShipHull.CurrentHullStrength = GameController.CurrentShip.ShipHull.BaseHullStrength;
-                    GameController.CurrentShip.ShipHull.NotifyObservers();
+                if (_gameController.PlayerProfile.AddCredits(GetRepairCost())) {
+                    _gameController.CurrentShip.ShipHull.CurrentHullStrength = _gameController.CurrentShip.ShipHull.BaseHullStrength;
+                    _gameController.CurrentShip.ShipHull.NotifyObservers();
                     SetFeedbackMsg("Ship Repaired", Color.green);
                     Refresh();
                 }

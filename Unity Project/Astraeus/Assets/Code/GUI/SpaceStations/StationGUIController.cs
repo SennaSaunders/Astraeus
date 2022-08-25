@@ -33,9 +33,9 @@ namespace Code.GUI.SpaceStations {
             stationGUI = Instantiate((GameObject)Resources.Load(_stationGUIBasePath + _stationGUIPathSpecifier));
             WakeUp wakeUp = stationGUI.AddComponent<WakeUp>();
             wakeUp.wakeFunction = WakeUpFunc;
-            GameController.GUIController.SetShipGUIActive(false);
+            _gameController.GUIController.SetShipGUIActive(false);
 
-            GameController.IsPaused = true;
+            _gameController.IsPaused = true;
             SetupStationInfo();
             SetupButtons();
         }
@@ -49,7 +49,7 @@ namespace Code.GUI.SpaceStations {
         }
 
         private void SetupStationInfo() {
-            SolarSystem solarSystem = GameController.CurrentSolarSystem;
+            SolarSystem solarSystem = _gameController.CurrentSolarSystem;
             GameObjectHelper.SetGUITextValue(stationGUI, "StationName", solarSystem.SystemName + " Station");
             GameObjectHelper.SetGUITextValue(stationGUI, "FactionNameValue", solarSystem.OwnerFaction.GetFactionName());
             GameObjectHelper.SetGUITextValue(stationGUI, "FactionTypeValue", solarSystem.OwnerFaction.factionType.ToString());
@@ -94,8 +94,8 @@ namespace Code.GUI.SpaceStations {
         }
 
         private void Exit() {
-            GameController.IsPaused = false;
-            GameController.GUIController.SetShipGUIActive(true);
+            _gameController.IsPaused = false;
+            _gameController.GUIController.SetShipGUIActive(true);
             Destroy(stationGUI);
             Destroy(this);
         }
@@ -141,7 +141,7 @@ namespace Code.GUI.SpaceStations {
         private void OutfittingBtnClick() {
             OutfittingGUIController outfittingGUIController = gameObject.AddComponent<OutfittingGUIController>();
             OutfittingService outfittingService = (OutfittingService)FindStationService<OutfittingService>();
-            outfittingGUIController.StartOutfitting(outfittingService, stationGUI, GameController.CurrentShip);
+            outfittingGUIController.StartOutfitting(outfittingService, stationGUI, _gameController.CurrentShip);
         }
 
         private void RefuelBtnClick() {

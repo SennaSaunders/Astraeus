@@ -33,17 +33,17 @@ namespace Code._GameControllers {
                 Destroy(stationGUIController);
             }
 
-            GameController.CurrentStation = station;
+            _gameController.CurrentStation = station;
             SetShipGUIActive(false);
             stationGUIController = gameObject.AddComponent<StationGUIController>();
             stationGUIController.Setup(station, _gameController);
         }
 
         public void SetupGalaxyMap() {
-            GameController.IsPaused = true;
+            _gameController.IsPaused = true;
             GameObject mapHolder = new GameObject("Galaxy Map Holder");
             GalaxyMapGUIController galaxyMapGUIController = mapHolder.AddComponent<GalaxyMapGUIController>();
-            galaxyMapGUIController.Setup(null, GameController.GalaxyController.activeSystemController.SolarSystem, mapHolder);
+            galaxyMapGUIController.Setup(null, _gameController.GalaxyController.activeSystemController.SolarSystem, mapHolder);
         }
 
         public void SetShipGUIActive(bool on) {

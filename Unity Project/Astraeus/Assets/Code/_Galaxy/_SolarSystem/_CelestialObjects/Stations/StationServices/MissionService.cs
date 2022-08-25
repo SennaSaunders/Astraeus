@@ -5,17 +5,27 @@ using Code._Cargo;
 using Code._Cargo.ProductTypes.Commodity;
 using Code._Galaxy._Factions;
 using Code._GameControllers;
+using Code._Utility;
 using Code.Missions;
+using UnityEngine;
+using Random = System.Random;
 
 namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
     public class MissionService : StationService {
         private Faction _faction;
         private SpaceStation _spaceStation;
+        private GameController _gameController;
         private static Random r = new Random();
 
         public MissionService(Faction faction, SpaceStation spaceStation) {
             _faction = faction;
             _spaceStation = spaceStation;
+        }
+
+        private void GetGameController() {
+            if (_gameController == null) {
+                _gameController = GameObjectHelper.GetGameController();
+            }
         }
 
         protected override void SetGUIStrings() {
@@ -38,7 +48,8 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
         }
 
         private int GetQuota() {
-            int playerCargoSpace = GameController.PlayerShipController.CargoController.GetMaxCargoSpace();
+            GetGameController();
+            int playerCargoSpace = _gameController.PlayerShipController.CargoController.GetMaxCargoSpace();
             float maxMult = 1.5f;
             int multiplesOf = 20;
             int min = multiplesOf;
@@ -63,7 +74,8 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects.Stations.StationServices {
             }
             else {
                 Faction.FactionType factionType = faction.factionType;
-                List<Faction> deliveryFactions = GameController.GalaxyController.GetFactions();
+                GetGameController();
+                List<Faction> deliveryFactions = _gameController.GalaxyController.GetFactions();
                 deliveryFactions.Remove(faction);
                 if (factionType == Faction.FactionType.Military) { //deliver to all types except military & pirate
                     deliveryFactions = deliveryFactions.Where(f => f.factionType != Faction.FactionType.Military && f.factionType != Faction.FactionType.Pirate).ToList();

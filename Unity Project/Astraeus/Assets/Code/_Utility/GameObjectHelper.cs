@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using Code._GameControllers;
+using TMPro;
 using UnityEngine;
 
 namespace Code._Utility {
@@ -20,7 +21,11 @@ namespace Code._Utility {
 
             return null;
         }
-        
+
+        public static GameController GetGameController() {
+            return GameObject.FindWithTag("GameController").GetComponent<GameController>();
+        }
+
         public static void SetGUITextValue(GameObject parent, string gameObjectName, string text) {
             TextMeshProUGUI textObject = FindChild(parent, gameObjectName).GetComponent<TextMeshProUGUI>();
             textObject.text = text;

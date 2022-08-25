@@ -16,8 +16,10 @@ namespace Code.GUI.SpaceStations.Services.Missions {
         private GameObject _availableContentView;
         private GameObject _acceptedContentView;
         private List<TradeMissionGUIController> _acceptedTradeMissions = new List<TradeMissionGUIController>();
+        private GameController _gameController;
 
         public void SetupGUI(MissionService missionService, StationGUIController stationGUIController) {
+            _gameController = GameObjectHelper.GetGameController();
             _missionService = missionService;
             _stationGUIController = stationGUIController;
             _stationGUIController.stationGUI.SetActive(false);
@@ -31,7 +33,7 @@ namespace Code.GUI.SpaceStations.Services.Missions {
         }
 
         public void SetCreditsValue() {
-            GameObjectHelper.SetGUITextValue(guiGameObject,"CreditsValue", GameController.PlayerProfile._credits + "Cr");
+            GameObjectHelper.SetGUITextValue(guiGameObject,"CreditsValue", _gameController.PlayerProfile._credits + "Cr");
         }
 
         private void SetupExitBtn() {
@@ -54,7 +56,7 @@ namespace Code.GUI.SpaceStations.Services.Missions {
         }
 
         private void DisplayAcceptedMissions() {
-            foreach (Mission mission in GameController.PlayerProfile.Missions) {
+            foreach (Mission mission in _gameController.PlayerProfile.Missions) {
                 AddAcceptedMission(mission);
             }
         }

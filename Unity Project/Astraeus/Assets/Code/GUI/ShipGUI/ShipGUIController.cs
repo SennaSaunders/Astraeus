@@ -6,8 +6,10 @@ using UnityEngine.UI;
 namespace Code.GUI.ShipGUI {
     public class ShipGUIController : MonoBehaviour{
         public GameObject guiGameObject;
+        private GameController _gameController;
 
         private void Awake() {
+            _gameController = GameObjectHelper.GetGameController();
             SetupShipGUI();
         }
 
@@ -24,18 +26,18 @@ namespace Code.GUI.ShipGUI {
         }
 
         private void GalaxyMapBtnClick() {
-            GameController.IsPaused = true;
-            GameController.GUIController.SetupGalaxyMap();
+            _gameController.IsPaused = true;
+            _gameController.GUIController.SetupGalaxyMap();
         }
         
         private void LocalMapBtnClick() {
-            GameController.InLocalMap = true;
-            GameController.GUIController.SetupLocalMapGUI();
+            _gameController.InLocalMap = true;
+            _gameController.GUIController.SetupLocalMapGUI();
         }
 
         public void SetSystemDetails() {
-            GameObjectHelper.SetGUITextValue(guiGameObject, "SystemName",GameController.CurrentSolarSystem.SystemName);
-            GameObjectHelper.SetGUITextValue(guiGameObject, "FactionValue", GameController.CurrentSolarSystem.OwnerFaction == null ? "Unoccupied" : GameController.CurrentSolarSystem.OwnerFaction.GetFactionName());
+            GameObjectHelper.SetGUITextValue(guiGameObject, "SystemName",_gameController.CurrentSolarSystem.SystemName);
+            GameObjectHelper.SetGUITextValue(guiGameObject, "FactionValue", _gameController.CurrentSolarSystem.OwnerFaction == null ? "Unoccupied" : _gameController.CurrentSolarSystem.OwnerFaction.GetFactionName());
         }
     }
 }

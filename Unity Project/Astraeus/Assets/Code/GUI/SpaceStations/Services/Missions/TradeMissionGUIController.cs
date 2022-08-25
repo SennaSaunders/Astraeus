@@ -13,6 +13,7 @@ namespace Code.GUI.SpaceStations.Services.Missions {
         private GameObject _guiGameObject;
         private MissionGUIController _missionGUIController;
         private Slider _slider;
+        private GameController _gameController;
 
         private enum DeliveryLocationEnum {
             Pickup,
@@ -21,11 +22,11 @@ namespace Code.GUI.SpaceStations.Services.Missions {
         }
 
         private DeliveryLocationEnum LocationCheck() {
-            if (GameController.CurrentStation == _tradeMission.Destination) {
+            if (_gameController.CurrentStation == _tradeMission.Destination) {
                 return DeliveryLocationEnum.Destination;
             }
 
-            if (GameController.CurrentStation == _tradeMission.MissionPickupLocation) {
+            if (_gameController.CurrentStation == _tradeMission.MissionPickupLocation) {
                 return DeliveryLocationEnum.Pickup;
             }
 
@@ -33,6 +34,7 @@ namespace Code.GUI.SpaceStations.Services.Missions {
         }
 
         private void SetupBaseGUI(GameObject parent, TradeMission mission) {
+            _gameController = GameObjectHelper.GetGameController();
             _tradeMission = mission;
             _guiGameObject = (GameObject)Instantiate(Resources.Load(path), parent.transform);
             GameObjectHelper.FindChild(_guiGameObject, "MissionCompletePanel").SetActive(false);
@@ -48,7 +50,7 @@ namespace Code.GUI.SpaceStations.Services.Missions {
                 GameObjectHelper.SetGUITextValue(_guiGameObject, "PickupValue", _tradeMission.MissionPickupLocation.SolarSystem.SystemName + " Station");
                 GameObjectHelper.SetGUITextValue(_guiGameObject, "DestinationValue", _tradeMission.Destination.SolarSystem.SystemName + " Station");
                 
-                Vector2 currentSystemPos = GameController.GalaxyController.activeSystemController.SolarSystem.Coordinate;
+                Vector2 currentSystemPos = _gameController.GalaxyController.activeSystemController.SolarSystem.Coordinate;
                 string pickupDistString = (currentSystemPos - _tradeMission.MissionPickupLocation.SolarSystem.Coordinate).magnitude.ToString("0.0"); 
                 GameObjectHelper.SetGUITextValue(_guiGameObject, "PickupDistanceValue", pickupDistString + " LY");
                 string destDistString = (currentSystemPos - _tradeMission.Destination.SolarSystem.Coordinate).magnitude.ToString("0.0");
@@ -83,7 +85,7 @@ namespace Code.GUI.SpaceStations.Services.Missions {
         }
 
         private void AcceptMission(Mission mission) {
-            GameController.PlayerProfile.Missions.Add(mission);
+            _gameController.PlayerProfile.Missions.Add(mission);
             _missionGUIController.AddAcceptedMission(mission);
             Destroy(_guiGameObject);
             Destroy(this);
@@ -115,7 +117,7 @@ namespace Code.GUI.SpaceStations.Services.Missions {
             GameObjectHelper.FindChild(_guiGameObject, "AcceptPanel").SetActive(false);
             //setup slider
             int min = 0;
-            int cargoCount = GameController.PlayerShipController.CargoController.GetCargoOfType(_tradeMission.Cargo.GetType()).Count;
+            int cargoCount = _gameController.PlayerShipController.CargoController.GetCargoOfType(_tradeMission.Cargo.GetType()).Count;
             int cargoLeft = _tradeMission.CargoQuota - _tradeMission.CargoDelivered;
             int max = cargoCount < cargoLeft ? cargoCount : cargoLeft;
             _slider = SetupSlider(min, max);
@@ -137,9 +139,9 @@ namespace Code.GUI.SpaceStations.Services.Missions {
             GameObjectHelper.FindChild(_guiGameObject, "MissionCompletePanel").SetActive(true);
             GameObjectHelper.FindChild(_guiGameObject, "MainPanel").SetActive(false);
             GameObjectHelper.SetGUITextValue(_guiGameObject, "CompleteRewardMsg", "Earned: "+ _tradeMission.RewardCredits+"Cr");
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditBalanceMsg", "Credits: "+ GameController.PlayerProfile._credits+"Cr");
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditBalanceMsg", "Credits: "+ _gameController.PlayerProfile._credits+"Cr");
             _missionGUIController.SetCreditsValue();
-            GameController.PlayerProfile.Missions.Remove(_tradeMission);
+            _gameController.PlayerProfile.Missions.Remove(_tradeMission);
             _missionGUIController.RemoveTradeMission(this);
             Destroy(_guiGameObject, 3);
             Destroy(this,3);
@@ -150,7 +152,7 @@ namespace Code.GUI.SpaceStations.Services.Missions {
             GameObjectHelper.FindChild(_guiGameObject, "AcceptPanel").SetActive(false);
             //setup slider
             int min = 0;
-            int cargoSpace = GameController.PlayerShipController.CargoController.GetFreeCargoSpace();
+            int cargoSpace = _gameController.PlayerShipController.CargoController.GetFreeCargoSpace();
             int cargoLeft = _tradeMission.CargoQuota - _tradeMission.SuppliedCargo;
             int max = cargoSpace < cargoLeft ? cargoSpace : cargoLeft;
             _slider = SetupSlider(min, max);

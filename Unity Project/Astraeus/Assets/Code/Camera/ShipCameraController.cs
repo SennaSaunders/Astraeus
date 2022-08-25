@@ -1,4 +1,5 @@
 ﻿using Code._GameControllers;
+using Code._Utility;
 using UnityEngine;
 
 namespace Code.Camera {
@@ -14,8 +15,10 @@ namespace Code.Camera {
         
         private UnityEngine.Camera _miniMapCamera;
         private float _miniMapZ = -8000;
-        
+        private GameController _gameController;
+
         private void Awake() {
+            _gameController = GameObjectHelper.GetGameController();
             _mainCamera = UnityEngine.Camera.main;
             _minZ = GameController.ShipZ + _minZOffset;
             _maxZ = GameController.ShipZ + _maxZOffset;
@@ -56,7 +59,7 @@ namespace Code.Camera {
         }
 
         private void ControlZoom() {
-            if (!GameController.IsPaused) {
+            if (!_gameController.IsPaused) {
                 //change currentZ
                 float scrollDelta = Input.mouseScrollDelta.y;//positive == up == zoom in, negative == down == zoom out
                 if (scrollDelta != 0) {

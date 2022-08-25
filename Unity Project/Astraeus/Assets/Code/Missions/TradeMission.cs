@@ -25,13 +25,13 @@ namespace Code.Missions {
         public SpaceStation Destination { get; }
 
         public bool PickupCargo(int qty) {
-            if (qty <= GameController.PlayerShipController.CargoController.GetFreeCargoSpace()) {
+            if (qty <= _gameController.PlayerShipController.CargoController.GetFreeCargoSpace()) {
                 List<Cargo> cargos = new List<Cargo>();
                 for (int i = 0; i < qty; i++) {
                     cargos.Add(Cargo);
                 }
                 SuppliedCargo += cargos.Count;
-                GameController.PlayerShipController.CargoController.AddCargo(cargos);
+                _gameController.PlayerShipController.CargoController.AddCargo(cargos);
                 
                 return true;
             }
@@ -40,14 +40,14 @@ namespace Code.Missions {
         }
 
         public bool AttemptDelivery(int qty) {
-            List<Cargo> cargo = GameController.PlayerShipController.CargoController.GetCargoOfType(Cargo.GetType());
+            List<Cargo> cargo = _gameController.PlayerShipController.CargoController.GetCargoOfType(Cargo.GetType());
             while (cargo.Count > qty) {
                 cargo.RemoveAt(cargo.Count - 1);
             }
 
             if (cargo.Count > 0) {
                 DeliverCargo(cargo.Count);
-                GameController.PlayerShipController.CargoController.RemoveCargo(cargo);
+                _gameController.PlayerShipController.CargoController.RemoveCargo(cargo);
                 return true;
             }
 

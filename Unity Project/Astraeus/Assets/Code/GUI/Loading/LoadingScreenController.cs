@@ -9,8 +9,10 @@ namespace Code.GUI.Loading {
         private GameObject _loadingIcon;
         private UnityEngine.Camera _camera;
         private Action _loadedFunction;
+        private GameController _gameController;
 
-        private void Start() {
+        private void Awake() {
+            _gameController = GameObjectHelper.GetGameController();
             _loadingIcon = GameObject.Find("LoadingIcon");
         }
 
@@ -24,13 +26,13 @@ namespace Code.GUI.Loading {
         }
 
         public void StartLoadingScreen(string loadMsg, Action loadedFunction) {
-            GameController.IsPaused = true;
+            _gameController.IsPaused = true;
             if (loadedFunction != null) {
                 _loadedFunction = loadedFunction;
             }
 
-            if (GameController.GUIController != null) {
-                GameController.GUIController.SetShipGUIActive(false);
+            if (_gameController.GUIController != null) {
+                _gameController.GUIController.SetShipGUIActive(false);
             }
 
             CameraUtility.SolidSkybox();
@@ -42,7 +44,7 @@ namespace Code.GUI.Loading {
         public void FinishedLoading() {
             CameraUtility.ChangeCullingMask(GameController.DefaultGameMask);
             CameraUtility.NormalSkybox();
-            GameController.IsPaused = false;
+            _gameController.IsPaused = false;
             if (_loadedFunction != null) {
                 _loadedFunction.Invoke();
                 _loadedFunction = null;

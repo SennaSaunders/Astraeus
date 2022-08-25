@@ -9,6 +9,7 @@ using Code._Galaxy._SolarSystem._CelestialObjects.Star;
 using Code._Galaxy._SolarSystem._CelestialObjects.Stations;
 using Code._GameControllers;
 using Code._Ships.ShipComponents;
+using Code._Utility;
 using UnityEngine;
 
 namespace Code._Galaxy._SolarSystem {
@@ -24,6 +25,7 @@ namespace Code._Galaxy._SolarSystem {
         public bool Active { get; set; }
         private Thread _generationThread;
         private bool _shipGUI;
+        private GameController _gameController;
 
         private Thread GeneratePlanetColours(SolarSystem solarSystem) {
             Thread generationThread = new Thread(solarSystem.GenerateSolarSystemPlanetColours);
@@ -65,9 +67,12 @@ namespace Code._Galaxy._SolarSystem {
 
         public void DisplaySolarSystem(bool shipGUI) {
             _shipGUI = shipGUI;
+            if (_gameController == null) {
+                _gameController = GameObjectHelper.GetGameController();
+            }
             if (!TexturesGenerated()) {
                 if (!ColoursGenerated()) {
-                    GameController.GUIController.loadingScreenController.StartLoadingScreen("Generating Planet Textures", null);
+                    _gameController.GUIController.loadingScreenController.StartLoadingScreen("Generating Planet Textures", null);
                     _generationThread = GeneratePlanetColours(SolarSystem);
                 }
                 else {
@@ -83,8 +88,8 @@ namespace Code._Galaxy._SolarSystem {
         private void Display(bool shipGUI) {
             SetupSolarSystemHolder();
             DisplaySolarSystemObjects();
-            GameController.GUIController.loadingScreenController.FinishedLoading();
-            GameController.GUIController.SetShipGUIActive(shipGUI);
+            _gameController.GUIController.loadingScreenController.FinishedLoading();
+            _gameController.GUIController.SetShipGUIActive(shipGUI);
             _spawnTimer = timeTillSpawn;
             Active = true;
         }
@@ -98,7 +103,7 @@ namespace Code._Galaxy._SolarSystem {
                 }
             }
 
-            if (Active && !GameController.IsPaused) {
+            if (Active && !_gameController.IsPaused) {
                 SpawnShipsCheck();
             }
         }
@@ -135,11 +140,11 @@ namespace Code._Galaxy._SolarSystem {
                 bool spawnPirate = r.NextDouble() < pirateChance;
                 do {
                     if (spawnPirate) {
-                        var pirateFactions = GameController.GalaxyController._galaxy.Factions.Where(f => f.factionType == Faction.FactionType.Pirate).ToList();
+                        var pirateFactions = _gameController.GalaxyController._galaxy.Factions.Where(f => f.factionType == Faction.FactionType.Pirate).ToList();
                         faction = pirateFactions[r.Next(pirateFactions.Count)];
                     }
                     else {
-                        var factionsExcludingOwnerAndPirates = GameController.GalaxyController._galaxy.Factions.Where(f => f.factionType != Faction.FactionType.Pirate && f != SolarSystem.OwnerFaction).ToList();
+                        var factionsExcludingOwnerAndPirates = _gameController.GalaxyController._galaxy.Factions.Where(f => f.factionType != Faction.FactionType.Pirate && f != SolarSystem.OwnerFaction).ToList();
                         faction = factionsExcludingOwnerAndPirates[r.Next(factionsExcludingOwnerAndPirates.Count)];
                     }
                 } while (faction == SolarSystem.OwnerFaction);
@@ -150,7 +155,7 @@ namespace Code._Galaxy._SolarSystem {
             int numShipTiers = Enum.GetValues(typeof(ShipComponentTier)).Length;
             int tierRoll = r.Next(numShipTiers);
             if (spawns.Count > 0) {
-                GameObject.FindWithTag("GameController").GetComponent<GameController>().CreateNPC(faction, (ShipCreator.ShipClass)classRoll, (ShipComponentTier)tierRoll, (float)r.NextDouble(), spawns[r.Next(spawns.Count)].transform.position);
+                _gameController.CreateNPC(faction, (ShipCreator.ShipClass)classRoll, (ShipComponentTier)tierRoll, (float)r.NextDouble(), spawns[r.Next(spawns.Count)].transform.position);
             }
         }
 
@@ -217,13 +222,13 @@ namespace Code._Galaxy._SolarSystem {
                     bodyObject.transform.localPosition = new Vector3(0, 0, SpaceStationZ);
                     PlayerBodyProximity playerBodyProximity = bodyObject.AddComponent<PlayerBodyProximity>();
                     playerBodyProximity.Setup(KeyCode.F, proximityGUIBase + "EnterSpaceStationGUI");
-                    playerBodyProximity.SetProximityFunction<SpaceStation>(GameController.GUIController.SetupStationGUI, (SpaceStation)body);
+                    playerBodyProximity.SetProximityFunction<SpaceStation>(_gameController.GUIController.SetupStationGUI, (SpaceStation)body);
                 }
 
                 if (body.GetType() == typeof(Star)) {
                     PlayerBodyProximity playerBodyProximity = bodyObject.AddComponent<PlayerBodyProximity>();
                     playerBodyProximity.Setup(KeyCode.Space, proximityGUIBase + "FuelScoopGUI");
-                    playerBodyProximity.SetProximityFunction<Star>(delegate { GameController.PlayerShipController.CargoController.FuelScoop((Star)body);},(Star)body );
+                    playerBodyProximity.SetProximityFunction<Star>(delegate { _gameController.PlayerShipController.CargoController.FuelScoop((Star)body);},(Star)body );
                 }
 
                 bodyHolders.Add(bodyHolder);

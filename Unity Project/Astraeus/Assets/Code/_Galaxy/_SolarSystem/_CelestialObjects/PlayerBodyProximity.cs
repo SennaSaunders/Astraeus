@@ -1,5 +1,6 @@
 ﻿using System;
 using Code._GameControllers;
+using Code._Utility;
 using UnityEngine;
 
 namespace Code._Galaxy._SolarSystem._CelestialObjects {
@@ -10,8 +11,11 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects {
         private KeyCode _interactKey;
         private GameObject _interactGUI;
         private string _guiPath;
+        private GameController _gameController;
+
 
         public void Setup(KeyCode interactKey, string prefabPath) {
+            _gameController = GameObjectHelper.GetGameController();
             _interactKey = interactKey;
             _guiPath = prefabPath;
         }
@@ -21,13 +25,13 @@ namespace Code._Galaxy._SolarSystem._CelestialObjects {
         }
 
         private void ProximityCheck() {
-            if (!GameController.IsPaused) {
-                if (GameController.CurrentShip != null) {
-                    if (GameController.CurrentShip.ShipObject != null) {
-                        Vector2 distanceBetween = (Vector2)transform.position - (Vector2)GameController.CurrentShip.ShipObject.transform.position;
+            if (!_gameController.IsPaused) {
+                if (_gameController.CurrentShip != null) {
+                    if (_gameController.CurrentShip.ShipObject != null) {
+                        Vector2 distanceBetween = (Vector2)transform.position - (Vector2)_gameController.CurrentShip.ShipObject.transform.position;
                         if (distanceBetween.magnitude < _distance) {
                             if (_interactGUI == null) {
-                                _interactGUI = Instantiate((GameObject)Resources.Load(_guiPath), GameController.CurrentShip.ShipObject.transform);
+                                _interactGUI = Instantiate((GameObject)Resources.Load(_guiPath), _gameController.CurrentShip.ShipObject.transform);
                             }
                             if (Input.GetKey(_interactKey)) {
                                 _proximityFunction.DynamicInvoke(_param);

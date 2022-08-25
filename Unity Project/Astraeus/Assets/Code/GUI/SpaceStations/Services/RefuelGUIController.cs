@@ -21,8 +21,10 @@ namespace Code.GUI.SpaceStations.Services {
         private GameObject _notEnoughCreditsMsg;
         private float _creditMsgTime = 3;
         private float _creditMsgCountdown = 0;
+        private GameController _gameController;
 
         public void StartRefuelGUI(RefuelService refuelService, StationGUIController stationGUIController) {
+            _gameController = GameObjectHelper.GetGameController();
             _refuelService = refuelService;
             _stationGUIController = stationGUIController;
             SetupGUI();
@@ -42,7 +44,7 @@ namespace Code.GUI.SpaceStations.Services {
         private void SetupGUI() {
             _stationGUIController.stationGUI.SetActive(false);
             _guiGameObject = Instantiate((GameObject)Resources.Load(_refuelService.GUIPath));
-            _cargoController = GameController.CurrentShip.ShipObject.GetComponent<ShipController>().CargoController;
+            _cargoController = _gameController.CurrentShip.ShipObject.GetComponent<ShipController>().CargoController;
             _notEnoughCreditsMsg = GameObjectHelper.FindChild(_guiGameObject, "NotEnoughCredits");
             _notEnoughCreditsMsg.SetActive(false);
             SetupExitBtn();
@@ -87,7 +89,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void UpdateCredits() {
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsCurrentValue", GameController.PlayerProfile._credits.ToString());
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsCurrentValue", _gameController.PlayerProfile._credits.ToString());
             GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsChangeValue", GetChangeInFunds().ToString());
         }
 
@@ -106,7 +108,7 @@ namespace Code.GUI.SpaceStations.Services {
         private void PurchaseBtnClick() {
             int currentFuelUnits = _cargoController.GetCargoOfType(typeof(Fuel)).Count;
             int fuelChange = (int)_slider.value - currentFuelUnits;
-            if (GameController.PlayerProfile.AddCredits(GetChangeInFunds())) {
+            if (_gameController.PlayerProfile.AddCredits(GetChangeInFunds())) {
                 if (fuelChange > 0) {
                     List<Cargo> fuel = new List<Cargo>();
                     for (int i = 0; i < fuelChange; i++) {

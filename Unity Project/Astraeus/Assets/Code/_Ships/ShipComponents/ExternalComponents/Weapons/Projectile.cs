@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Code._GameControllers;
 using Code._Ships.Controllers;
@@ -13,6 +14,11 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
         private GameObject _shipObject;
         private Vector2 _velocity;
         private bool _needsRefresh = false;
+        private GameController _gameController;
+
+        public void Awake() {
+            _gameController = GameObjectHelper.GetGameController();
+        }
 
         public void Spawn(Weapon weapon, Vector2 shipVelocity, float damage, GameObject shipObject) {
             gameObject.layer = LayerMask.NameToLayer("Projectile");
@@ -34,7 +40,7 @@ namespace Code._Ships.ShipComponents.ExternalComponents.Weapons {
         }
 
         private void Update() {
-            if (GameController.IsPaused) {
+            if (_gameController.IsPaused) {
                 Rigidbody projectileRigidbody = gameObject.GetComponent<Rigidbody>();
                 if (!_needsRefresh) {
                     _velocity = projectileRigidbody.velocity;

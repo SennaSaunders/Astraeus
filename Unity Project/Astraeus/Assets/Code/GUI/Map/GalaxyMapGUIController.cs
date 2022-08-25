@@ -24,6 +24,7 @@ namespace Code.GUI.Map {
         private List<(SolarSystem pickup, List<TradeMission> missions)> _solarSystemTradePickup;
         private List<(SolarSystem destination, List<TradeMission> missions)> _solarSystemTradeDestination;
         private List<GameObject> _missionCircles = new List<GameObject>();
+        private GameController _gameController;
 
         public void Setup(GameObject previousGUI, SolarSystem solarSystem, GameObject holder) {
             _previousGUI = previousGUI;
@@ -32,9 +33,10 @@ namespace Code.GUI.Map {
             if (_previousGUI != null) {
                 _previousGUI.SetActive(false);
             }
-            GameController.GUIController.SetShipGUIActive(false);
-            _galaxyController = GameController.GalaxyController;
-            _jumpDriveController = GameController.CurrentShip.ShipObject.GetComponent<ShipController>().JumpDriveController;
+            _gameController = GameObjectHelper.GetGameController();
+            _gameController.GUIController.SetShipGUIActive(false);
+            _galaxyController = _gameController.GalaxyController;
+            _jumpDriveController = _gameController.CurrentShip.ShipObject.GetComponent<ShipController>().JumpDriveController;
             _camera = GameObject.FindWithTag("MainCamera").GetComponent<UnityEngine.Camera>();
             _galaxyCameraController = _camera.gameObject.GetComponent<GalaxyCameraController>();
             if (_galaxyCameraController == null) {
@@ -42,7 +44,7 @@ namespace Code.GUI.Map {
             }
 
             _galaxyCameraController.TakeCameraControl();
-            _galaxyCameraController.SetupCamera(GameController.GalaxyWidth, GameController.GalaxyHeight);
+            _galaxyCameraController.SetupCamera(_gameController.GalaxyWidth, _gameController.GalaxyHeight);
             CenterOnLocation(solarSystem);
             DrawJumpDistanceCircle();
             DrawMissionCircles();
@@ -65,7 +67,7 @@ namespace Code.GUI.Map {
         }
 
         private void Exit() {
-            GameController.CurrentShip.ShipObject.GetComponent<ShipCameraController>().TakeCameraControl();
+            _gameController.CurrentShip.ShipObject.GetComponent<ShipCameraController>().TakeCameraControl();
             Destroy(_jumpRangeCircle);
             Destroy(_circleHolder);
             Destroy(_guiGameObject);
@@ -77,8 +79,8 @@ namespace Code.GUI.Map {
         private void ExitBtn() {
             _camera.cullingMask = GameController.DefaultGameMask;
             if (_previousGUI == null) {
-                GameController.GUIController.SetShipGUIActive(true);
-                GameController.IsPaused = false;
+                _gameController.GUIController.SetShipGUIActive(true);
+                _gameController.IsPaused = false;
             }
             else {
                 _previousGUI.SetActive(true);
@@ -88,7 +90,7 @@ namespace Code.GUI.Map {
         }
 
         private void JumpExit() {
-            GameController.CurrentShip.ShipObject.GetComponent<ShipController>().ThrusterController.Velocity = new Vector2();
+            _gameController.CurrentShip.ShipObject.GetComponent<ShipController>().ThrusterController.Velocity = new Vector2();
             Destroy(GameObject.Find("ProjectileHolder"));
             Exit();
         }
@@ -113,7 +115,7 @@ namespace Code.GUI.Map {
         }
 
         private void DrawJumpDistanceCircle() {
-            float diameter = GameController.CurrentShip.ShipObject.GetComponent<ShipController>().JumpDriveController.GetMaxRange() * 2;
+            float diameter = _gameController.CurrentShip.ShipObject.GetComponent<ShipController>().JumpDriveController.GetMaxRange() * 2;
             Vector2 currentSystemPosition = _galaxyController.activeSystemController.SolarSystem.Coordinate;
             string circlePath = "GUIPrefabs/Map/Circle";
             DrawCircle(diameter, currentSystemPosition, Color.white, circlePath);
@@ -123,7 +125,7 @@ namespace Code.GUI.Map {
             //trade missions
             _solarSystemTradePickup = new List<(SolarSystem pickup, List<TradeMission> missions)>();
             _solarSystemTradeDestination = new List<(SolarSystem pickup, List<TradeMission> missions)>();
-            foreach (TradeMission mission in GameController.PlayerProfile.Missions.FindAll(m => m.GetType()==typeof(TradeMission)).ToList().Cast<TradeMission>()) {
+            foreach (TradeMission mission in _gameController.PlayerProfile.Missions.FindAll(m => m.GetType()==typeof(TradeMission)).ToList().Cast<TradeMission>()) {
                 (SolarSystem pickup, List<TradeMission> missions) pickupMap = _solarSystemTradePickup.Find(s => s.pickup ==mission.MissionPickupLocation.SolarSystem);
                 (SolarSystem destination, List<TradeMission> missions) destinationMap = _solarSystemTradeDestination.Find(s => s.destination ==mission.Destination.SolarSystem);
                 if (pickupMap.pickup==null) {
@@ -200,8 +202,8 @@ namespace Code.GUI.Map {
             FindObjectOfType<GameController>().ClearNPCs();
             Debug.Log("Jumping");
             _jumpDriveController.Jump(GetJumpDistance());
-            GameController.ChangeSolarSystem(_selectedSystem, true);
-            GameController.SetShipToSystemOrigin();
+            _gameController.ChangeSolarSystem(_selectedSystem, true);
+            _gameController.SetShipToSystemOrigin();
             JumpExit();
         }
 

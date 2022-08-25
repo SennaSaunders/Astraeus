@@ -29,8 +29,10 @@ namespace Code.GUI.SpaceStations.Services {
         private GameObject notEnoughCreditsMsg;
         private float creditMsgTime = 3;
         private float creditMsgCountdown = 0;
+        private GameController _gameController;
 
         public void StartTradeGUI(TradeService tradeService, StationGUIController stationGUIController) {
+            _gameController = GameObjectHelper.GetGameController();
             _tradeService = tradeService;
             _stationGUIController = stationGUIController;
             SetupGUI();
@@ -50,7 +52,7 @@ namespace Code.GUI.SpaceStations.Services {
         private void SetupGUI() {
             _stationGUIController.stationGUI.SetActive(false);
             _guiGameObject = Instantiate((GameObject)Resources.Load(_tradeService.GUIPath));
-            _cargoController = GameController.CurrentShip.ShipObject.GetComponent<ShipController>().CargoController;
+            _cargoController = _gameController.CurrentShip.ShipObject.GetComponent<ShipController>().CargoController;
             notEnoughCreditsMsg = GameObjectHelper.FindChild(_guiGameObject, "NotEnoughCredits");
             notEnoughCreditsMsg.SetActive(false);
             SetupButtons();
@@ -74,7 +76,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void UpdateCredits() {
-            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsCurrentValue", GameController.PlayerProfile._credits.ToString());
+            GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsCurrentValue", _gameController.PlayerProfile._credits.ToString());
             GameObjectHelper.SetGUITextValue(_guiGameObject, "CreditsChangeValue", GetChangeInFunds().ToString());
         }
 
@@ -197,7 +199,7 @@ namespace Code.GUI.SpaceStations.Services {
         }
 
         private void PurchaseBtnClick() {
-            if (GameController.PlayerProfile.AddCredits(GetChangeInFunds())) {
+            if (_gameController.PlayerProfile.AddCredits(GetChangeInFunds())) {
                 List<Cargo> newCargo = new List<Cargo>();
                 List<Cargo> cargoToSell = new List<Cargo>();
 
@@ -297,7 +299,8 @@ namespace Code.GUI.SpaceStations.Services {
                 int value = Int32.Parse(text);
                 value = value < 0 ? 0 : value > Product.quantity ? Product.quantity : value;//stops negative values && values larger than quantity of products
 
-                int freeCargoSpace = GameController.CurrentShip.ShipObject.GetComponent<ShipController>().CargoController.GetFreeCargoSpace();
+                // int freeCargoSpace = _gameController.CurrentShip.ShipObject.GetComponent<ShipController>().CargoController.GetFreeCargoSpace();
+                int freeCargoSpace = 0;
                 
                 //ensures cargo won't be overfilled when buying
                 if (!_isSellCard) {

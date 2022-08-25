@@ -5,7 +5,6 @@ using Code._Ships.ShipComponents.ExternalComponents.Thrusters;
 using Code._Ships.ShipComponents.InternalComponents;
 using Code.Camera;
 using Code.GUI.ObserverPattern;
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Code._Ships.Hulls {
@@ -33,15 +32,13 @@ namespace Code._Ships.Hulls {
         public int HullPrice { get; }
         public float CurrentHullStrength { get; set; }
         protected const string BaseHullPath = "Ships/Hulls/";
+        
         public List<(ShipComponentType componentType, ShipComponentTier maxSize, InternalComponent concreteComponent, string parentTransformName)> InternalComponents;
         public List<(ShipComponentType componentType, ShipComponentTier maxSize, Weapon concreteComponent, string parentTransformName)> WeaponComponents;
         public List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string parentTransformName, bool needsBracket)> MainThrusterComponents;
         public (ShipComponentType componentType, ShipComponentTier maxSize, ManoeuvringThruster concreteComponent, string selectionTransformName, List<string> parentTransformNames) ManoeuvringThrusterComponents;
         public List<List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string parentTransformName, bool needsBracket)>> TiedThrustersSets = new List<List<(ShipComponentType componentType, ShipComponentTier maxSize, MainThruster concreteComponent, string parentTransformName, bool needsBracket)>>();
-
-        [JsonIgnore]
         public List<(GameObject mesh, int channelIdx)> MeshObjects;
-        [JsonIgnore]
         public List<(List<string> objectName, Color colour)> ColourChannelObjectMap;
         private List<IItemObserver<float>> _observers = new List<IItemObserver<float>>();
 

@@ -9,7 +9,7 @@ namespace Code.GUI.ShipDestroyed {
         private GameController _gameController;
 
         private void Awake() {
-            _gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
+            _gameController = GameObjectHelper.GetGameController();
             SetupButtons();
         }
 
@@ -18,15 +18,15 @@ namespace Code.GUI.ShipDestroyed {
         }
 
         private void Respawn() {
-            if (GameController.CurrentStation.SolarSystem!= GameController.CurrentSolarSystem) {
-                GameController.ChangeSolarSystem(GameController.GalaxyController.GetSolarSystemController(GameController.CurrentStation.SolarSystem), false);
+            if (_gameController.CurrentStation.SolarSystem!= _gameController.CurrentSolarSystem) {
+                _gameController.ChangeSolarSystem(_gameController.GalaxyController.GetSolarSystemController(_gameController.CurrentStation.SolarSystem), false);
             }
             
-            Hull hull = GameController.CurrentShip.ShipHull;
-            GameController.CurrentShip.ShipHull.CurrentHullStrength = .5f * hull.BaseHullStrength;
-            GameController.PlayerShipController.ResetShields();
+            Hull hull = _gameController.CurrentShip.ShipHull;
+            _gameController.CurrentShip.ShipHull.CurrentHullStrength = .5f * hull.BaseHullStrength;
+            _gameController.PlayerShipController.ResetShields();
             _gameController.RefreshPlayerShip();
-            GameController.StartGame();
+            _gameController.StartGame();
             Destroy(gameObject);
         }
     }
