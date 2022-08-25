@@ -26,12 +26,12 @@ This process vastly speeds up the distribution of solar systems across the galax
 
 ## Customisation
 
-![Hull with different weapons and thrusters](/GitHubPageImgs/ShipCustomisation Screenshot.png?raw=true)
+![Hull with different weapons and thrusters](/GitHubPageImgs/ShipCustomisation.png?raw=true)
 
 It was important to display the potential for cosmetic and functional customisation of the player driven entities in the game - the space ships, as a demonstration of the ability to code dynamic, flexible and extensible systems.
 Ships and their components are easily swapped inside the outfitting section of a space station.
 Some components e.g. weapons/thrusters are limited to assignment in specific locations whereas internal slots can accommodate a range of different items.
 As an additional feature - colour customisation was added as a test of the flexibility of the systems responsible for displaying the ship models and physical components.
 
-![Example of a ship with different colour selections](/GitHubPageImgs/Ship Colours Screenshot.png?raw=true)
+![Example of a ship with different colour selections](/GitHubPageImgs/ShipColours.png?raw=true)
 
